@@ -48,4 +48,9 @@ public class FunctionDTO {
 	public String getDateUpdate() {
 		return dateUpdate;
 	}
+
+	@Override
+	public String toString() {
+		return "FunctionDTO [id=" + id + ", name=" + name + ", status=" + status + ", dateUpdate=" + dateUpdate + "]";
+	}
 }

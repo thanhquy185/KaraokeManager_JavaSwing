@@ -2,60 +2,66 @@ package DTO;
 
 public class RoomDTO {
 	// Properties
-	private String idRoom;
+	private String id;
 	private String name;
-	private String idRoomType;
-	private String status;
+	private String roomTypeId;
+	private Boolean status;
 	private String dateUpdate;
 
 	// Constructors
-	public RoomDTO(String idRoom, String name, String idRoomType, String status, String dateUpdate) {
+	public RoomDTO(String id, String name, String roomTypeId, Boolean status, String dateUpdate) {
 		super();
-		this.idRoom = idRoom;
+		this.id = id;
 		this.name = name;
-		this.idRoomType = idRoomType;
+		this.roomTypeId = roomTypeId;
 		this.status = status;
 		this.dateUpdate = dateUpdate;
 	}
 
 	// Setter - Getter
-	public String getIdRoom() {
-		return idRoom;
-	}
-
-	public void setIdRoom(String idRoom) {
-		this.idRoom = idRoom;
-	}
-
-	public String getName() {
-		return name;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getIdRoomType() {
-		return idRoomType;
+	public void setRoomTypeId(String roomTypeId) {
+		this.roomTypeId = roomTypeId;
 	}
 
-	public void setIdRoomType(String idRoomType) {
-		this.idRoomType = idRoomType;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
+	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public void setDateUpdate(String dateUpdate) {
+		this.dateUpdate = dateUpdate;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getRoomTypeId() {
+		return roomTypeId;
+	}
+
+	public Boolean getStatus() {
+		return status;
 	}
 
 	public String getDateUpdate() {
 		return dateUpdate;
 	}
 
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
+	@Override
+	public String toString() {
+		return "RoomDTO [id=" + id + ", name=" + name + ", roomTypeId=" + roomTypeId + ", status=" + status
+				+ ", dateUpdate=" + dateUpdate + "]";
 	}
 }

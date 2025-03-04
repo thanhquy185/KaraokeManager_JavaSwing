@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import org.jdesktop.swingx.JXDatePicker;
 
 import PL.CommonPL.CustomCornerDatePicker.CustomRoundedBorder;
+import PL.CommonPL.CustomTextField;
 
 public class Admin_InputTicketManagerPL extends JPanel {
 	// Các Component
@@ -56,6 +57,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 	private JButton filterResetButton;
 	private JPanel filterPanel;
 	// - Các Component của Data Panel
+	private JButton excelButton;
 	private JButton addButton;
 	private JButton updateButton;
 	private JTable tableData;
@@ -194,12 +196,12 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		numbersOfRowTextField.setBounds(832, 100, 293, 24);
 
 		// - Tuỳ chỉnh Filter Apply Button
-		filterApplyButton = CommonPL.getLastButtonForm("Lọc", Color.decode("#007bff"), Color.WHITE,
+		filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
 		filterApplyButton.setBounds(765, 130, 170, 40);
 
 		// - Tuỳ chỉnh Filter Reset Button
-		filterResetButton = CommonPL.getLastButtonForm("Đặt lại", Color.decode("#f44336"), Color.WHITE,
+		filterResetButton = CommonPL.getRoundedBorderButton(20, "Đặt lại", Color.decode("#f44336"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
 		filterResetButton.setBounds(955, 130, 170, 40);
 
@@ -232,17 +234,23 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		// <==================== ====================>
 
 		// <===== Cấu trúc Data Panel =====>
+		// - Tuỳ chỉnh Excel Button
+		excelButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+				CommonPL.getMiddlePathToShowIcon() + "excel-icon.png", "Excel", Color.BLACK, Color.decode("#4C8CFA"),
+				Color.BLACK, Color.decode("#4C8CFA"), CommonPL.getFontParagraphBold());
+		excelButton.setBounds(15, 15, 210, 40);
+
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
 				Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
-		addButton.setBounds(15, 15, 210, 40);
+		addButton.setBounds(240, 15, 210, 40);
 
 		// - Tuỳ chỉnh Update Button
 		updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK,
 				Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
-		updateButton.setBounds(240, 15, 210, 40);
+		updateButton.setBounds(465, 15, 210, 40);
 
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		tableData = CommonPL.createTableData(columns, widthColumns, datas, "input ticket manager");
@@ -254,6 +262,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		dataPanel.setLayout(null);
 		dataPanel.setBackground(Color.WHITE);
 		dataPanel.setBounds(30, 330, 1140, 485);
+		dataPanel.add(excelButton);
 		dataPanel.add(addButton);
 		dataPanel.add(updateButton);
 		dataPanel.add(tableScrollPane);
@@ -354,6 +363,92 @@ public class Admin_InputTicketManagerPL extends JPanel {
 	private int addURowSelected = -1;
 	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
 	private Boolean[] addUValueSelected = { null };
+
+	// Hàm hiện một Dialog cho phép thêm 1 nguyên liệu để nhập
+	private void showAddU() {
+		// <===== Các Component của Add U Block Panel =====>
+		// - Tuỳ chỉnh Add U Supplier Infor Label
+		addUSupllierInforLabel = CommonPL.getParagraphLabel("Nhà cung cấp", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addUSupllierInforLabel.setBounds(20, 10, 460, 40);
+
+		// - Tuỳ chỉnh Add U Supplier Infor ComboBox
+		String[] suppliersArray = { "Chọn Nhà cung cấp", "NCC0001 - Tiệm tạp hoá", "NCC0002 - Acecook" };
+		Vector<String> suppliersVector = CommonPL.getVectorHasValues(suppliersArray);
+		addUSupllierInforComboBox = CommonPL.CustomComboBox(suppliersVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
+				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+		addUSupllierInforComboBox.setBounds(20, 50, 460, 40);
+
+		// - Tuỳ chỉnh Add U Unit Infor Label
+		addUUnitInforLabel = CommonPL.getParagraphLabel("Nguyên liệu", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addUUnitInforLabel.setBounds(20, 100, 460, 40);
+
+		// - Tuỳ chỉnh Add U Unit Infor ComboBox
+		String[] unitsArray = { "Chọn Nguyên liệu", "NL0001 - Mì gói hảo hảo", "NL0002 - Trứng gà" };
+		Vector<String> unitsVector = CommonPL.getVectorHasValues(unitsArray);
+		addUUnitInforComboBox = CommonPL.CustomComboBox(unitsVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
+				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+		addUUnitInforComboBox.setBounds(20, 140, 460, 40);
+
+		// - Tuỳ chỉnh Add U Price Label
+		addUPriceInputLabel = CommonPL.getParagraphLabel("Giá nhập", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addUPriceInputLabel.setBounds(20, 190, 220, 40);
+
+		// - Tuỳ chỉnh Add U Price Text Field
+		addUPriceInputTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Giá nhập", Color.LIGHT_GRAY, Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addUPriceInputTextField.setBounds(20, 230, 220, 40);
+
+		// - Tuỳ chỉnh Add U Quantity Label
+		addUQuantityInputLabel = CommonPL.getParagraphLabel("Số lượng", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addUQuantityInputLabel.setBounds(260, 190, 220, 40);
+
+		// - Tuỳ chỉnh Add U Quantity Text Field
+		addUQuantityInputTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Số lượng", Color.LIGHT_GRAY,
+				Color.BLACK, CommonPL.getFontParagraphPlain());
+		addUQuantityInputTextField.setBounds(260, 230, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Button
+		addUButton = CommonPL.getButtonDefaultForm("Thêm", CommonPL.getFontParagraphBold());
+		addUButton.setBounds(20, 300, 460, 40);
+		SwingUtilities.invokeLater(() -> addUButton.requestFocusInWindow());
+
+		// - Tuỳ chỉnh Add U Block Panel
+		addUBlockPanel = new JPanel();
+		addUBlockPanel.setLayout(null);
+		addUBlockPanel.setBackground(Color.WHITE);
+		addUBlockPanel.setBounds(0, 0, 500, 390);
+		addUBlockPanel.add(addUSupllierInforLabel);
+		addUBlockPanel.add(addUSupllierInforComboBox);
+		addUBlockPanel.add(addUUnitInforLabel);
+		addUBlockPanel.add(addUUnitInforComboBox);
+		addUBlockPanel.add(addUPriceInputLabel);
+		addUBlockPanel.add(addUPriceInputTextField);
+		addUBlockPanel.add(addUQuantityInputLabel);
+		addUBlockPanel.add(addUQuantityInputTextField);
+		addUBlockPanel.add(addUButton);
+		// <==================== ====================>
+
+		// Định nghĩa tính chất cho Add U Dialog
+		addUDialog = new JDialog();
+		addUDialog.setTitle("Thêm Nguyên liệu");
+		addUDialog.setLayout(null);
+		addUDialog.setSize(500, 390);
+		addUDialog.setResizable(false);
+		addUDialog.setAutoRequestFocus(false);
+		addUDialog.setLocationRelativeTo(null);
+		addUDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//			addUDialog.addWindowListener(new WindowAdapter() {
+//				@Override
+//				public void windowDeactivated(WindowEvent e) {
+//					// Đóng Dialog khi mất focus (nhấn ngoài)
+//					addUDialog.dispose();
+//				}
+//			});
+		addUDialog.add(addUBlockPanel);
+		addUDialog.setModal(true);
+		addUDialog.setVisible(true);
+	}
 
 	// Hàm hiện một Dialog cho phép thêm hoặc sửa 1 phiếu nhập
 	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
@@ -537,7 +632,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		});
 
 		// - Tuỳ chỉnh Add Or Update Cost Label
-		addOrUpdateCostLabel = CommonPL.getParagraphLabel("Tổng tiền thanh toán", Color.BLACK,
+		addOrUpdateCostLabel = CommonPL.getParagraphLabel("Tổng tiền nhập (VNĐ)", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateCostLabel.setBounds(660, 140, 460, 40);
 
@@ -561,36 +656,40 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		addOrUpdateStatusTextField.setBackground(Color.decode("#dedede"));
 
 		// - Tuỳ chỉnh Add Or Update Complete Button
-		addOrUpdateCompleteButton = CommonPL.getLastButtonForm("Đã hoàn thành", Color.decode("#33CC00"), Color.WHITE,
-				CommonPL.getFontParagraphBold());
+		addOrUpdateCompleteButton = CommonPL.getRoundedBorderButton(20, "Đã hoàn thành", Color.decode("#33CC00"),
+				Color.WHITE, CommonPL.getFontParagraphBold());
 		addOrUpdateCompleteButton.setBounds(900, 540, 220, 40);
 		addOrUpdateCompleteButton.setVisible(false);
 
 		// - Tuỳ chỉnh Add Or Update Not Pay Button
-		addOrUpdateNotPayButton = CommonPL.getLastButtonForm("Chưa thanh toán", Color.decode("#FFCC33"), Color.WHITE,
-				CommonPL.getFontParagraphBold());
+		addOrUpdateNotPayButton = CommonPL.getRoundedBorderButton(20, "Chưa thanh toán", Color.decode("#FFCC33"),
+				Color.WHITE, CommonPL.getFontParagraphBold());
 		addOrUpdateNotPayButton.setBounds(660, 540, 220, 40);
 		addOrUpdateNotPayButton.setVisible(false);
 
 		// - Tuỳ chỉnh Add Or Update Delete Button
-		addOrUpdateDeleteButton = CommonPL.getLastButtonForm("Đã huỷ phiếu", Color.decode("#EE0000"), Color.WHITE,
-				CommonPL.getFontParagraphBold());
+		addOrUpdateDeleteButton = CommonPL.getRoundedBorderButton(20, "Đã huỷ phiếu", Color.decode("#EE0000"),
+				Color.WHITE, CommonPL.getFontParagraphBold());
 		addOrUpdateDeleteButton.setBounds(900, 540, 220, 40);
 		addOrUpdateDeleteButton.setVisible(false);
 
 		// - Tuỳ chỉnh Add Or Update Button
-		addOrUpdateButton = CommonPL.getButtonDefaultForm(button, CommonPL.getFontParagraphBold());
+		addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button,
+				button == "Thêm" ? Color.decode("#699f4c") : Color.decode("#bf873e"), Color.WHITE,
+				CommonPL.getFontParagraphBold());
 		addOrUpdateButton.setBounds(660, 540, 460, 40);
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
-		if (button.equals("Thay đổi")) {
-			addOrUpdateButton.setVisible(false);
-		}
 
 		// Khi "Thay đổi" một Khách hàng
 		if (title.equals("Thay đổi Phiếu nhập") && button.equals("Thay đổi") && object.size() != 0) {
+			// - Ẩn nút thêm phiếu nhập
+			addOrUpdateButton.setVisible(false);
+
 			// - Gán dữ liệu là "Mã phiếu"
 			addOrUpdateIdTextField.setText((String) object.get(0));
 			addOrUpdateIdTextField.setEnabled(false);
+			addOrUpdateIdTextField.setCaretPosition(0);
+			((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
 			addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
 
 			// - Gán dữ liệu là "Ngày lập phiếu"
@@ -599,6 +698,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				addOrUpdateDateCreateDatePicker.setDate(date);
 				((JButton) addOrUpdateDateCreateDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
+				addOrUpdateDateCreateDatePicker.getEditor().setCaretPosition(0);
 				addOrUpdateDateCreateDatePicker.getEditor().setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
 				addOrUpdateDateCreateDatePicker.getEditor().setForeground(Color.BLACK);
 			} catch (ParseException e) {
@@ -611,6 +711,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				addOrUpdateDateContractDatePicker.setDate(date);
 				((JButton) addOrUpdateDateContractDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
+				addOrUpdateDateContractDatePicker.getEditor().setCaretPosition(0);
 				addOrUpdateDateContractDatePicker.getEditor()
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
 				addOrUpdateDateContractDatePicker.getEditor().setForeground(Color.BLACK);
@@ -620,19 +721,27 @@ public class Admin_InputTicketManagerPL extends JPanel {
 
 			// - Gán dữ liệu là "Nhân viên lập phiếu"
 			addOrUpdateIdEmployeeCreatedComboBox.setSelectedItem((String) object.get(3));
+			((JTextField) addOrUpdateIdEmployeeCreatedComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			addOrUpdateIdEmployeeCreatedComboBox.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Nhân viên nhận hàng"
 			addOrUpdateIdEmployeeGottenComboBox.setSelectedItem((String) object.get(4));
+			((JTextField) addOrUpdateIdEmployeeGottenComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			addOrUpdateIdEmployeeGottenComboBox.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Tổng tiền thanh toán"
 			addOrUpdateCostTextField.setText((String) object.get(5));
-			addOrUpdateCostTextField.setForeground(Color.BLACK);
+			addOrUpdateCostTextField.setEnabled(false);
+			addOrUpdateCostTextField.setCaretPosition(0);
+			((CustomTextField) addOrUpdateCostTextField).setBorderColor(Color.decode("#dedede"));
+			addOrUpdateCostTextField.setBackground(Color.decode("#dedede"));
 
 			// - Gán dữ liệu là "Trạng thái"
 			addOrUpdateStatusTextField.setText((String) object.get(6));
-			addOrUpdateStatusTextField.setForeground(Color.BLACK);
+			addOrUpdateStatusTextField.setEnabled(false);
+			addOrUpdateStatusTextField.setCaretPosition(0);
+			((CustomTextField) addOrUpdateStatusTextField).setBorderColor(Color.decode("#dedede"));
+			addOrUpdateStatusTextField.setBackground(Color.decode("#dedede"));
 			if (addOrUpdateStatusTextField.getText().equals("Đã hoàn thành")) {
 				addOrUpdateAddUnitButton.setVisible(false);
 				addOrUpdateDeleteUnitButton.setVisible(false);
@@ -721,89 +830,4 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		addOrUpdateDialog.setVisible(true);
 	}
 
-	// Hàm hiện một Dialog cho phép thêm 1 nguyên liệu để nhập
-	private void showAddU() {
-		// <===== Các Component của Add U Block Panel =====>
-		// - Tuỳ chỉnh Add U Supplier Infor Label
-		addUSupllierInforLabel = CommonPL.getParagraphLabel("Nhà cung cấp", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addUSupllierInforLabel.setBounds(20, 10, 460, 40);
-
-		// - Tuỳ chỉnh Add U Supplier Infor ComboBox
-		String[] suppliersArray = { "Chọn Nhà cung cấp", "NCC0001 - Tiệm tạp hoá", "NCC0002 - Acecook" };
-		Vector<String> suppliersVector = CommonPL.getVectorHasValues(suppliersArray);
-		addUSupllierInforComboBox = CommonPL.CustomComboBox(suppliersVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
-				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUSupllierInforComboBox.setBounds(20, 50, 460, 40);
-
-		// - Tuỳ chỉnh Add U Unit Infor Label
-		addUUnitInforLabel = CommonPL.getParagraphLabel("Nguyên liệu", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUUnitInforLabel.setBounds(20, 100, 460, 40);
-
-		// - Tuỳ chỉnh Add U Unit Infor ComboBox
-		String[] unitsArray = { "Chọn Nguyên liệu", "NL0001 - Mì gói hảo hảo", "NL0002 - Trứng gà" };
-		Vector<String> unitsVector = CommonPL.getVectorHasValues(unitsArray);
-		addUUnitInforComboBox = CommonPL.CustomComboBox(unitsVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
-				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUUnitInforComboBox.setBounds(20, 140, 460, 40);
-
-		// - Tuỳ chỉnh Add U Price Label
-		addUPriceInputLabel = CommonPL.getParagraphLabel("Giá nhập", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUPriceInputLabel.setBounds(20, 190, 220, 40);
-
-		// - Tuỳ chỉnh Add U Price Text Field
-		addUPriceInputTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Giá nhập", Color.LIGHT_GRAY, Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addUPriceInputTextField.setBounds(20, 230, 220, 40);
-
-		// - Tuỳ chỉnh Add U Quantity Label
-		addUQuantityInputLabel = CommonPL.getParagraphLabel("Số lượng", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUQuantityInputLabel.setBounds(260, 190, 220, 40);
-
-		// - Tuỳ chỉnh Add U Quantity Text Field
-		addUQuantityInputTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Số lượng", Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUQuantityInputTextField.setBounds(260, 230, 220, 40);
-
-		// - Tuỳ chỉnh Add Or Update Button
-		addUButton = CommonPL.getButtonDefaultForm("Thêm", CommonPL.getFontParagraphBold());
-		addUButton.setBounds(20, 300, 460, 40);
-		SwingUtilities.invokeLater(() -> addUButton.requestFocusInWindow());
-
-		// - Tuỳ chỉnh Add U Block Panel
-		addUBlockPanel = new JPanel();
-		addUBlockPanel.setLayout(null);
-		addUBlockPanel.setBackground(Color.WHITE);
-		addUBlockPanel.setBounds(0, 0, 500, 390);
-		addUBlockPanel.add(addUSupllierInforLabel);
-		addUBlockPanel.add(addUSupllierInforComboBox);
-		addUBlockPanel.add(addUUnitInforLabel);
-		addUBlockPanel.add(addUUnitInforComboBox);
-		addUBlockPanel.add(addUPriceInputLabel);
-		addUBlockPanel.add(addUPriceInputTextField);
-		addUBlockPanel.add(addUQuantityInputLabel);
-		addUBlockPanel.add(addUQuantityInputTextField);
-		addUBlockPanel.add(addUButton);
-		// <==================== ====================>
-
-		// Định nghĩa tính chất cho Add U Dialog
-		addUDialog = new JDialog();
-		addUDialog.setTitle("Thêm Nguyên liệu");
-		addUDialog.setLayout(null);
-		addUDialog.setSize(500, 390);
-		addUDialog.setResizable(false);
-		addUDialog.setAutoRequestFocus(false);
-		addUDialog.setLocationRelativeTo(null);
-		addUDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//		addUDialog.addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowDeactivated(WindowEvent e) {
-//				// Đóng Dialog khi mất focus (nhấn ngoài)
-//				addUDialog.dispose();
-//			}
-//		});
-		addUDialog.add(addUBlockPanel);
-		addUDialog.setModal(true);
-		addUDialog.setVisible(true);
-	}
 }

@@ -12,7 +12,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import BLL.FunctionBLL;
+import BLL.PrivilegeDetailBLL;
+import DTO.FunctionDTO;
+import DTO.PrivilegeDetailDTO;
+
 public class AdminMenuPL extends JPanel {
+	// Các đối tượng từ tầng BLL
+	private PrivilegeDetailBLL privilegeDetailBLL;
+	private FunctionBLL functionBLL;
 	// Các Font
 	private Font fontTitle = new Font("Arial", Font.BOLD, 28);
 	private Font fontSubTitle = new Font("Arial", Font.BOLD, 22);
@@ -39,13 +47,18 @@ public class AdminMenuPL extends JPanel {
 	private JButton employeeManagerButton;
 	private JButton calenderManagerButton;
 	private JButton historyManagerButton;
-	private JButton logoutManagerButton;
+	private JButton logoutButton;
 	private JPanel mainMenuPanel;
 
 	public AdminMenuPL() {
+		// <===== Các đối tượng từ tầng BLL =====>
+		privilegeDetailBLL = new PrivilegeDetailBLL();
+		functionBLL = new FunctionBLL();
+		// <==================== ====================>
+
 		// <===== Cấu trúc của Admin Label =====>
 		// - Tuỳ chỉnh Admin Label
-		adminLabel = CommonPL.getTitleLabel("QUẢN LÝ", colorForegroundInLeftMenu, fontTitle, SwingConstants.CENTER,
+		adminLabel = CommonPL.getTitleLabel("KARAOKE", colorForegroundInLeftMenu, fontTitle, SwingConstants.CENTER,
 				SwingConstants.CENTER);
 		adminLabel.setBounds(10, 0, 220, 64);
 
@@ -65,7 +78,7 @@ public class AdminMenuPL extends JPanel {
 
 		// - Tuỳ chỉnh Room Status Button
 		roomStatusManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "reload-icon.png", "Tình trạng phòng", colorBackgroundInLeftMenu,
+				CommonPL.getMiddlePathToShowIcon() + "karaoke-icon.png", "Phòng hát", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
 		roomStatusManagerButton.setBounds(0, 60, CommonPL.getLeftMenuWidth(), 60);
@@ -148,11 +161,11 @@ public class AdminMenuPL extends JPanel {
 //		historyManagerButton.setBounds(0, 600, CommonPL.getLeftMenuWidth(), 60);
 //
 //		// - Tuỳ chỉnh Account Manager Button
-		logoutManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
+		logoutButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
 				CommonPL.getMiddlePathToShowIcon() + "logout-icon.png", "Đăng xuất", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		logoutManagerButton.setBounds(0, 600, CommonPL.getLeftMenuWidth(), 60);
+		logoutButton.setBounds(0, 600, CommonPL.getLeftMenuWidth(), 60);
 
 		// - Tuỳ chỉnh Main Menu Panel
 		mainMenuPanel = new JPanel();
@@ -172,7 +185,7 @@ public class AdminMenuPL extends JPanel {
 //		mainMenuPanel.add(employeeManagerButton);
 //		mainMenuPanel.add(calenderManagerButton);
 //		mainMenuPanel.add(historyManagerButton);
-		mainMenuPanel.add(logoutManagerButton);
+		mainMenuPanel.add(logoutButton);
 		// <==================== ====================>
 
 		// Định nghĩa các tính chất cho Admin Menu PL
@@ -184,15 +197,8 @@ public class AdminMenuPL extends JPanel {
 		this.add(linePanel);
 		this.add(mainMenuPanel);
 
-		// Mặc định mục "Thống kê" sẽ được nhấn đầu tiên
-		dashboardManagerButton.getComponent(1).setForeground(colorForegroundHoverInLeftMenu);
-		MouseListener[] listeners = dashboardManagerButton.getMouseListeners();
-		for (MouseListener listener : listeners) {
-			dashboardManagerButton.removeMouseListener(listener);
-		}
-
 		// Thiết lập sự kiện cập nhật lại các mục theo chi tiết quyền
-		renderButtonsInMenu();
+//		renderButtonsInMenu();
 
 		// Thiết lập sự kiện khi nhấn vào các mục
 		menuButtonEvents();
@@ -206,8 +212,26 @@ public class AdminMenuPL extends JPanel {
 	// Hàm cập nhật lại các mục theo chi tiết quyền của Người dùng hiện tại
 	private void renderButtonsInMenu() {
 		// - Truy vấn chi tiết quyền của Người dùng hiện tại đang sử dụng
-		String privilegeDetail = "Thống kê,Tình trạng phòng,Đặt món,Thực đơn,Khuyến mãi,Khách hàng,Người dùng,Nhà cung cấp,Phiếu nhập,Nguyên liệu,Nhân viên,Lịch làm việc,Lịch sử ca";
-		String[] privilegeDetailSplit = privilegeDetail.split(",");
+		String[] joinPrivilegeDetail = null;
+		String conditionPrivilegeDetail = String.format("ChiTietQuyen.maNguoiDung = '%s'",
+				CommonPL.getAccountUsingApp().getId());
+		String orderPrivilegeDetail = null;
+		ArrayList<PrivilegeDetailDTO> privilegeDetailList = privilegeDetailBLL
+				.getAllPrivilegeDetailByCondition(joinPrivilegeDetail, conditionPrivilegeDetail, orderPrivilegeDetail);
+
+		String functionsStr = "";
+		for (PrivilegeDetailDTO privilegeDetailDTO : privilegeDetailList) {
+			if (privilegeDetailDTO.getStatus()) {
+				FunctionDTO functionDTO = functionBLL.getOneFunctionById(privilegeDetailDTO.getFunctionId());
+				functionsStr += "," + functionDTO.getName();
+			}
+		}
+		if (functionsStr.length() != 0)
+			functionsStr = functionsStr.substring(1);
+
+		// -
+		String functionsPattern = "Thống kê,Phòng hát,Đặt món,Thực đơn,Khuyến mãi,Khách hàng,Người dùng,Nhà cung cấp,Phiếu nhập,Nguyên liệu,Loại Phòng hát,Loại món ăn";
+		String[] functionsSplit = functionsPattern.split(",");
 
 		// - Lấy ra tất cả các JButton có ở Menu Panel và ẩn đi hết
 		ArrayList<JButton> buttonsInMainMenu = CommonPL.getAllButtons(mainMenuPanel);
@@ -219,23 +243,25 @@ public class AdminMenuPL extends JPanel {
 
 		// - Duyệt qua từng giá trị trong mảng rồi thêm mục tương ứng
 		int i = 0;
-		for (String privilege : privilegeDetailSplit) {
-			for (JButton button : buttons) {
-				String textInButton = ((JLabel) button.getComponent(1)).getText();
-				if (privilege.equals(textInButton)) {
-					button.setVisible(true);
-					button.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
-					i += 60;
+		for (String function : functionsSplit) {
+			if (functionsStr.contains(function)) {
+				for (JButton button : buttons) {
+					JLabel labelInButton = (JLabel) button.getComponent(1);
+					if (function.equals(labelInButton.getText())) {
+						button.setVisible(true);
+						button.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
+						i += 60;
+					}
 				}
 			}
 		}
 		// - Mặc định là 'Đăng xuất' luôn có và ở vị trí cuối cùng
-		logoutManagerButton.setVisible(true);
-		logoutManagerButton.setBounds(0, i, CommonPL.getLeftMenuWidth(), 54);
-		i += 54;
+		logoutButton.setVisible(true);
+		logoutButton.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
+		i += 60;
 
 		// - Cập nhật lại kích thước và vị trí của Menu Panel
-		mainMenuPanel.setBounds(0, (900 - i) / 2 + 8, CommonPL.getLeftMenuWidth(), i);
+		mainMenuPanel.setBounds(0, 115, CommonPL.getLeftMenuWidth(), i);
 	}
 
 	// Hàm thiết lập các sự kiện cho các nút ở menu trái
@@ -251,6 +277,7 @@ public class AdminMenuPL extends JPanel {
 			buttonClicked.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseClicked(MouseEvent evt) {
+					// Đối tượng chứa nút đã được nhấn
 					JLabel labelInButtonClicked = (JLabel) buttonClicked.getComponent(1);
 					if (labelInButtonClicked.getText().equals("Thống kê")) {
 						Admin_DashboardManagerPL dashboardManagerPL = new Admin_DashboardManagerPL();
@@ -258,8 +285,8 @@ public class AdminMenuPL extends JPanel {
 								CommonPL.getScreenHeightByOwner());
 						dashboardManagerPL.setBackground(colorBackgroundInMain);
 						AdminCardPL.getInstance().changeAdminMain(dashboardManagerPL);
-					} else if (labelInButtonClicked.getText().equals("Tình trạng phòng")) {
-						Admin_RoomStatusManagerPL roomStatusManagerPL = new Admin_RoomStatusManagerPL();
+					} else if (labelInButtonClicked.getText().equals("Phòng hát")) {
+						Admin_KaraokeRoomManagerPL roomStatusManagerPL = new Admin_KaraokeRoomManagerPL();
 						roomStatusManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
 								CommonPL.getScreenHeightByOwner());
 						roomStatusManagerPL.setBackground(colorBackgroundInMain);
@@ -312,6 +339,10 @@ public class AdminMenuPL extends JPanel {
 								CommonPL.getScreenHeightByOwner());
 						ingredientManagerPL.setBackground(colorBackgroundInMain);
 						AdminCardPL.getInstance().changeAdminMain(ingredientManagerPL);
+					} else if (labelInButtonClicked.getText().equals("Đăng xuất")) {
+						CommonPL.setAccountUsingApp(null);
+						LoginRegisterPL loginRegisterPL = new LoginRegisterPL();
+						FramePL.getInstance().changeFrameContent(loginRegisterPL);
 					}
 //					else if (labelInButtonClicked.getText().equals("Nhân viên")) {
 //						Admin_EmployeeManagerPL employeeManagerPL = new Admin_EmployeeManagerPL();

@@ -5,6 +5,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -30,6 +31,8 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -41,6 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -53,6 +57,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -79,6 +84,8 @@ import org.jdesktop.swingx.JXMonthView;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
+import DTO.AccountDTO;
+
 public class CommonPL {
 	// Kích thước màn hình tiêu chuẩn (dựa trên máy của Quy)
 	final private static int screenWidthByDevelopment = 1440;
@@ -95,33 +102,33 @@ public class CommonPL {
 	final private static int mainWidth = screenWidthByDevelopment - leftMenuWidth;
 	// Khoảng cách giữa các JPanel lớn trong Main
 	final private static int marginBetweenBigPanelsInMain = 30;
+	// Thông tin tài khoản hiện đang sử dụng phần mềm
+	private static AccountDTO accountUsingApp;
 	// Các Font
 	final private static Font fontTitle = new Font("Arial", Font.PLAIN, 34);
 	final private static Font fontParagraphBold = new Font("Arial", Font.BOLD, 20);
 	final private static Font fontParagraphPlain = new Font("Arial", Font.PLAIN, 20);
 	final private static Font fontQuestionIcon = new Font("Arial", Font.PLAIN, 14);
+	// Thông tin về ngày giờ hiện tại khi sử dụng phần mềm
+	final private static LocalDateTime currentDateTime = LocalDateTime.now();
+	final private static DateTimeFormatter datetimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+	final private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	final private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss");
+	final private static String currentDatetime = currentDateTime.format(datetimeFormatter);
+	final private static String currentDate = currentDateTime.format(dateFormatter);
+	final private static String currentTime = currentDateTime.format(timeFormatter);
 	// Định dạng ngôn ngữ và nội dung cho JXDatePicker
 	final private static Locale locale = new Locale("vi", "VN");
 	final private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", locale);
 	final private static SimpleDateFormat dateDetailFormat = new SimpleDateFormat("EEEE, yyyy-MM-dd", locale);
-	// Phần trăm khuyến mãi tiền viện phí khi một khách hàng có thẻ BHYT
-	final private static double discountPercent = 1;
 	// Map chứa các địa chỉ hợp lệ ở Việt Nam
 	final private static Multimap<String, Multimap<String, String>> addressInfo = LinkedHashMultimap.create();
-	// Map chứa các Nơi cấp hợp lệ ở Việt Nam
-	final private static Multimap<String, String> diplomaInfo = LinkedHashMultimap.create();
 	// Đường dẫn đến hình ảnh chứa icon (Đoạn giữa)
 	final private static String middlePathToShowIcon = System.getProperty("user.dir") + File.separator + "src"
 			+ File.separator + "Images" + File.separator + "Icons" + File.separator;
-	// Đường dẫn đến hình ảnh của Khách hàng (Đoạn giữa)
+	// Đường dẫn đến hình ảnh của Sản phẩm (Đoạn giữa)
 	final private static String middlePathToShowProductImage = System.getProperty("user.dir") + File.separator + "src"
 			+ File.separator + "Images" + File.separator + "Products" + File.separator;
-	// Đường dẫn đến hình ảnh của Nhân viên (Đoạn giữa)
-	final private static String middlePathToShowEmployeeAvatar = System.getProperty("user.dir") + File.separator + "src"
-			+ File.separator + "Images" + File.separator + "Avatars" + File.separator + "Employees" + File.separator;
-	// Đường dẫn đến hình ảnh của Khách hàng (Đoạn giữa)
-	final private static String middlePathToShowMedicineAvatar = System.getProperty("user.dir") + File.separator + "src"
-			+ File.separator + "Images" + File.separator + "Avatars" + File.separator + "Medicines" + File.separator;
 
 	// Hàm lấy kích thước màn hình máy khác
 	public static int getScreenWidthByOwner() {
@@ -156,6 +163,46 @@ public class CommonPL {
 		return CommonPL.marginBetweenBigPanelsInMain;
 	}
 
+	// Hàm gán giá trị thông tin tài khoản đang sử dụng phần mềm
+	public static void setAccountUsingApp(AccountDTO accountDTO) {
+		CommonPL.accountUsingApp = accountDTO;
+	}
+
+	// Hàm lấy ra thông tin tài khoản đang sử dụng phần mềm
+	public static AccountDTO getAccountUsingApp() {
+		return CommonPL.accountUsingApp;
+	}
+
+	// Hàm lấy ra ngày giờ hiện tại
+	public static String getCurrentDatetime() {
+		return CommonPL.currentDatetime;
+	}
+
+	// Hàm lấy ra ngày hiện tại
+	public static String getCurrentDate() {
+		return CommonPL.currentDate;
+	}
+
+	// Hàm lấy ra giờ hiện tại
+	public static String getCurrentTime() {
+		return CommonPL.currentTime;
+	}
+
+	// Hàm lấy ra Locale
+	public static Locale getLocale() {
+		return CommonPL.locale;
+	}
+
+	// Hàm lấy ra Date Format
+	public static SimpleDateFormat getDateFormat() {
+		return CommonPL.dateFormat;
+	}
+
+	// Hàm lấy ra Date Detail Format
+	public static SimpleDateFormat getDateDetailFormat() {
+		return CommonPL.dateDetailFormat;
+	}
+
 	// Hàm lấy ra kích cỡ chữ tiêu đề ở Main Menu
 	public static Font getFontTitle() {
 		return CommonPL.fontTitle;
@@ -176,34 +223,9 @@ public class CommonPL {
 		return CommonPL.fontQuestionIcon;
 	}
 
-	// Hàm lấy ra Locale
-	public static Locale getLocale() {
-		return CommonPL.locale;
-	}
-
-	// Hàm lấy ra Date Format
-	public static SimpleDateFormat getDateFormat() {
-		return CommonPL.dateFormat;
-	}
-
-	// Hàm lấy ra Date Detail Format
-	public static SimpleDateFormat getDateDetailFormat() {
-		return CommonPL.dateDetailFormat;
-	}
-
-	// Hàm lấy ra giá trị phần trăm khuyến mãi khi có mã BHYT
-	public static double getDiscountPercent() {
-		return CommonPL.discountPercent;
-	}
-
 	// Hàm lấy ra Address Info Map
 	public static Multimap<String, Multimap<String, String>> getAddressInfo() {
 		return CommonPL.addressInfo;
-	}
-
-	// Hàm lấy ra Diploma Info Map
-	public static Multimap<String, String> getDiplomaInfo() {
-		return CommonPL.diplomaInfo;
 	}
 
 	// Hàm lấy ra Middle Path To Show Icon
@@ -214,16 +236,6 @@ public class CommonPL {
 	// Hàm lấy ra Middle Path To Show Product Image
 	public static String getMiddlePathToShowProductImage() {
 		return CommonPL.middlePathToShowProductImage;
-	}
-
-	// Hàm lấy ra Middle Path To Show Icon
-	public static String getMiddlePathToShowEmployeeAvatar() {
-		return CommonPL.middlePathToShowEmployeeAvatar;
-	}
-
-	// Hàm lấy ra Middle Path To Show Icon
-	public static String getMiddlePathToShowMedicineAvatar() {
-		return CommonPL.middlePathToShowMedicineAvatar;
 	}
 
 	// Hàm chuyển từ tiền dạng số nguyên sang dạng chuỗi (VNĐ)
@@ -239,43 +251,97 @@ public class CommonPL {
 		return Long.parseLong(moneyFormat.replace(".", ""));
 	}
 
-	// Hàm tách địa chỉ từ 1 địa chỉ hợp lệ
-
-	// Thiết lập các địa chỉ cho Diploma Info khi chương trình chạy
-	public static void renderDiplomaInfo() {
-		File f = new File(System.getProperty("user.dir") + File.separator + "src" + File.separator + "Others"
-				+ File.separator + "DiplomaInfo.txt");
-		if (f.exists()) {
-			try {
-				FileReader fr = new FileReader(f);
-				BufferedReader br = new BufferedReader(fr);
-				while (true) {
-					try {
-						// Đọc để lấy dữ liệu của các địa chỉ từ file
-						String line = br.readLine();
-						if (line == null) {
-							break;
-						}
-						if (line.indexOf("--") == 0) {
-							continue;
-						}
-						String[] info = line.split("\\|");
-						String diploma = info[0].trim();
-						String school = info[1].trim();
-
-						// Thêm từng bằng cấp và trường đã đọc
-						diplomaInfo.put(diploma, school);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		} else {
-			System.out.println("Đường dẫn tệp 'AddressInfo.txt' không tồn tại");
+	// Hàm kiểm tra chuỗi hợp lệ kiểu 1 (cho phép: chữ không dấu, chữ có dấu và số)
+	public static boolean isValidStringType01(String s) {
+		if (s == null || s == "") {
+			return false;
 		}
+
+		String pattern = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃẢẠÈÉÊẼẺẸÌÍĨỈỊÒÓÔÕỎỌÙÚŨỦỤỲÝỸỶỴĂẰẮẲẴẶÂẦẤẨẪẬÊỀẾỂỄỆÔỒỐỔỖỘƠỜỚỞỠỢƯỪỨỬỮỰĐàáâãảạèéêẽẻẹìíĩỉịòóôõỏọùúũủụỳýỹỷỵăằắẳẵặâầấẩẫậêềếểễệôồốổỗộơờớởỡợưừứửữựđ0123456789";
+		for (int i = 0; i < s.length(); i++) {
+			if (pattern.indexOf(s.charAt(i)) == -1) {
+				return false;
+			}
+		}
+
+		return true;
 	}
+
+	// Hàm kiểm tra chuỗi hợp lệ kiểu 2 (cho phép: chữ không dấu, số và đặc biệt)
+	public static boolean isValidStringType02(String s) {
+		if (s == null || s == "") {
+			return false;
+		}
+
+		String pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#$%^&*()_+={}[]|:;\"'<>,.?/0123456789";
+		for (int i = 0; i < s.length(); i++) {
+			if (pattern.indexOf(s.charAt(i)) == -1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// Hàm kiểm tra chuỗi hợp lệ kiểu 3 (cho phép: chữ không dấu, số)
+	public static boolean isValidStringType03(String s) {
+		if (s == null || s == "") {
+			return false;
+		}
+
+		String pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		for (int i = 0; i < s.length(); i++) {
+			if (pattern.indexOf(s.charAt(i)) == -1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// Hàm kiểm tra chuỗi hợp lệ kiểu 4 (cho phép: số)
+	public static boolean isValidStringType04(String s) {
+		if (s == null || s == "") {
+			return false;
+		}
+
+		String pattern = "0123456789";
+		for (int i = 0; i < s.length(); i++) {
+			if (pattern.indexOf(s.charAt(i)) == -1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// Hàm kiểm tra chuỗi hợp lệ kiểu 5 (địa chỉ hợp lệ)
+	public static boolean isValidStringType05(String s) {
+		if (s == null || s == "") {
+			return false;
+		}
+
+		String pattern = " /,ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃẢẠÈÉÊẼẺẸÌÍĨỈỊÒÓÔÕỎỌÙÚŨỦỤỲÝỸỶỴĂẰẮẲẴẶÂẦẤẨẪẬÊỀẾỂỄỆÔỒỐỔỖỘƠỜỚỞỠỢƯỪỨỬỮỰĐàáâãảạèéêẽẻẹìíĩỉịòóôõỏọùúũủụỳýỹỷỵăằắẳẵặâầấẩẫậêềếểễệôồốổỗộơờớởỡợưừứửữựđ0123456789";
+		for (int i = 0; i < s.length(); i++) {
+			if (pattern.indexOf(s.charAt(i)) == -1) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// Hàm kiểm tra chuỗi hợp lệ kiểu 6 (email hợp lệ)
+	public static boolean isValidStringType06(String s) {
+		if (s == null || s == "") {
+			return false;
+		}
+
+		String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+		return Pattern.matches(EMAIL_REGEX, s);
+	}
+
+	// Hàm tách địa chỉ từ 1 địa chỉ hợp lệ
 
 	// Thiết lập các địa chỉ cho Address Info khi chương trình chạy
 	public static void renderAddressInfo() {
@@ -358,45 +424,6 @@ public class CommonPL {
 		for (ActionListener listener : listeners) {
 			comboBox.addActionListener(listener); // Thêm lại các ActionListener
 		}
-	}
-
-	// Hàm cập nhật các giá trị tương ứng cho từng ComboBox để chọn Học tập
-	public static void renderAllComponentToSelectStudy(String diplomaFirstSelected, JComboBox<String> diplomasComboBox,
-			String schoolFirstSelected, JComboBox<String> schoolsComboBox) {
-		if (diplomaFirstSelected != null && schoolFirstSelected != null) {
-			// - Cập nhật lại ô "Chọn Bằng cấp"
-			diplomasComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-			diplomasComboBox.setForeground(Color.BLACK);
-
-			// - Cập nhật lại ô "Chọn Nơi cấp"
-			Set<String> schools = new LinkedHashSet<>();
-			for (var entry : CommonPL.diplomaInfo.entries()) {
-				schools.add(entry.getValue());
-			}
-			schoolsComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-			schoolsComboBox.setForeground(Color.BLACK);
-			updateComboBox(schoolsComboBox, schools, schoolFirstSelected);
-		}
-		// Cập nhật Bằng cấp
-		updateComboBox(diplomasComboBox, CommonPL.diplomaInfo.keySet(), diplomaFirstSelected);
-
-		// Lắng nghe sự kiện thay đổi Bằng cấp
-		diplomasComboBox.addActionListener(e -> {
-			String selectedCity = (String) diplomasComboBox.getSelectedItem();
-			if (selectedCity != null) {
-				Set<String> schools = new LinkedHashSet<>();
-				for (var entry : CommonPL.diplomaInfo.entries()) {
-					if (entry.getKey().equals(selectedCity)) {
-						schools.add(entry.getValue());
-					}
-				}
-
-				// Cập nhật lại ô "Chọn Nơi cấp"
-				schoolsComboBox.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
-				schoolsComboBox.setForeground(Color.LIGHT_GRAY);
-				updateComboBox(schoolsComboBox, schools, null);
-			}
-		});
 	}
 
 	// Hàm cập nhật các giá trị tương ứng cho từng ComboBox để chọn Địa chỉ
@@ -510,6 +537,46 @@ public class CommonPL {
 			}
 		}
 		return map;
+	}
+
+	// Trả về chuỗi SQL (Checkboxs)
+	public static String getSQLFromCheckboxs(Map<String, Boolean> checkboxs, String[] sqlsInfor) {
+		String sql = "";
+		int i = 0;
+		for (Map.Entry<String, Boolean> entry : checkboxs.entrySet()) {
+			if (entry.getValue()) {
+				sql += "," + sqlsInfor[i];
+			}
+			i++;
+		}
+
+		return sql.length() != 0 ? sql.substring(1) : null;
+	}
+
+	// Trả về chuỗi SQL (Radios)
+	public static String getSQLFromRadios(Map<String, Boolean> radios, String[] sqlsInfor) {
+		String sql = "";
+		int i = 0;
+		for (Map.Entry<String, Boolean> entry : radios.entrySet()) {
+			if (entry.getValue()) {
+				sql += sqlsInfor[i];
+			}
+			i++;
+		}
+
+		return sql.length() != 0 ? sql : null;
+	}
+
+	// Cập nhật lại giá trị cho Checkboxs, Radios (tìm kiếm / lọc)
+	public static void resetMapForFilter(Map<String, Boolean> map, String[] filtersInfo, JButton button) {
+		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+			if (entry.getKey().equals(filtersInfo[0])) {
+				entry.setValue(true);
+				button.setText(filtersInfo[0]);
+			} else {
+				entry.setValue(false);
+			}
+		}
 	}
 
 	// Gán giá trị vào Vector
@@ -627,6 +694,7 @@ public class CommonPL {
 	// Định dạng mẫu mặc định cho JButton
 	public static JButton getButtonDefaultForm(String content, Font font) {
 		JButton button = new JButton();
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		button.setContentAreaFilled(true);
 		button.setOpaque(true);
 		button.setBorderPainted(true);
@@ -661,6 +729,7 @@ public class CommonPL {
 	// Định dạng nút JButton có bo góc
 	public static JButton getRoundedBorderButton(int border, String text, Color bgColor, Color fgColor, Font font) {
 		JButton button = new CommonPL.CustomRoundedButton(border, border, text);
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		button.setBackground(bgColor);
 		button.setForeground(fgColor);
 		button.setFont(font);
@@ -708,6 +777,7 @@ public class CommonPL {
 		label.setForeground(foregroundColor);
 
 		// Định dạng các tính chất khác cho nút
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		button.setContentAreaFilled(true);
 		button.setOpaque(true);
 		button.setBorderPainted(true);
@@ -744,6 +814,7 @@ public class CommonPL {
 	// Định dạng mẫu mặc định cho JButton ở Left Menu
 	public static JButton getButtonInLeftMenuForm(String content, Color fontColorHover, Color fontColor, Font font) {
 		JButton button = new JButton();
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		button.setContentAreaFilled(true);
 		button.setOpaque(true);
 		button.setBorderPainted(true);
@@ -775,6 +846,7 @@ public class CommonPL {
 	// Định dạng mẫu mặc định cho JButton có ý nghĩa là nút thao tác cuối cùng
 	public static JButton getLastButtonForm(String content, Color backgroundColor, Color fontColor, Font font) {
 		JButton button = new JButton();
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		button.setContentAreaFilled(true);
 		button.setOpaque(true);
 		button.setBorderPainted(true);
@@ -807,6 +879,7 @@ public class CommonPL {
 	// Định dạng mẫu mặc định cho icon (?)
 	public static JButton getQuestionIconForm(String icon, String inform, String informDetail, Color color, Font font) {
 		JButton button = new JButton();
+		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 		button.setOpaque(false);
 		button.setBorder(new CommonPL.RoundedBorder(999));
 		button.setText(icon);
@@ -873,6 +946,98 @@ public class CommonPL {
 
 		public CustomTextField(int columns, int arcWidth, int arcHeight, String content, Color color, Color colorHover,
 				Font font) {
+			super(columns);
+			this.borderColor = color;
+			this.arcWidth = arcWidth;
+			this.arcHeight = arcHeight;
+			setText(content);
+			setFont(font);
+			setForeground(color);
+			setOpaque(false); // Đảm bảo nền trong suốt để custom border
+			setBorder(new EmptyBorder(5, 10, 5, 10)); // Đệm phần nội dung
+
+			getDocument().addDocumentListener(new DocumentListener() {
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					checkContent();
+				}
+
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					checkContent();
+				}
+
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					checkContent();
+				}
+
+				private void checkContent() {
+					if (!getText().equals(content)) {
+						setBorderColor(colorHover);
+					} else {
+						setBorderColor(color);
+					}
+				}
+			});
+
+			addFocusListener(new FocusAdapter() {
+				@Override
+				public void focusGained(FocusEvent e) {
+					if (getText().equals(content)) {
+						setText("");
+						setForeground(colorHover);
+					}
+				}
+
+				@Override
+				public void focusLost(FocusEvent e) {
+					if (getText().isEmpty()) {
+						setText(content);
+						setForeground(color);
+					}
+				}
+			});
+		}
+
+		public void setBorderColor(Color color) {
+			this.borderColor = color;
+			repaint();
+		}
+
+		@Override
+		protected void paintComponent(Graphics g) {
+			Graphics2D g2 = (Graphics2D) g.create();
+
+			// Bật khử răng cưa để viền mượt hơn
+			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+			// Vẽ nền JTextField
+			g2.setColor(getBackground());
+			g2.fillRoundRect(0, 0, getWidth(), getHeight(), arcWidth, arcHeight);
+
+			// Vẽ viền ngoài với màu tùy chỉnh
+			g2.setColor(borderColor);
+			g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, arcWidth, arcHeight);
+
+			g2.dispose();
+			super.paintComponent(g);
+		}
+
+		@Override
+		protected void paintBorder(Graphics g) {
+			// Không vẽ viền mặc định
+		}
+	}
+
+	// Bo góc cho JPasswordField
+	public static class CustomPasswordField extends JPasswordField {
+		private Color borderColor = Color.LIGHT_GRAY; // Màu viền mặc định
+		private int arcWidth = 0; // Bo góc mặc định (0 = vuông)
+		private int arcHeight = 0;
+
+		public CustomPasswordField(int columns, int arcWidth, int arcHeight, String content, Color color,
+				Color colorHover, Font font) {
 			super(columns);
 			this.borderColor = color;
 			this.arcWidth = arcWidth;
@@ -1495,6 +1660,7 @@ public class CommonPL {
 		public static JButton createButtonHasCheckboxs(Map<String, Boolean> checkboxs, String firstCheckboxItem,
 				Color color, Color colorHover, Font font) {
 			JButton button = new JButton();
+			button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			button.setBorder(new CommonPL.RoundedBorder(20));
 			button.setText(firstCheckboxItem);
 			button.setFont(font);
@@ -1605,6 +1771,7 @@ public class CommonPL {
 		public static JButton createButtonHasRadios(Map<String, Boolean> radios, String firsRadioItem, Color color,
 				Color colorHover, Font font) {
 			JButton button = new JButton();
+			button.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			button.setBorder(new CommonPL.RoundedBorder(20));
 			button.setText(firsRadioItem);
 			button.setFont(font);
@@ -1925,218 +2092,6 @@ public class CommonPL {
 		}
 	}
 
-//	// Hàm tạo cấu trúc Table chứa dữ liệu
-//	public static JTable createTableData(String[] columns, int[] widthColumns, Object[][] datas, String type) {
-//		// Tạo DefaultTableModel
-//		DefaultTableModel model = new DefaultTableModel();
-//
-//		// Thêm tiêu đề cột
-//		for (int i = 0; i < columns.length; i++) {
-//			model.addColumn(columns[i]);
-//		}
-//
-//		// Thêm dữ liệu vào model
-//		for (int i = 0; i < datas.length; i++) {
-//			model.addRow(datas[i]);
-//		}
-//
-//		// Tạo JTable với model
-//		JTable table = new JTable(model);
-//
-//		// Tuỳ chỉnh lại ô dữ liệu nào có thể thay đổi (mặc định là không ô nào được
-//		// phép thay đổi)
-//		DefaultTableModel customModel = new DefaultTableModel(datas, columns) {
-//			@Override
-//			public boolean isCellEditable(int row, int column) {
-//				return false;
-//			}
-//		};
-//		table.setModel(customModel); // Gán model mới sau khi tạo bảng
-//
-//		// Tạo đường kẽ màu đen giữa các ô
-//		table.setShowGrid(true);
-//		table.setGridColor(Color.BLACK);
-//
-//		// Định dạng lại tiêu đề các cột
-//		// - Kiểu, kích thước font
-//		table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
-//		if (type.equals("dashboard manager") || type.equals("employee muster manager")) {
-//			table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16));
-//		}
-//		// - Căn giữa
-//		DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader()
-//				.getDefaultRenderer();
-//		headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-//		table.getTableHeader().setDefaultRenderer(headerRenderer);
-//		// - Màu chữ
-//		table.getTableHeader().setForeground(Color.WHITE);
-//		// - Màu ô
-//		table.getTableHeader().setBackground(Color.BLACK);
-//		// - Chiều cao của dòng tiêu đề
-//		table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 50));
-//		if (type.equals("dashboard manager") || type.equals("employee muster manager")) {
-//			table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 45));
-//		}
-//		// - Chiều rộng giữa các cột ở dòng tiêu đề
-//		for (int i = 0; i < widthColumns.length; i++) {
-//			if (widthColumns[i] != -1) {
-//				table.getColumnModel().getColumn(i).setPreferredWidth(widthColumns[i]);
-//			}
-//		}
-//
-//		// Định dạng lại các dòng dữ liệu (không phải dòng tiêu đề)
-//		// - Kiểu, kích thước font
-//		table.setFont(new Font("Arial", Font.PLAIN, 16));
-//		if (type.equals("dashboard manager") || type.equals("employee muster manager")) {
-//			table.setFont(new Font("Arial", Font.PLAIN, 14));
-//		}
-//		// - Căn giữa
-//		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-//		renderer.setHorizontalAlignment(SwingConstants.CENTER);
-//		for (int i = 0; i < columns.length; i++) {
-//			table.getColumnModel().getColumn(i).setCellRenderer(renderer);
-//		}
-//		// - Chiều cao của các dòng dữ liệu
-//		table.setRowHeight(50);
-//		if (type.equals("dashboard manager") || type.equals("employee muster manager")) {
-//			table.setRowHeight(45);
-//		}
-//		// - Định dạng lại một dòng dữ liệu khi được chọn
-//		table.setSelectionForeground(Color.BLACK);
-//		table.setSelectionBackground(Color.decode("#efefef"));
-//		// - Định dạng ô dữ liệu "Chức năng" ngoại trừ các mục: "Phân công", "Điểm danh"
-////		if (!type.equals("healthcare worker assignment manager") && !type.equals("healthcare worker muster manager")
-////				&& !type.equals("pay for test manager") && !type.equals("test calender list manager")) {
-////			table.getColumnModel().getColumn(columns.length - 1).setCellRenderer(new TableCellRenderer() {
-////				@Override
-////				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-////						boolean hasFocus, int row, int column) {
-////					// Tạo ImageIcon từ tệp hình ảnh
-////					ImageIcon originalIcon = new ImageIcon("/Users/macbook/Desktop/bars-solid.png");
-////
-////					// Lấy ảnh từ ImageIcon và thay đổi kích thước
-////					Image image = originalIcon.getImage();
-////					Image resizedImage = image.getScaledInstance(14, 14, Image.SCALE_SMOOTH); // Đổi kích thước
-////
-////					// Tạo ImageIcon mới với ảnh đã thay đổi kích thước
-////					ImageIcon resizedIcon = new ImageIcon(resizedImage);
-////
-////					// Tạo JLabel và gán ImageIcon đã thay đổi kích thước
-////					JLabel label = new JLabel("", JLabel.CENTER);
-////					label.setIcon(resizedIcon);
-////					label.setBackground(Color.WHITE);
-////
-////					label.setOpaque(true); // Đảm bảo màu nền hiển thị
-////					return label;
-////				}
-////			});
-////		}
-//
-//		// - Nếu là Thống kê thì định dạng ô dữ liệu "Tổng cộng"
-//		if (type.equals("dashboard manager")) {
-//			// Thay đổi màu ô "Tổng cộng"
-//			table.getColumnModel().getColumn(0).setCellRenderer(new TableCellRenderer() {
-//				@Override
-//				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-//						boolean hasFocus, int row, int column) {
-//					String status = String.valueOf(value).trim();
-//					JLabel statusLabel = new JLabel(status, JLabel.CENTER);
-//
-//					if (status.equals("Tổng cộng")) {
-//						statusLabel.setBackground(Color.decode("#DEDEDE"));
-//						statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
-//					} else {
-//						statusLabel.setBackground(Color.WHITE);
-//					}
-//
-//					statusLabel.setOpaque(true);
-//					return statusLabel;
-//				}
-//			});
-//		}
-//
-//		// - Định dạng ô dữ liệu ở cột "Trạng thái"
-//		if (!type.equals("dashboard manager") && !type.equals("work schedule manager")) {
-//			// Biến tạm chứa vị trí chứa cột "Trạng thái"
-//			int columnsValue = -1;
-//
-//			// Duyệt qua các cột
-//			for (int i = 0; i < widthColumns.length; i++) {
-//				String currentColumnName = table.getColumnModel().getColumn(i).getHeaderValue().toString();
-//				if (currentColumnName.equals("Trạng thái")) {
-//					columnsValue = i;
-//					break;
-//				}
-//			}
-//
-//			// Thay đổi màu các ô của cột "Trạng thái"
-//			table.getColumnModel().getColumn(columnsValue).setCellRenderer(new TableCellRenderer() {
-//				@Override
-//				public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-//						boolean hasFocus, int row, int column) {
-//					String status = String.valueOf(value).trim();
-//					JLabel statusLabel = new JLabel(status, JLabel.CENTER);
-////					statusLabel.setForeground(Color.WHITE);
-//
-//					if (status.equals("Đã hoàn thành") || status.equals("Đã điểm danh") || status.equals("Đã xác nhận")
-//							|| status.equals("Hoạt động")) {
-//						statusLabel.setBackground(Color.GREEN);
-//					} else if (status.equals("Đang khám - chữa bệnh") || status.equals("Đang chờ khám")
-//							|| status.equals("Chưa thanh toán")) {
-//						statusLabel.setBackground(Color.YELLOW);
-//					} else if (status.equals("Đã huỷ hồ sơ") || status.equals("Đã huỷ đơn")
-//							|| status.equals("Chưa điểm danh") || status.equals("Đã huỷ phiếu")) {
-//						statusLabel.setBackground(Color.RED);
-//					} else if (status.equals("Đang chờ xác nhận") || status.equals("Tạm dừng")) {
-//						statusLabel.setBackground(Color.LIGHT_GRAY);
-//					}
-//
-////					if (isSelected) {
-////						statusLabel.setBorder(BorderFactory.createLineBorder(Color.BLUE));
-////					}
-//
-//					statusLabel.setOpaque(true);
-//					return statusLabel;
-//				}
-//			});
-//		}
-//
-//		// Thiết lập các nút sự kiện cho cột "Chức năng"
-////		table.addMouseListener(new MouseAdapter() {
-////			@Override
-////			public void mouseClicked(MouseEvent e) {
-////				int column = table.columnAtPoint(e.getPoint());
-////				if (column == columns.length - 1) {
-////					if (type.equals("account manager")) {
-////						System.out.println("Chức năng ở Tài khoản");
-////					} else if (type.equals("department manager")) {
-////						System.out.println("Chức năng ở Khoa");
-////					} else if (type.equals("sick manager")) {
-////						System.out.println("Chức năng ở Bệnh");
-////					} else if (type.equals("table prices manager")) {
-////						System.out.println("Chức năng ở Bảng giá Khám - Chữa");
-////					} else if (type.equals("medicine supplier manager")) {
-////						System.out.println("Chức năng ở Nhà cung cấp thuốc");
-////					} else if (type.equals("medicine object manager")) {
-////						System.out.println("Chức năng ở Đối tượng thuốc");
-////					} else if (type.equals("medicine bill manager")) {
-////						System.out.println("Chức năng ở Đơn thuốc");
-////					} else if (type.equals("healthcare worker object manager")) {
-////						System.out.println("Chức năng ở Đối tượng Nhân viên");
-////					} else if (type.equals("healthcare worker muster manager")) {
-////						System.out.println("Chức năng ở Điểm danh");
-////					} else if (type.equals("medical record object manager")) {
-////						System.out.println("Chức năng ở Bệnh án");
-////					} else if (type.equals("patient object manager")) {
-////						System.out.println("Chức năng ở Bệnh nhân");
-////					}
-////				}
-////			}
-////		});
-//
-//		return table;
-//	}
-
 	// Hàm tạo cấu trúc Table chứa dữ liệu
 	public static JTable createTableData(String[] columns, int[] widthColumns, Object[][] datas, String type) {
 		// Tạo DefaultTableModel
@@ -2179,7 +2134,7 @@ public class CommonPL {
 		// - Chiều cao của dòng tiêu đề
 		table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 50));
 		if (type.equals("dashboard manager")) {
-			table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 46));
+			table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 45));
 		}
 		if (type.equals("add or update unit table")) {
 			table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 40));
@@ -2254,7 +2209,7 @@ public class CommonPL {
 		// - Chiều cao của các dòng dữ liệu
 		table.setRowHeight(50);
 		if (type.equals("dashboard manager")) {
-			table.setRowHeight(46);
+			table.setRowHeight(45);
 		}
 		if (type.equals("add or update unit table")) {
 			table.setRowHeight(40);

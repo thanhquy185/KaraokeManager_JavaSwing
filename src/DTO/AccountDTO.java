@@ -2,7 +2,7 @@ package DTO;
 
 public class AccountDTO {
 	// Properties
-	private String id;
+	private int id;
 	private String fullname;
 	private String phone;
 	private String email;
@@ -10,11 +10,11 @@ public class AccountDTO {
 	private String username;
 	private String password;
 	private String privilegeId;
-	private Boolean status;
+	private boolean status;
 	private String dateUpdate;
 
 	// Constructors
-	public AccountDTO(String id, String fullname, String phone, String email, String address, String username,
+	public AccountDTO(Integer id, String fullname, String phone, String email, String address, String username,
 			String password, String privilegeId, Boolean status, String dateUpdate) {
 		super();
 		this.id = id;
@@ -30,7 +30,7 @@ public class AccountDTO {
 	}
 
 	// Setter - Getter
-	public void setId(String id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -70,7 +70,7 @@ public class AccountDTO {
 		this.dateUpdate = dateUpdate;
 	}
 
-	public String getId() {
+	public Integer getId() {
 		return id;
 	}
 
@@ -108,6 +108,13 @@ public class AccountDTO {
 
 	public String getDateUpdate() {
 		return dateUpdate;
+	}
+
+	@Override
+	public String toString() {
+		return "AccountDTO [id=" + id + ", fullname=" + fullname + ", phone=" + phone + ", email=" + email
+				+ ", address=" + address + ", username=" + username + ", password=" + password + ", privilegeId="
+				+ privilegeId + ", status=" + status + ", dateUpdate=" + dateUpdate + "]";
 	}
 
 }

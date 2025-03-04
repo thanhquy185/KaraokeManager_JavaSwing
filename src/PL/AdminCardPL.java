@@ -3,30 +3,36 @@ package PL;
 import javax.swing.JPanel;
 
 public class AdminCardPL extends JPanel {
-	private static AdminCardPL instance;
+	// Properties
+	// - Mục đích là chỉ có một admin card được sử dụng
+	private static AdminCardPL adminCardPL;
 
-	public static AdminCardPL getInstance() {
-		if (AdminCardPL.instance == null) {
-			AdminCardPL.instance = new AdminCardPL();
-		}
-		return AdminCardPL.instance;
-	}
-
+	// Constructors
 	public AdminCardPL() {
-		AdminCardPL.instance = this;
+		//
+		AdminCardPL.adminCardPL = this;
 
 		// Menu của Quản lý
 		AdminMenuPL adminMenuPL = new AdminMenuPL();
 		// Main của Quản lý (mặc định là Tóm tắt)
-		Admin_DashboardManagerPL dashboardManagerPL = new Admin_DashboardManagerPL();
+		AdminImagePL adminImagePL = new AdminImagePL();
+//		Admin_DashboardManagerPL dashboardManagerPL = new Admin_DashboardManagerPL();
 
 		// Đĩnh nghĩa các tính chất của Admin Card
 		this.setSize(CommonPL.getScreenWidthByOwner(), CommonPL.getScreenHeightByOwner());
 		this.setLayout(null);
 		this.add(adminMenuPL);
-		this.add(dashboardManagerPL);
+		this.add(adminImagePL);
 	}
 
+	public static AdminCardPL getInstance() {
+		if (AdminCardPL.adminCardPL == null) {
+			AdminCardPL.adminCardPL = new AdminCardPL();
+		}
+		return AdminCardPL.adminCardPL;
+	}
+
+	// Methods
 	public void changeAdminMenu(JPanel currentAdminMenuPanel) {
 		if (this.getComponents().length >= 2) {
 			this.remove(1);

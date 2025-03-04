@@ -25,10 +25,12 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import org.jdesktop.swingx.JXDatePicker;
 
 import PL.CommonPL.CustomCornerDatePicker.CustomRoundedBorder;
+import PL.CommonPL.CustomTextField;
 
 public class Admin_DiscountManagerPL extends JPanel {
 	// Các Component
@@ -49,8 +51,10 @@ public class Admin_DiscountManagerPL extends JPanel {
 	private JButton filterResetButton;
 	private JPanel filterPanel;
 	// - Các Component của Data Panel
+	private JButton excelButton;
 	private JButton addButton;
 	private JButton updateButton;
+	private JButton lockButton;
 	private JTable tableData;
 	private JScrollPane tableScrollPane;
 	private JPanel dataPanel;
@@ -153,12 +157,12 @@ public class Admin_DiscountManagerPL extends JPanel {
 		numbersOfRowTextField.setBounds(832, 100, 293, 24);
 
 		// - Tuỳ chỉnh Filter Apply Button
-		filterApplyButton = CommonPL.getLastButtonForm("Lọc", Color.decode("#007bff"), Color.WHITE,
+		filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
 		filterApplyButton.setBounds(765, 130, 170, 40);
 
 		// - Tuỳ chỉnh Filter Reset Button
-		filterResetButton = CommonPL.getLastButtonForm("Đặt lại", Color.decode("#f44336"), Color.WHITE,
+		filterResetButton = CommonPL.getRoundedBorderButton(20, "Đặt lại", Color.decode("#f44336"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
 		filterResetButton.setBounds(955, 130, 170, 40);
 
@@ -181,17 +185,29 @@ public class Admin_DiscountManagerPL extends JPanel {
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Data Pane =====>
+		// - Tuỳ chỉnh Excel Button
+		excelButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+				CommonPL.getMiddlePathToShowIcon() + "excel-icon.png", "Excel", Color.BLACK, Color.decode("#4C8CFA"),
+				Color.BLACK, Color.decode("#4C8CFA"), CommonPL.getFontParagraphBold());
+		excelButton.setBounds(15, 15, 210, 40);
+
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
 				Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
-		addButton.setBounds(15, 15, 210, 40);
+		addButton.setBounds(240, 15, 210, 40);
 
 		// - Tuỳ chỉnh Update Button
 		updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK,
 				Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
-		updateButton.setBounds(240, 15, 210, 40);
+		updateButton.setBounds(465, 15, 210, 40);
+
+		// - Tuỳ chỉnh Lock Button
+		lockButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+				CommonPL.getMiddlePathToShowIcon() + "lock-icon.png", "Khoá", Color.BLACK, Color.decode("#9f4d4d"),
+				Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
+		lockButton.setBounds(690, 15, 210, 40);
 
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		tableData = CommonPL.createTableData(columns, widthColumns, datas, "account manager");
@@ -203,8 +219,10 @@ public class Admin_DiscountManagerPL extends JPanel {
 		dataPanel.setLayout(null);
 		dataPanel.setBackground(Color.WHITE);
 		dataPanel.setBounds(30, 330, 1140, 485);
+		dataPanel.add(excelButton);
 		dataPanel.add(addButton);
 		dataPanel.add(updateButton);
+		dataPanel.add(lockButton);
 		dataPanel.add(tableScrollPane);
 		// <==================== ====================>
 
@@ -236,6 +254,18 @@ public class Admin_DiscountManagerPL extends JPanel {
 				showAddOrUpdateDialog("Thay đổi Khuyến mãi", "Thay đổi", currentObject);
 			} else {
 				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần thay đổi");
+			}
+			rowSelected = -1;
+			valueSelected[0] = false;
+			tableData.clearSelection();
+		});
+		lockButton.addActionListener(e -> {
+			if (rowSelected != -1) {
+				CommonPL.createSelectionsDialog("Thông báo lựa chọn", "Có chắc chắn muốn khoá dòng dữ liệu này ?",
+						valueSelected);
+				System.out.println(valueSelected[0]);
+			} else {
+				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần khoá");
 			}
 			rowSelected = -1;
 			valueSelected[0] = false;
@@ -294,22 +324,22 @@ public class Admin_DiscountManagerPL extends JPanel {
 		addOrUpdateNameTextField.setBounds(20, 140, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Percent Label
-		addOrUpdatePercentLabel = CommonPL.getParagraphLabel("Phần trăm", Color.BLACK,
+		addOrUpdatePercentLabel = CommonPL.getParagraphLabel("Phần trăm (%)", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdatePercentLabel.setBounds(20, 190, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Percent Text Field
-		addOrUpdatePercentTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Phần trăm", Color.LIGHT_GRAY,
+		addOrUpdatePercentTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Phần trăm (%)", Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdatePercentTextField.setBounds(20, 230, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Room Cost Label
-		addOrUpdateRoomCostLabel = CommonPL.getParagraphLabel("Mức áp dụng", Color.BLACK,
+		addOrUpdateRoomCostLabel = CommonPL.getParagraphLabel("Mức áp dụng (VNĐ)", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateRoomCostLabel.setBounds(260, 190, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Room Cost Text Field
-		addOrUpdateRoomCostTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mức áp dụng", Color.LIGHT_GRAY,
+		addOrUpdateRoomCostTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mức áp dụng (VNĐ)", Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateRoomCostTextField.setBounds(260, 230, 220, 40);
 
@@ -366,7 +396,9 @@ public class Admin_DiscountManagerPL extends JPanel {
 		timer.start();
 
 		// - Tuỳ chỉnh Add Or Update Button
-		addOrUpdateButton = CommonPL.getButtonDefaultForm(button, CommonPL.getFontParagraphBold());
+		addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button,
+				button == "Thêm" ? Color.decode("#699f4c") : Color.decode("#bf873e"), Color.WHITE,
+				CommonPL.getFontParagraphBold());
 		addOrUpdateButton.setBounds(20, 500, 460, 40);
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 
@@ -375,18 +407,23 @@ public class Admin_DiscountManagerPL extends JPanel {
 			// - Gán dữ liệu là "Mã khuyến mãi"
 			addOrUpdateIdTextField.setText((String) object.get(0));
 			addOrUpdateIdTextField.setEnabled(false);
+			addOrUpdateIdTextField.setCaretPosition(0);
+			((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
 			addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
 
 			// - Gán dữ liệu là "Tên khuyến mãi"
 			addOrUpdateNameTextField.setText((String) object.get(1));
+			addOrUpdateNameTextField.setCaretPosition(0);
 			addOrUpdateNameTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Phần trăm"
 			addOrUpdatePercentTextField.setText((String) object.get(2));
+			addOrUpdatePercentTextField.setCaretPosition(0);
 			addOrUpdatePercentTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Mức áp dụng"
 			addOrUpdateRoomCostTextField.setText((String) object.get(3));
+			addOrUpdateRoomCostTextField.setCaretPosition(0);
 			addOrUpdateRoomCostTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Ngày bắt đầu"
@@ -395,6 +432,7 @@ public class Admin_DiscountManagerPL extends JPanel {
 				addOrUpdateDateStartDatePicker.setDate(date);
 				((JButton) addOrUpdateDateStartDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
+				addOrUpdateDateStartDatePicker.getEditor().setCaretPosition(0);
 				addOrUpdateDateStartDatePicker.getEditor().setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
 				addOrUpdateDateStartDatePicker.getEditor().setForeground(Color.BLACK);
 			} catch (ParseException e) {
@@ -407,6 +445,7 @@ public class Admin_DiscountManagerPL extends JPanel {
 				addOrUpdateDateEndDatePicker.setDate(date);
 				((JButton) addOrUpdateDateEndDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
+				addOrUpdateDateEndDatePicker.getEditor().setCaretPosition(0);
 				addOrUpdateDateEndDatePicker.getEditor().setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
 				addOrUpdateDateEndDatePicker.getEditor().setForeground(Color.BLACK);
 			} catch (ParseException e) {
@@ -415,7 +454,10 @@ public class Admin_DiscountManagerPL extends JPanel {
 
 			// - Gán dữ liệu là "Trạng thái"
 			addOrUpdateStatusComboBox.setSelectedItem((String) object.get(6));
-			addOrUpdateStatusComboBox.setForeground(Color.BLACK);
+			addOrUpdateStatusComboBox.setEnabled(false);
+			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
+			addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
 
 			// - Gán dữ liệu là "Thời gian cập nhật gần đây"
 //							addOrUpdateTimeDetailLabel.setText((String) object.get(11));
