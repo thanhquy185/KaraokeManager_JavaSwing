@@ -7,5 +7,6 @@ public class Program {
 		FramePL mainFrame = new FramePL();
 
 //		System.out.println(null);
+int a = 1;
 	}
 }
