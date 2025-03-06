@@ -109,5 +109,4 @@ public class OrderDTO {
 	public String getDateUpdate() {
 		return dateUpdate;
 	}
-
 }
