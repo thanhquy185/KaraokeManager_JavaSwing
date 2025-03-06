@@ -160,11 +160,12 @@ public class Admin_DashboardManagerPL extends JPanel {
 					timeDetailsVector.add("Chọn Thời gian cụ thể");
 
 					// Nếu giá trị hiện tại không là "Chọn Mốc thời gian"
+					int yearStart = 2000, yearEnd = 2030;
 					if (!subValueSelected.equals("Chọn Mốc thời gian")) {
 						// Nếu chọn "Theo năm"
 						if (subValueSelected.equals("Theo năm")) {
 							// Tính năm 1900 - năm 2100
-							for (int year = 1900; year <= 2100; year++) {
+							for (int year = yearStart; year <= yearEnd; year++) {
 								timeDetailsVector.add(String.format("Năm %04d", year));
 							}
 						}
@@ -172,7 +173,7 @@ public class Admin_DashboardManagerPL extends JPanel {
 						// Nếu chọn "Theo tháng"
 						if (subValueSelected.equals("Theo tháng")) {
 							// Tính năm 1900 - năm 2100
-							for (int year = 1900; year <= 2100; year++) {
+							for (int year = yearStart; year <= yearEnd; year++) {
 								// Tính tháng 1 - tháng 12
 								for (int month = 1; month <= 12; month++) {
 									timeDetailsVector.add(String.format("Tháng %02d/%04d", month, year));
@@ -221,18 +222,6 @@ public class Admin_DashboardManagerPL extends JPanel {
 		final String[] inputTicketColumns02 = { "Tuần", "Số phiếu nhập", "Tổng số nguyên liệu nhập", "Chi (VNĐ)" };
 		// + Chiều rộng các cột
 		final int[] inputTicketWidthColumns = { 280, 240, 240, 350 };
-		// + Dữ liệu
-		Object[][] inputTicketDatas01 = { { "Tháng 01 (01-01-yyyy - 31-01-yyyy)", "Số phiếu nhập", "", "" },
-				{ "Tháng 02 (01-02-yyyy - 31-02-yyyy)", "", "", "" }, { "Tháng 03", "", "", "" },
-				{ "Tháng 04", "", "", "" }, { "Tháng 05", "", "", "" }, { "Tháng 06", "", "", "" },
-				{ "Tháng 07", "", "", "" }, { "Tháng 08", "", "", "" }, { "Tháng 09", "", "", "" },
-				{ "Tháng 10", "", "", "" }, { "Tháng 11", "", "", "" }, { "Tháng 12", "", "", "" },
-				{ "Tổng cộng", "", "", "" }, };
-		Object[][] inputTicketDatas02 = { { "Tuần 01 (01-mm-yyyy - 07-mm-yyyy)", "", "", "", "" },
-				{ "Tuần 02 (08-mm-yyyy - 14-mm-yyyy)", "", "", "" },
-				{ "Tuần 03 (15-mm-yyyy - 21-mm-yyyy)", "", "", "" },
-				{ "Tuần 04 (22-mm-yyyy - 27-mm-yyyy)", "", "", "" },
-				{ "Tuần 05 (28-mm-yyyy - 31-mm-yyyy)", "", "", "" }, { "Tổng cộng", "", "", "" }, };
 
 		// Nếu là lần đầu nhấn vào mục "Thống kê"
 		// PHẢI XỬ LÝ LÀ THỐNG KÊ THEO NĂM HIỆN TẠI

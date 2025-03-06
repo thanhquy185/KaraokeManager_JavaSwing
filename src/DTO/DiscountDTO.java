@@ -6,21 +6,25 @@ public class DiscountDTO {
 	// Properties
 	private String id;
 	private String name;
-	private Integer percent;
-	private Long roomCost;
+	private String discountType;
+	private Long value;
+	private Long costMin;
+	private Long costMax;
 	private String dateStart;
 	private String dateEnd;
 	private Boolean status;
 	private String dateUpdate;
-
-	// Constructors
-	public DiscountDTO(String id, String name, Integer percent, Long roomCost, String dateStart, String dateEnd,
-			Boolean status, String dateUpdate) {
+	
+	// Constructos
+	public DiscountDTO(String id, String name, String discountType, Long value, Long costMin, Long costMax,
+			String dateStart, String dateEnd, Boolean status, String dateUpdate) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.percent = percent;
-		this.roomCost = roomCost;
+		this.discountType = discountType;
+		this.value = value;
+		this.costMin = costMin;
+		this.costMax = costMax;
 		this.dateStart = dateStart;
 		this.dateEnd = dateEnd;
 		this.status = status;
@@ -36,12 +40,20 @@ public class DiscountDTO {
 		this.name = name;
 	}
 
-	public void setPercent(Integer percent) {
-		this.percent = percent;
+	public void setDiscountType(String discountType) {
+		this.discountType = discountType;
 	}
 
-	public void setRoomCost(Long roomCost) {
-		this.roomCost = roomCost;
+	public void setValue(Long value) {
+		this.value = value;
+	}
+
+	public void setCostMin(Long costMin) {
+		this.costMin = costMin;
+	}
+
+	public void setCostMax(Long costMax) {
+		this.costMax = costMax;
 	}
 
 	public void setDateStart(String dateStart) {
@@ -59,7 +71,7 @@ public class DiscountDTO {
 	public void setDateUpdate(String dateUpdate) {
 		this.dateUpdate = dateUpdate;
 	}
-
+	
 	public String getId() {
 		return id;
 	}
@@ -68,12 +80,20 @@ public class DiscountDTO {
 		return name;
 	}
 
-	public Integer getPercent() {
-		return percent;
+	public String getDiscountType() {
+		return discountType;
 	}
 
-	public Long getRoomCost() {
-		return roomCost;
+	public Long getValue() {
+		return value;
+	}
+
+	public Long getCostMin() {
+		return costMin;
+	}
+
+	public Long getCostMax() {
+		return costMax;
 	}
 
 	public String getDateStart() {
@@ -90,6 +110,5 @@ public class DiscountDTO {
 
 	public String getDateUpdate() {
 		return dateUpdate;
-	}
-
+	}	
 }

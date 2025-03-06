@@ -33,13 +33,17 @@ import org.jdesktop.swingx.JXDatePicker;
 
 import BLL.CommonBLL;
 import BLL.DiscountBLL;
+import BLL.DiscountTypeBLL;
 import DTO.DiscountDTO;
+import DTO.DiscountTypeDTO;
+import DTO.PrivilegeDTO;
 import PL.CommonPL.CustomCornerDatePicker.CustomRoundedBorder;
 import PL.CommonPL.CustomTextField;
 
 public class Admin_DiscountManagerPL extends JPanel {
 	// Các đối tượng từ tầng Bussiness Logical Layer
 	private DiscountBLL discountBLL;
+	private DiscountTypeBLL discountTypeBLL;
 	// Các Component
 	private JLabel titleLabel;
 	// - Các Component của Filter Panel
@@ -49,19 +53,17 @@ public class Admin_DiscountManagerPL extends JPanel {
 	private JLabel sortsLabel;
 	private Map<String, Boolean> sortsCheckboxs;
 	private JButton sortsButton;
+	private JLabel typesLabel;
+	private Map<String, Boolean> typesRadios;
+	private JButton typesButton;
+	private JLabel dateLabel;
+	private JButton dateInformButton;
+	private JXDatePicker dateStartDatePicker;
+	private JLabel dateRectangleLabel;
+	private JXDatePicker dateEndDatePicker;
 	private JLabel statusLabel;
 	private Map<String, Boolean> statusRadios;
 	private JButton statusButton;
-	private JLabel dateStartLabel;
-	private JButton dateStartInformButton;
-	private JXDatePicker dateStartBeforeDatePicker;
-	private JLabel dateStartRectangleLabel;
-	private JXDatePicker dateStartAfterDatePicker;
-	private JLabel dateEndLabel;
-	private JButton dateEndInformButton;
-	private JXDatePicker dateEndBeforeDatePicker;
-	private JLabel dateEndRectangleLabel;
-	private JXDatePicker dateEndAfterDatePicker;
 	private JButton filterApplyButton;
 	private JButton filterResetButton;
 	private JPanel filterPanel;
@@ -77,10 +79,14 @@ public class Admin_DiscountManagerPL extends JPanel {
 	private JTextField addOrUpdateIdTextField;
 	private JLabel addOrUpdateNameLabel;
 	private JTextField addOrUpdateNameTextField;
-	private JLabel addOrUpdatePercentLabel;
-	private JTextField addOrUpdatePercentTextField;
-	private JLabel addOrUpdateRoomCostLabel;
-	private JTextField addOrUpdateRoomCostTextField;
+	private JLabel addOrUpdateTypeLabel;
+	private JComboBox<String> addOrUpdateTypeComboBox;
+	private JLabel addOrUpdateValueLabel;
+	private JTextField addOrUpdateValueTextField;
+	private JLabel addOrUpdateCostMinLabel;
+	private JTextField addOrUpdateCostMinTextField;
+	private JLabel addOrUpdateCostMaxLabel;
+	private JTextField addOrUpdateCostMaxTextField;
 	private JLabel addOrUpdateDateStartLabel;
 	private JXDatePicker addOrUpdateDateStartDatePicker;
 	private JLabel addOrUpdateDateEndLabel;
@@ -92,13 +98,12 @@ public class Admin_DiscountManagerPL extends JPanel {
 	private JButton addOrUpdateButton;
 	private JPanel addOrUpdateBlockPanel;
 	private JDialog addOrUpdateDialog;
-
 	// - Các thông tin cần có của Table Data và Table Scroll Pane
 	// + Tiêu đề các cột
-	private final String[] columns = { "Mã khuyến mãi", "Tên khuyến mãi", "Phần trăm", "Mức áp dụng (VNĐ)",
-			"Ngày bắt đầu", "Ngày kết thúc", "Trạng thái" };
+	private final String[] columns = { "Mã khuyến mãi", "Tên khuyến mãi", "Loại khuyến mãi", "Giá trị",
+			"Mức tối thiểu (VNĐ)", "Mức tối đa (VNĐ)", "Ngày bắt đầu", "Ngày kết thúc", "Trạng thái" };
 	// + Chiều rộng các cột
-	private final int[] widthColumns = { 150, 400, 150, 200, 150, 150, 150 };
+	private final int[] widthColumns = { 150, 400, 150, 150, 250, 250, 150, 150, 150 };
 	// + Dữ liệu
 	private Object[][] datas = {};
 	// + Dòng hiện tại đang được chọn
@@ -110,6 +115,10 @@ public class Admin_DiscountManagerPL extends JPanel {
 	private final String[] sortsString;
 	private final String[] sortsSQL;
 	// + Trạng thái
+	private final String[] typesStringForFilter;
+	private final String[] typesStringForAddOrUpdate;
+	private final String[] typesSQL;
+	// + Trạng thái
 	private final String[] statusStringForFilter;
 	private final String[] statusStringForAddOrUpdate;
 	private final String[] statusSQL;
@@ -117,15 +126,19 @@ public class Admin_DiscountManagerPL extends JPanel {
 	public Admin_DiscountManagerPL() {
 		// <===== Các đối tượng từ tầng Bussiness Logical Layer =====>
 		discountBLL = new DiscountBLL();
+		discountTypeBLL = new DiscountTypeBLL();
 		// <==================== ====================>
 
 		// <===== Cập nhật các dữ liệu cần thiết =====>
 		sortsString = new String[] { "Mã khuyến mãi tăng dần", "Mã khuyến mãi giảm dần", "Tên khuyến mãi tăng dần",
-				"Tên khuyến mãi giảm dần", "Phần trăm tăng dần", "Phần trăm giảm dần", "Mức áp dụng tăng dần",
-				"Mức áp dụng giảm dần", "Ngày bắt đầu tăng dần", "Ngày bắt đầu giảm dần" };
+				"Tên khuyến mãi giảm dần", "Giá trị tăng dần", "Giá trị giảm dần", "Mức tối thiểu (VNĐ) tăng dần",
+				"Mức tối thiểu (VNĐ) giảm dần", "Ngày bắt đầu tăng dần", "Ngày bắt đầu giảm dần" };
 		sortsSQL = new String[] { "maKhuyenMai ASC", "maKhuyenMai DESC", "tenKhuyenMai ASC", "tenKhuyenMai DESC",
-				"phanTram ASC", "phanTram DESC", "mucApDung ASC", "mucApDung DESC", "ngayBatDau ASC",
+				"giaTri ASC", "giaTri DESC", "mucToiThieu ASC", "mucToiThieu DESC", "ngayBatDau ASC",
 				"ngayKetThuc DESC" };
+		typesStringForFilter = renderTypesString("Tìm kiếm");
+		typesStringForAddOrUpdate = renderTypesString("Thêm hoặc sửa");
+		typesSQL = renderTypesString("Truy vấn SQL");
 		statusStringForFilter = new String[] { "Tất cả", "Hoạt động", "Tạm dừng" };
 		statusStringForAddOrUpdate = new String[] { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
 		statusSQL = new String[] { "", "trangThai = 1", "trangThai = 0" };
@@ -166,59 +179,44 @@ public class Admin_DiscountManagerPL extends JPanel {
 				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortsButton.setBounds(390, 45, 360, 40);
 
-		// - Tuỳ chỉnh Date Start Label
-		dateStartLabel = CommonPL.getParagraphLabel("Ngày bắt đầu", Color.BLACK, CommonPL.getFontParagraphPlain());
-		dateStartLabel.setBounds(765, 15, 120, 24);
+		// - Tuỳ chỉnh Types Label
+		typesLabel = CommonPL.getParagraphLabel("Loại khuyến mãi", Color.BLACK, CommonPL.getFontParagraphPlain());
+		typesLabel.setBounds(765, 15, 360, 24);
 
-		// - Tuỳ chỉnh Date Start Inform Button
-		dateStartInformButton = CommonPL.getQuestionIconForm("?", "Chú thích sử dụng lọc Ngày bắt đầu",
+		// - Tuỳ chỉnh Types Radios
+		typesRadios = CommonPL.getMapHasValues(typesStringForFilter);
+
+		// - Tuỳ chỉnh Types Button
+		typesButton = CommonPL.ButtonHasRadios.createButtonHasRadios(typesRadios, typesStringForFilter[0],
+				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+		typesButton.setBounds(765, 45, 360, 40);
+
+		// - Tuỳ chỉnh Date Label
+		dateLabel = CommonPL.getParagraphLabel("Ngày áp dụng", Color.BLACK, CommonPL.getFontParagraphPlain());
+		dateLabel.setBounds(15, 100, 125, 24);
+
+		// - Tuỳ chỉnh Date Inform Button
+		dateInformButton = CommonPL.getQuestionIconForm("?", "Chú thích sử dụng lọc Ngày áp dụng",
 				"Lọc những ngày có trong đoạn từ Ngày trước đến Ngày sau và chỉ cho phép nhập các định dạng như: ddmmyyyy, dd-mm-yyyy.",
 				Color.BLACK, CommonPL.getFontQuestionIcon());
-		dateStartInformButton.setBounds(898, 15, 24, 24);
+		dateInformButton.setBounds(153, 100, 24, 24);
 
-		// - Tuỳ chỉnh Date Start Before Date Picker
-		dateStartBeforeDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(10, CommonPL.getLocale(),
-				CommonPL.getDateFormat(), "Ngày trước", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain(),
-				20, 40);
-		dateStartBeforeDatePicker.setBounds(765, 45, 170, 40);
+		// - Tuỳ chỉnh Date Start Date Picker
+		dateStartDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(10, CommonPL.getLocale(),
+				CommonPL.getDateFormat(), "Ngày bắt đầu", Color.LIGHT_GRAY, Color.BLACK,
+				CommonPL.getFontParagraphPlain(), 20, 40);
+		dateStartDatePicker.setBounds(15, 130, 170, 40);
 
-		// - Tuỳ chỉnh Date Start Rectangle Label
-		dateStartRectangleLabel = CommonPL.getTitleLabel("-", Color.BLACK, CommonPL.getFontParagraphPlain(),
+		// - Tuỳ chỉnh Date Rectangle Label
+		dateRectangleLabel = CommonPL.getTitleLabel("-", Color.BLACK, CommonPL.getFontParagraphPlain(),
 				SwingConstants.CENTER, SwingConstants.CENTER);
-		dateStartRectangleLabel.setBounds(935, 45, 20, 40);
+		dateRectangleLabel.setBounds(185, 130, 20, 40);
 
-		// - Tuỳ chỉnh Date Start After Date Picker
-		dateStartAfterDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(10, CommonPL.getLocale(),
-				CommonPL.getDateFormat(), "Ngày sau", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain(),
-				20, 40);
-		dateStartAfterDatePicker.setBounds(955, 45, 170, 40);
-
-		// - Tuỳ chỉnh Date End Label
-		dateEndLabel = CommonPL.getParagraphLabel("Ngày kết thúc", Color.BLACK, CommonPL.getFontParagraphPlain());
-		dateEndLabel.setBounds(15, 100, 125, 24);
-
-		// - Tuỳ chỉnh Date End Inform Button
-		dateEndInformButton = CommonPL.getQuestionIconForm("?", "Chú thích sử dụng lọc Ngày kết thúc",
-				"Lọc những ngày có trong đoạn từ Ngày trước đến Ngày sau và chỉ cho phép nhập các định dạng như: ddmmyyyy, dd-mm-yyyy.",
-				Color.BLACK, CommonPL.getFontQuestionIcon());
-		dateEndInformButton.setBounds(153, 100, 24, 24);
-
-		// - Tuỳ chỉnh Date End Before Date Picker
-		dateEndBeforeDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(10, CommonPL.getLocale(),
-				CommonPL.getDateFormat(), "Ngày trước", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain(),
-				20, 40);
-		dateEndBeforeDatePicker.setBounds(15, 130, 170, 40);
-
-		// - Tuỳ chỉnh Date End Rectangle Label
-		dateEndRectangleLabel = CommonPL.getTitleLabel("-", Color.BLACK, CommonPL.getFontParagraphPlain(),
-				SwingConstants.CENTER, SwingConstants.CENTER);
-		dateEndRectangleLabel.setBounds(185, 130, 20, 40);
-
-		// - Tuỳ chỉnh Date End After Date Picker
-		dateEndAfterDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(10, CommonPL.getLocale(),
-				CommonPL.getDateFormat(), "Ngày sau", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain(),
-				20, 40);
-		dateEndAfterDatePicker.setBounds(205, 130, 170, 40);
+		// - Tuỳ chỉnh Date End Date Picker
+		dateEndDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(10, CommonPL.getLocale(),
+				CommonPL.getDateFormat(), "Ngày kết thúc", Color.LIGHT_GRAY, Color.BLACK,
+				CommonPL.getFontParagraphPlain(), 20, 40);
+		dateEndDatePicker.setBounds(205, 130, 170, 40);
 
 		// - Tuỳ chỉnh Status Label
 		statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
@@ -252,16 +250,13 @@ public class Admin_DiscountManagerPL extends JPanel {
 		filterPanel.add(findInputTextField);
 		filterPanel.add(sortsLabel);
 		filterPanel.add(sortsButton);
-		filterPanel.add(dateStartLabel);
-		filterPanel.add(dateStartInformButton);
-		filterPanel.add(dateStartBeforeDatePicker);
-		filterPanel.add(dateStartRectangleLabel);
-		filterPanel.add(dateStartAfterDatePicker);
-		filterPanel.add(dateEndLabel);
-		filterPanel.add(dateEndInformButton);
-		filterPanel.add(dateEndBeforeDatePicker);
-		filterPanel.add(dateEndRectangleLabel);
-		filterPanel.add(dateEndAfterDatePicker);
+		filterPanel.add(typesLabel);
+		filterPanel.add(typesButton);
+		filterPanel.add(dateLabel);
+		filterPanel.add(dateInformButton);
+		filterPanel.add(dateStartDatePicker);
+		filterPanel.add(dateRectangleLabel);
+		filterPanel.add(dateEndDatePicker);
 		filterPanel.add(statusLabel);
 		filterPanel.add(statusButton);
 		filterPanel.add(filterApplyButton);
@@ -375,6 +370,31 @@ public class Admin_DiscountManagerPL extends JPanel {
 		renderTableData(null, null, null);
 	}
 
+	// Hàm cập nhật dữ liệu loại mã khuyến mãi cho việc thêm, sửa hoặc tìm kiếm
+	private String[] renderTypesString(String action) {
+		ArrayList<DiscountTypeDTO> discountTypeList = discountTypeBLL.getAllDiscountType();
+		String[] result = new String[discountTypeList.size() + 1];
+		if (action.equals("Tìm kiếm")) {
+			result[0] = "Tất cả";
+		} else if (action.equals("Thêm hoặc sửa")) {
+			result[0] = "Chọn Loại khuyến mãi";
+		} else if (action.equals("Truy vấn SQL")) {
+			result[0] = "";
+		}
+		for (int i = 0; i < discountTypeList.size(); i++) {
+			if (action.equals("Tìm kiếm")) {
+				result[i + 1] = String.format("%s", discountTypeList.get(i).getName());
+			} else if (action.equals("Thêm hoặc sửa")) {
+				result[i + 1] = String.format("%s - %s", discountTypeList.get(i).getId(),
+						discountTypeList.get(i).getName());
+			} else if (action.equals("Truy vấn SQL")) {
+				result[i + 1] = String.format("maLoaiKhuyenMai = '%s'", discountTypeList.get(i).getId());
+			}
+		}
+
+		return result;
+	}
+
 	// Hàm sự kiện lọc dữ liệu
 	private void filterDatasInTable() {
 		// Nếu nhấn vào nút "Áp dụng"
@@ -384,50 +404,38 @@ public class Admin_DiscountManagerPL extends JPanel {
 					: null;
 			// Giá trị ô sắp xếp
 			String sortsValue = CommonPL.getSQLFromCheckboxs(sortsCheckboxs, sortsSQL);
+			// Giá trị ô loại khuyến mãi
+			String typesValue = CommonPL.getSQLFromRadios(typesRadios, typesSQL);
+			// Giá trị ngày áp dụng
+			String dateStart = !dateStartDatePicker.getEditor().getText().equals("Ngày bắt đầu")
+					? dateStartDatePicker.getEditor().getText()
+					: null;
+			String dateEnd = !dateEndDatePicker.getEditor().getText().equals("Ngày kết thúc")
+					? dateEndDatePicker.getEditor().getText()
+					: null;
+			if (dateStart != null && dateEnd != null && CommonBLL.compareBetweenTwoDate(dateStart, dateEnd) == 1) {
+				CommonPL.createErrorDialog("Thông báo lỗi", "Ngày bắt đầu phải là trước hoặc bằng Ngày kết thúc");
+				return;
+			}
 			// Giá trị ô trạng thái
 			String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);
-			// Giá trị ngày bắt đầu
-			String dateStartBefore = !dateStartBeforeDatePicker.getEditor().getText().equals("Ngày trước")
-					? dateStartBeforeDatePicker.getEditor().getText()
-					: null;
-			String dateStartAfter = !dateStartAfterDatePicker.getEditor().getText().equals("Ngày sau")
-					? dateStartAfterDatePicker.getEditor().getText()
-					: null;
-			if (dateStartBefore != null && dateStartAfter != null && CommonBLL.compareBetweenTwoDate(dateStartBefore, dateStartAfter) == 1) {
-				CommonPL.createErrorDialog("Thông báo lỗi",
-						"Ngày trước phải là trước hoặc bằng Ngày sau (Ngày bắt đầu)");
-				return;
-			}
-			// Giá trị ngày kết thúc
-			String dateEndBefore = !dateEndBeforeDatePicker.getEditor().getText().equals("Ngày trước")
-					? dateEndBeforeDatePicker.getEditor().getText()
-					: null;
-			String dateEndAfter = !dateEndAfterDatePicker.getEditor().getText().equals("Ngày sau")
-					? dateEndAfterDatePicker.getEditor().getText()
-					: null;
-			if (dateEndBefore != null && dateEndAfter != null && CommonBLL.compareBetweenTwoDate(dateEndBefore, dateEndAfter) == 1) {
-				CommonPL.createErrorDialog("Thông báo lỗi",
-						"Ngày trước phải là trước hoặc bằng Ngày sau (Ngày kết thúc)");
-				return;
-			}
 
 			// Gán lệnh SQL tương ứng để truy vấn rồi cập nhật bảng
 			String[] join = null;
 			String condition = (findValue != null
 					? String.format("(maKhuyenMai = '%s' OR tenKhuyenMai LIKE '%%%s%%')", findValue, findValue)
 					: "")
-					+ (statusValue != null ? (findValue != null ? " AND " + statusValue : statusValue) : "")
-					+ (dateStartBefore != null && dateStartAfter != null ? (findValue != null || statusValue != null
-							? " AND "
-									+ String.format("ngayBatDau BETWEEN '%s' AND '%s'", dateStartBefore, dateStartAfter)
-							: String.format("ngayBatDau BETWEEN '%s' AND '%s'", dateStartBefore, dateStartAfter)) : "")
-					+ (dateEndBefore != null && dateEndAfter != null
-							? (findValue != null || statusValue != null
-									|| (dateStartBefore != null && dateStartAfter != null)
-											? " AND " + String.format("ngayKetThuc BETWEEN '%s' AND '%s'",
-													dateEndBefore, dateEndAfter)
-											: String.format("ngayKetThuc BETWEEN '%s' AND '%s'", dateEndBefore,
-													dateEndAfter))
+					+ (typesValue != null ? (findValue != null ? " AND " + typesValue : typesValue) : "")
+					+ (dateStart != null ? (findValue != null || typesValue != null
+							? " AND " + String.format("ngayBatDau = '%s'", dateStart)
+							: String.format("ngayBatDau = '%s'", dateStart)) : "")
+					+ (dateEnd != null ? (findValue != null || typesValue != null || dateStart != null
+							? " AND " + String.format("ngayKetThuc = '%s'", dateEnd)
+							: String.format("ngayKetThuc = '%s'", dateEnd)) : "")
+					+ (statusValue != null
+							? (findValue != null || typesValue != null || dateStart != null || dateEnd != null
+									? " AND " + statusValue
+									: statusValue)
 							: "");
 			if (condition.length() == 0)
 				condition = null;
@@ -444,16 +452,15 @@ public class Admin_DiscountManagerPL extends JPanel {
 			// Cập nhật lại ô sắp xếp
 			CommonPL.resetMapForFilter(sortsCheckboxs, sortsString, sortsButton);
 
+			// Cập nhật lại ô loại khuyến mãi
+			CommonPL.resetMapForFilter(typesRadios, typesStringForFilter, typesButton);
+
+			// Cập nhật lại ô ngày áp dụng
+			CommonPL.resetDatePickerForFilter(dateStartDatePicker, "Ngày bắt đầu", Color.LIGHT_GRAY, 10);
+			CommonPL.resetDatePickerForFilter(dateEndDatePicker, "Ngày kết thúc", Color.LIGHT_GRAY, 10);
+
 			// Cập nhật lại ô trạng thái
 			CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
-
-			// Cập nhật lại ô ngày bắt đầu
-			CommonPL.resetDatePickerForFilter(dateStartBeforeDatePicker, "Ngày trước", Color.LIGHT_GRAY, 10);
-			CommonPL.resetDatePickerForFilter(dateStartAfterDatePicker, "Ngày sau", Color.LIGHT_GRAY, 10);
-
-			// Cập nhật lại ô ngày kết thúc
-			CommonPL.resetDatePickerForFilter(dateEndBeforeDatePicker, "Ngày trước", Color.LIGHT_GRAY, 10);
-			CommonPL.resetDatePickerForFilter(dateEndAfterDatePicker, "Ngày sau", Color.LIGHT_GRAY, 10);
 
 			// Cập nhật lại bảng
 			renderTableData(null, null, null);
@@ -467,12 +474,17 @@ public class Admin_DiscountManagerPL extends JPanel {
 		for (int i = 0; i < discountList.size(); i++) {
 			datasQuery[i][0] = (Object) discountList.get(i).getId();
 			datasQuery[i][1] = (Object) discountList.get(i).getName();
-			datasQuery[i][2] = (Object) discountList.get(i).getPercent();
+			datasQuery[i][2] = (Object) discountTypeBLL.getOneDiscountTypeById(discountList.get(i).getDiscountType())
+					.getName();
 			datasQuery[i][3] = (Object) CommonPL
-					.moneyLongToMoneyFormat(new BigInteger(String.valueOf(discountList.get(i).getRoomCost())));
-			datasQuery[i][4] = (Object) discountList.get(i).getDateStart();
-			datasQuery[i][5] = (Object) discountList.get(i).getDateEnd();
-			datasQuery[i][6] = (Object) (discountList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng");
+					.moneyLongToMoneyFormat(new BigInteger(String.valueOf(discountList.get(i).getValue())));
+			datasQuery[i][4] = (Object) CommonPL
+					.moneyLongToMoneyFormat(new BigInteger(String.valueOf(discountList.get(i).getCostMin())));
+			datasQuery[i][5] = (Object) CommonPL
+					.moneyLongToMoneyFormat(new BigInteger(String.valueOf(discountList.get(i).getCostMax())));
+			datasQuery[i][6] = (Object) discountList.get(i).getDateStart();
+			datasQuery[i][7] = (Object) discountList.get(i).getDateEnd();
+			datasQuery[i][8] = (Object) (discountList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng");
 		}
 		datas = datasQuery;
 
@@ -504,68 +516,90 @@ public class Admin_DiscountManagerPL extends JPanel {
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateNameTextField.setBounds(20, 140, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Percent Label
-		addOrUpdatePercentLabel = CommonPL.getParagraphLabel("Phần trăm (%)", Color.BLACK,
+		// - Tuỳ chỉnh Add Or Update Type Label
+		addOrUpdateTypeLabel = CommonPL.getParagraphLabel("Loại khuyến mãi", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdatePercentLabel.setBounds(20, 190, 220, 40);
+		addOrUpdateTypeLabel.setBounds(20, 190, 220, 40);
 
-		// - Tuỳ chỉnh Add Or Update Percent Text Field
-		addOrUpdatePercentTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Phần trăm (%)", Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdatePercentTextField.setBounds(20, 230, 220, 40);
+		// - Tuỳ chỉnh Add Or Update Type ComboBox
+		Vector<String> typesVector = CommonPL.getVectorHasValues(typesStringForAddOrUpdate);
+		addOrUpdateTypeComboBox = CommonPL.CustomComboBox(typesVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
+				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateTypeComboBox.setBounds(20, 230, 220, 40);
 
-		// - Tuỳ chỉnh Add Or Update Room Cost Label
-		addOrUpdateRoomCostLabel = CommonPL.getParagraphLabel("Mức áp dụng (VNĐ)", Color.BLACK,
+		// - Tuỳ chỉnh Add Or Update Value Label
+		addOrUpdateValueLabel = CommonPL.getParagraphLabel("Giá trị", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateValueLabel.setBounds(260, 190, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Value Text Field
+		addOrUpdateValueTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Giá trị", Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateRoomCostLabel.setBounds(260, 190, 220, 40);
+		addOrUpdateValueTextField.setBounds(260, 230, 220, 40);
 
-		// - Tuỳ chỉnh Add Or Update Room Cost Text Field
-		addOrUpdateRoomCostTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mức áp dụng (VNĐ)", Color.LIGHT_GRAY,
+		// - Tuỳ chỉnh Add Or Update Cost Min Label
+		addOrUpdateCostMinLabel = CommonPL.getParagraphLabel("Mức tổi thiểu (VNĐ)", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addOrUpdateCostMinLabel.setBounds(20, 280, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Cost Min Text Field
+		addOrUpdateCostMinTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mức tổi thiểu (VNĐ)",
+				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateCostMinTextField.setCaretPosition(0);
+		addOrUpdateCostMinTextField.setBounds(20, 320, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Cost Max Label
+		addOrUpdateCostMaxLabel = CommonPL.getParagraphLabel("Mức tối đa (VNĐ)", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addOrUpdateCostMaxLabel.setBounds(260, 280, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Cost Max Text Field
+		addOrUpdateCostMaxTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mức tối đa (VNĐ)", Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateRoomCostTextField.setBounds(260, 230, 220, 40);
+		addOrUpdateCostMaxTextField.setCaretPosition(0);
+		addOrUpdateCostMaxTextField.setBounds(260, 320, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Date Start Label
 		addOrUpdateDateStartLabel = CommonPL.getParagraphLabel("Ngày bắt đầu", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateDateStartLabel.setBounds(20, 280, 220, 40);
+		addOrUpdateDateStartLabel.setBounds(20, 370, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Date Start Date Picker
 		addOrUpdateDateStartDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(0, CommonPL.getLocale(),
 				CommonPL.getDateFormat(), "Chọn Ngày", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain(),
 				40, 40);
-		addOrUpdateDateStartDatePicker.setBounds(20, 320, 220, 40);
+		addOrUpdateDateStartDatePicker.setBounds(20, 410, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Date End Label
 		addOrUpdateDateEndLabel = CommonPL.getParagraphLabel("Ngày kết thúc", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateDateEndLabel.setBounds(260, 280, 220, 40);
+		addOrUpdateDateEndLabel.setBounds(260, 370, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Date End Date Picker
 		addOrUpdateDateEndDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(0, CommonPL.getLocale(),
 				CommonPL.getDateFormat(), "Chọn Ngày", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain(),
 				40, 40);
-		addOrUpdateDateEndDatePicker.setBounds(260, 320, 220, 40);
+		addOrUpdateDateEndDatePicker.setBounds(260, 410, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status Label
 		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateStatusLabel.setBounds(20, 370, 460, 40);
+		addOrUpdateStatusLabel.setBounds(20, 460, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status ComboBox
 		Vector<String> statusVector = CommonPL.getVectorHasValues(statusStringForAddOrUpdate);
 		addOrUpdateStatusComboBox = CommonPL.CustomComboBox(statusVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
 				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateStatusComboBox.setBounds(20, 410, 460, 40);
+		addOrUpdateStatusComboBox.setBounds(20, 500, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Time Label
 		addOrUpdateTimeLabel = CommonPL.getParagraphLabel("Cập nhật gần đây:", Color.GRAY,
 				new Font("Arial", Font.ITALIC, 18));
-		addOrUpdateTimeLabel.setBounds(20, 460, 148, 40);
+		addOrUpdateTimeLabel.setBounds(20, 550, 148, 40);
 
 		// - Tuỳ chỉnh Add Or Update Time Detail Label
 		addOrUpdateTimeDetailLabel = CommonPL.getTitleLabel("yyyy-MM-dd HH:mm:ss", Color.GRAY,
 				new Font("Arial", Font.ITALIC, 18), SwingConstants.RIGHT, SwingConstants.CENTER);
-		addOrUpdateTimeDetailLabel.setBounds(173, 460, 307, 40);
+		addOrUpdateTimeDetailLabel.setBounds(173, 550, 307, 40);
 		// -- Tạo Timer cập nhật thời gian
 		Timer timer = new Timer(1000, e -> {
 			LocalDateTime currentDateTime = LocalDateTime.now();
@@ -588,30 +622,56 @@ public class Admin_DiscountManagerPL extends JPanel {
 		// Khi "Thay đổi" một Khuyến mãi
 		if (title.equals("Thay đổi Khuyến mãi") && button.equals("Thay đổi") && object.size() != 0) {
 			// - Gán dữ liệu là "Mã khuyến mãi"
-			addOrUpdateIdTextField.setText(String.valueOf(object.get(0)));
-			addOrUpdateIdTextField.setEnabled(false);
-			addOrUpdateIdTextField.setCaretPosition(0);
-			((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
-			addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
+			if (object.get(0) != null) {
+				addOrUpdateIdTextField.setText(String.valueOf(object.get(0)));
+				addOrUpdateIdTextField.setEnabled(false);
+				addOrUpdateIdTextField.setCaretPosition(0);
+				((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
+				addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
+			}
 
 			// - Gán dữ liệu là "Tên khuyến mãi"
-			addOrUpdateNameTextField.setText(String.valueOf(object.get(1)));
-			addOrUpdateNameTextField.setCaretPosition(0);
-			addOrUpdateNameTextField.setForeground(Color.BLACK);
+			if (object.get(1) != null) {
+				addOrUpdateNameTextField.setText(String.valueOf(object.get(1)));
+				addOrUpdateNameTextField.setCaretPosition(0);
+				addOrUpdateNameTextField.setForeground(Color.BLACK);
+			}
 
-			// - Gán dữ liệu là "Phần trăm"
-			addOrUpdatePercentTextField.setText(String.valueOf(object.get(2)));
-			addOrUpdatePercentTextField.setCaretPosition(0);
-			addOrUpdatePercentTextField.setForeground(Color.BLACK);
+			// - Gán dữ liệu là "Loại khuyến mãi"
+			for (int i = 0; i < addOrUpdateTypeComboBox.getItemCount(); i++) {
+				String item = addOrUpdateTypeComboBox.getItemAt(i);
+				if (item.contains(String.valueOf(object.get(2)))) {
+					addOrUpdateTypeComboBox.setSelectedItem(item);
+					break;
+				}
+			}
+			((JTextField) addOrUpdateTypeComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+			addOrUpdateTypeComboBox.setForeground(Color.BLACK);
 
-			// - Gán dữ liệu là "Mức áp dụng"
-			addOrUpdateRoomCostTextField.setText(String.valueOf(object.get(3)).replace(".", ""));
-			addOrUpdateRoomCostTextField.setCaretPosition(0);
-			addOrUpdateRoomCostTextField.setForeground(Color.BLACK);
+			// - Gán dữ liệu là "Giá trị"
+			if (object.get(3) != null) {
+				addOrUpdateValueTextField.setText(String.valueOf(object.get(3)).replace(".", ""));
+				addOrUpdateValueTextField.setCaretPosition(0);
+				addOrUpdateValueTextField.setForeground(Color.BLACK);
+			}
+
+			// - Gán dữ liệu là "Mức tối thiểu (VNĐ)"
+			if (object.get(4) != null) {
+				addOrUpdateCostMinTextField.setText(String.valueOf(object.get(4)).replace(".", ""));
+				addOrUpdateCostMinTextField.setCaretPosition(0);
+				addOrUpdateCostMinTextField.setForeground(Color.BLACK);
+			}
+
+			// - Gán dữ liệu là "Mức tối đa (VNĐ)"
+			if (object.get(4) != null) {
+				addOrUpdateCostMaxTextField.setText(String.valueOf(object.get(5)).replace(".", ""));
+				addOrUpdateCostMaxTextField.setCaretPosition(0);
+				addOrUpdateCostMaxTextField.setForeground(Color.BLACK);
+			}
 
 			// - Gán dữ liệu là "Ngày bắt đầu"
 			try {
-				Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(4)));
+				Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(6)));
 				addOrUpdateDateStartDatePicker.setDate(date);
 				((JButton) addOrUpdateDateStartDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
@@ -624,7 +684,7 @@ public class Admin_DiscountManagerPL extends JPanel {
 
 			// - Gán dữ liệu là "Ngày kết thúc"
 			try {
-				Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(5)));
+				Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(7)));
 				addOrUpdateDateEndDatePicker.setDate(date);
 				((JButton) addOrUpdateDateEndDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
@@ -636,7 +696,7 @@ public class Admin_DiscountManagerPL extends JPanel {
 			}
 
 			// - Gán dữ liệu là "Trạng thái"
-			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(6)));
+			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(8)));
 			addOrUpdateStatusComboBox.setEnabled(false);
 			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
@@ -650,7 +710,7 @@ public class Admin_DiscountManagerPL extends JPanel {
 		addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button,
 				button == "Thêm" ? Color.decode("#699f4c") : Color.decode("#bf873e"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
-		addOrUpdateButton.setBounds(20, 500, 460, 40);
+		addOrUpdateButton.setBounds(20, 590, 460, 40);
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 		addOrUpdateButton.addActionListener(e -> {
 			// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
@@ -662,13 +722,21 @@ public class Admin_DiscountManagerPL extends JPanel {
 			String name = !addOrUpdateNameTextField.getText().equals("Nhập Tên khuyến mãi")
 					? addOrUpdateNameTextField.getText()
 					: null;
-			// + Phần trăm (%)
-			String percent = !addOrUpdatePercentTextField.getText().equals("Nhập Phần trăm (%)")
-					? addOrUpdatePercentTextField.getText()
+			// + Loại khuyến mãi
+			String type = !String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).equals("Chọn Loại khuyến mãi")
+					? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
 					: null;
-			// + Mức áp dụng (VNĐ)
-			String roomCost = !addOrUpdateRoomCostTextField.getText().equals("Nhập Mức áp dụng (VNĐ)")
-					? addOrUpdateRoomCostTextField.getText()
+			// + Giá trị
+			String value = !addOrUpdateValueTextField.getText().equals("Nhập Giá trị")
+					? addOrUpdateValueTextField.getText()
+					: null;
+			// + Mức tối thiểu (VNĐ)
+			String costMin = !addOrUpdateCostMinTextField.getText().equals("Nhập Mức tối thiểu (VNĐ)")
+					? addOrUpdateCostMinTextField.getText()
+					: null;
+			// + Mức tối đa (VNĐ)
+			String costMax = !addOrUpdateCostMaxTextField.getText().equals("Nhập Mức tối đa (VNĐ)")
+					? addOrUpdateCostMaxTextField.getText()
 					: null;
 			// + Ngày bắt đầu
 			String dateStart = !addOrUpdateDateStartDatePicker.getEditor().getText().equals("Chọn Ngày")
@@ -687,8 +755,8 @@ public class Admin_DiscountManagerPL extends JPanel {
 
 			// - Nếu là "Thêm"
 			if (title.equals("Thêm Khuyến mãi") && button.equals("Thêm")) {
-				String inform = discountBLL.insertDiscount(id, name, percent, roomCost, dateStart, dateEnd, status,
-						dateUpdate);
+				String inform = discountBLL.insertDiscount(id, name, type, value, costMin, costMax, dateStart, dateEnd,
+						status, dateUpdate);
 				if (inform.equals("Có thể thêm một khuyến mãi")) {
 					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện
 					CommonPL.createSuccessDialog("Thông báo thành công", "Thêm thành công");
@@ -700,8 +768,8 @@ public class Admin_DiscountManagerPL extends JPanel {
 			}
 			// - Nếu là "Sửa"
 			else if (title.equals("Thay đổi Khuyến mãi") && button.equals("Thay đổi")) {
-				String inform = discountBLL.updateDiscount(id, name, percent, roomCost, dateStart, dateEnd, status,
-						dateUpdate);
+				String inform = discountBLL.updateDiscount(id, name, type, value, costMin, costMax, dateStart, dateEnd,
+						status, dateUpdate);
 				if (inform.equals("Có thể thay đổi một khuyến mãi")) {
 					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện
 					CommonPL.createSuccessDialog("Thông báo thành công", "Thay đổi thành công");
@@ -716,16 +784,20 @@ public class Admin_DiscountManagerPL extends JPanel {
 		// - Tuỳ chỉnh Add Or Update Block Panel
 		addOrUpdateBlockPanel = new JPanel();
 		addOrUpdateBlockPanel.setLayout(null);
-		addOrUpdateBlockPanel.setBounds(0, 0, 500, 590);
+		addOrUpdateBlockPanel.setBounds(0, 0, 500, 680);
 		addOrUpdateBlockPanel.setBackground(Color.WHITE);
 		addOrUpdateBlockPanel.add(addOrUpdateIdLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateIdTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateNameLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateNameTextField);
-		addOrUpdateBlockPanel.add(addOrUpdatePercentLabel);
-		addOrUpdateBlockPanel.add(addOrUpdatePercentTextField);
-		addOrUpdateBlockPanel.add(addOrUpdateRoomCostLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateRoomCostTextField);
+		addOrUpdateBlockPanel.add(addOrUpdateTypeLabel);
+		addOrUpdateBlockPanel.add(addOrUpdateTypeComboBox);
+		addOrUpdateBlockPanel.add(addOrUpdateValueLabel);
+		addOrUpdateBlockPanel.add(addOrUpdateValueTextField);
+		addOrUpdateBlockPanel.add(addOrUpdateCostMinLabel);
+		addOrUpdateBlockPanel.add(addOrUpdateCostMinTextField);
+		addOrUpdateBlockPanel.add(addOrUpdateCostMaxLabel);
+		addOrUpdateBlockPanel.add(addOrUpdateCostMaxTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateDateStartLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateDateStartDatePicker);
 		addOrUpdateBlockPanel.add(addOrUpdateDateEndLabel);
@@ -741,7 +813,7 @@ public class Admin_DiscountManagerPL extends JPanel {
 		addOrUpdateDialog = new JDialog();
 		addOrUpdateDialog.setTitle(title);
 		addOrUpdateDialog.setLayout(null);
-		addOrUpdateDialog.setSize(500, 590);
+		addOrUpdateDialog.setSize(500, 680);
 		addOrUpdateDialog.setResizable(false);
 		addOrUpdateDialog.setLocationRelativeTo(null);
 		addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

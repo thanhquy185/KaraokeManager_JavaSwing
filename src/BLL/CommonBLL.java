@@ -9,7 +9,7 @@ public class CommonBLL {
 			return false;
 		}
 
-		String pattern = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃẢẠÈÉÊẼẺẸÌÍĨỈỊÒÓÔÕỎỌÙÚŨỦỤỲÝỸỶỴĂẰẮẲẴẶÂẦẤẨẪẬÊỀẾỂỄỆÔỒỐỔỖỘƠỜỚỞỠỢƯỪỨỬỮỰĐàáâãảạèéêẽẻẹìíĩỉịòóôõỏọùúũủụỳýỹỷỵăằắẳẵặâầấẩẫậêềếểễệôồốổỗộơờớởỡợưừứửữựđ0123456789";
+		String pattern = " /-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃẢẠÈÉÊẼẺẸÌÍĨỈỊÒÓÔÕỎỌÙÚŨỦỤỲÝỸỶỴĂẰẮẲẴẶÂẦẤẨẪẬÊỀẾỂỄỆÔỒỐỔỖỘƠỜỚỞỠỢƯỪỨỬỮỰĐàáâãảạèéêẽẻẹìíĩỉịòóôõỏọùúũủụỳýỹỷỵăằắẳẵặâầấẩẫậêềếểễệôồốổỗộơờớởỡợưừứửữựđ0123456789";
 		for (int i = 0; i < s.length(); i++) {
 			if (pattern.indexOf(s.charAt(i)) == -1) {
 				return false;

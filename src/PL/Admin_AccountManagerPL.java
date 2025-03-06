@@ -151,7 +151,7 @@ public class Admin_AccountManagerPL extends JPanel {
 				"tenTaiKhoan ASC", "tenTaiKhoan DESC" };
 		privilegesStringForFilter = renderPrivilegesString("Tìm kiếm");
 		privilegesStringForAddOrUpdate = renderPrivilegesString("Thêm hoặc sửa");
-		privilegesSQL = new String[] { "", "maQuyen = 'NHANVIEN'", "maQuyen = 'QUANLY'" };
+		privilegesSQL = renderPrivilegesString("Truy vấn SQL");
 		statusStringForFilter = new String[] { "Tất cả", "Hoạt động", "Tạm dừng" };
 		statusStringForAddOrUpdate = new String[] { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
 		statusSQL = new String[] { "", "trangThai = 1", "trangThai = 0" };
@@ -372,14 +372,18 @@ public class Admin_AccountManagerPL extends JPanel {
 		String[] result = new String[privilegeList.size() + 1];
 		if (action.equals("Thêm hoặc sửa")) {
 			result[0] = "Chọn Quyền";
-		} else {
+		} else if(action.equals("Tìm kiếm")) {
 			result[0] = "Tất cả";
+		} else if(action.equals("Truy vấn SQL")) {
+			result[0] = "";
 		}
 		for (int i = 0; i < privilegeList.size(); i++) {
-			if (action.equals("Thêm hoặc sửa")) {
-				result[i + 1] = String.format("%s - %s", privilegeList.get(i).getId(), privilegeList.get(i).getName());
-			} else {
+			if (action.equals("Tìm kiếm")) {
 				result[i + 1] = String.format("%s", privilegeList.get(i).getName());
+			} else if(action.equals("Tìm kiếm")) {
+				result[i + 1] = String.format("%s - %s", privilegeList.get(i).getId(), privilegeList.get(i).getName());
+			} else if(action.equals("Truy vấn SQL")) {
+				result[i + 1] = String.format("maQuyen = '%s'", privilegeList.get(i).getId());
 			}
 		}
 

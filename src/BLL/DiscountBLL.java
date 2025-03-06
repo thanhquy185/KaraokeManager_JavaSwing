@@ -35,18 +35,36 @@ public class DiscountBLL {
 		return true;
 	}
 
-	// - Hàm kiểm tra đã nhập phần trăm hay chưa ?
-	private boolean isInputedPercent(String percent) {
-		if (percent == null) {
+	// - Hàm kiểm tra đã chọn loại khuyến mãi hay chưa ?
+	private boolean isSelectedType(String type) {
+		if (type == null) {
 			return false;
 		}
 
 		return true;
 	}
 
-	// - Hàm kiểm tra đã nhập mức áp dụng hay chưa ?
-	private boolean isInputedRoomCost(String roomCost) {
-		if (roomCost == null) {
+	// - Hàm kiểm tra đã nhập giá trị hay chưa ?
+	private boolean isInputedValue(String value) {
+		if (value == null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// - Hàm kiểm tra đã nhập mức tổi thiểu hay chưa ?
+	private boolean isInputedCostMin(String costMin) {
+		if (costMin == null) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// - Hàm kiểm tra đã nhập mức tối đa hay chưa ?
+	private boolean isInputedCostMax(String costMax) {
+		if (costMax == null) {
 			return false;
 		}
 
@@ -106,21 +124,30 @@ public class DiscountBLL {
 		return true;
 	}
 
-	// - Hàm kiểm tra phần trăm có hợp lệ hay không ?
-	private boolean isValidPercent(String percent) {
-		if (!CommonBLL.isValidStringType04(percent)) {
+	// - Hàm kiểm tra giá trị có hợp lệ hay không ?
+	private boolean isValidValue(String value) {
+		if (!CommonBLL.isValidStringType04(value)) {
 			return false;
 		}
-		if (Integer.parseInt(percent) < 0 || Integer.parseInt(percent) > 100) {
+		if (Integer.parseInt(value) < 0) {
 			return false;
 		}
 
 		return true;
 	}
 
-	// - Hàm kiểm tra phần trăm có hợp lệ hay không ?
-	private boolean isValidRoomCost(String roomCost) {
-		if (!CommonBLL.isValidStringType04(roomCost)) {
+	// - Hàm kiểm tra mức tổi thiểu có hợp lệ hay không ?
+	private boolean isValidCostMin(String costMin) {
+		if (!CommonBLL.isValidStringType04(costMin)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// - Hàm kiểm tra mức tổi đa có hợp lệ hay không ?
+	private boolean isValidCostMax(String costMax) {
+		if (!CommonBLL.isValidStringType04(costMax)) {
 			return false;
 		}
 
@@ -146,9 +173,9 @@ public class DiscountBLL {
 	}
 
 	// - Hàm thêm một khuyến mãi (kiểm tra trước khi thêm)
-	public String insertDiscount(String id, String name, String percent, String roomCost, String dateStart,
-			String dateEnd, String status, String dateUpdate) {
-		if (!isInputedId(id) && !isInputedName(name) && !isInputedPercent(percent) && !isInputedRoomCost(roomCost)
+	public String insertDiscount(String id, String name, String type, String value, String costMin, String costMax,
+			String dateStart, String dateEnd, String status, String dateUpdate) {
+		if (!isInputedId(id) && !isInputedName(name) && !isSelectedType(type) && !isInputedValue(value) && !isInputedCostMin(costMin) && !isInputedCostMax(costMax)
 				&& !isSelectedDateStart(dateStart) && !isSelectedDateEnd(dateEnd) && !isSelectedStatus(status)) {
 			return "Chưa nhập đủ thông tin cần thiết";
 		}
@@ -158,11 +185,17 @@ public class DiscountBLL {
 		if (!isInputedName(name)) {
 			return "Chưa nhập tên khuyến mãi";
 		}
-		if (!isInputedPercent(percent)) {
-			return "Chưa nhập phần trăm (%)";
+		if (!isSelectedType(type)) {
+			return "Chưa chọn loại khuyến mãi";
 		}
-		if (!isInputedRoomCost(roomCost)) {
-			return "Chưa nhập mức áp dụng (VNĐ)";
+		if (!isInputedValue(value)) {
+			return "Chưa nhập giá trị";
+		}
+		if (!isInputedCostMin(costMin)) {
+			return "Chưa nhập mức tối thiểu (VNĐ)";
+		}
+		if (!isInputedCostMax(costMax)) {
+			return "Chưa nhập mức tối đa (VNĐ)";
 		}
 		if (!isSelectedDateStart(dateStart)) {
 			return "Chưa chọn ngày bắt đầu";
@@ -173,7 +206,7 @@ public class DiscountBLL {
 		if (!isSelectedStatus(status)) {
 			return "Chưa chọn trạng thái";
 		}
-		if (!isValidId(id) && !isValidName(name) && !isValidPercent(percent) && !isValidRoomCost(roomCost)
+		if (!isValidId(id) && !isValidName(name) && !isValidValue(value) && !isValidCostMin(costMin) && !isValidCostMax(costMax)
 				&& !isDateStartAfterDateEnd(dateStart, dateEnd) && !isDateStartEqualDateEnd(dateStart, dateEnd)) {
 			return "Nhập sai định thông tin khuyến mãi";
 		}
@@ -183,11 +216,14 @@ public class DiscountBLL {
 		if (!isValidName(name)) {
 			return "Nhập sai định dạng tên khuyến mãi";
 		}
-		if (!isValidPercent(percent)) {
-			return "Nhập sai định dạng phần trăm (%)";
+		if (!isValidValue(value)) {
+			return "Nhập sai định dạng giá trị";
 		}
-		if (!isValidRoomCost(roomCost)) {
-			return "Nhập sai định dạng mức áp dụng (VNĐ)";
+		if (!isValidCostMin(costMin)) {
+			return "Nhập sai định dạng mức tối thiểu (VNĐ)";
+		}
+		if (!isValidCostMax(costMax)) {
+			return "Nhập sai định dạng mức tối đa (VNĐ)";
 		}
 		if (CommonBLL.compareBetweenTwoDate(dateStart, dateEnd) == 1) {
 			return "Ngày bắt đầu cần phải là trước hoặc bằng ngày kết thúc";
@@ -196,13 +232,15 @@ public class DiscountBLL {
 		// - Nếu thoả mãn hết thì thêm vào CSDL
 		String discountId = id;
 		String discountName = name;
-		int discountPercent = Integer.parseInt(percent);
-		long discountRoomCost = Long.parseLong(roomCost);
+		String discountType = type;
+		long discountValue = Long.parseLong(value);
+		long discountCostMin = Long.parseLong(costMin);
+		long discountCostMax = Long.parseLong(costMax);
 		String discountDateStart = dateStart;
 		String discountDateEnd = dateEnd;
 		boolean discountStatus = status.equals("Hoạt động") ? true : false;
 		String discountDateUpdate = dateUpdate;
-		DiscountDTO newdiscountDTO = new DiscountDTO(discountId, discountName, discountPercent, discountRoomCost,
+		DiscountDTO newdiscountDTO = new DiscountDTO(discountId, discountName, discountType, discountValue, discountCostMin, discountCostMax,
 				discountDateStart, discountDateEnd, discountStatus, discountDateUpdate);
 		discountDAL.insert(newdiscountDTO);
 
@@ -210,20 +248,29 @@ public class DiscountBLL {
 	}
 
 	// - Hàm thay đổi một khuyến mãi (kiểm tra trước khi thay đổi)
-	public String updateDiscount(String id, String name, String percent, String roomCost, String dateStart,
-			String dateEnd, String status, String dateUpdate) {
-		if (!isInputedName(name) && !isInputedPercent(percent) && !isInputedRoomCost(roomCost)
+	public String updateDiscount(String id, String name, String type, String value, String costMin, String costMax,
+			String dateStart, String dateEnd, String status, String dateUpdate) {
+		if (!isInputedId(id) && !isInputedName(name) && !isSelectedType(type) && !isInputedValue(value) && !isInputedCostMin(costMin) && !isInputedCostMax(costMax)
 				&& !isSelectedDateStart(dateStart) && !isSelectedDateEnd(dateEnd) && !isSelectedStatus(status)) {
 			return "Chưa nhập đủ thông tin cần thiết";
+		}
+		if (!isInputedId(id)) {
+			return "Chưa nhập mã khuyến mãi";
 		}
 		if (!isInputedName(name)) {
 			return "Chưa nhập tên khuyến mãi";
 		}
-		if (!isInputedPercent(percent)) {
-			return "Chưa nhập phần trăm (%)";
+		if (!isSelectedType(type)) {
+			return "Chưa chọn loại khuyến mãi";
 		}
-		if (!isInputedRoomCost(roomCost)) {
-			return "Chưa nhập mức áp dụng (VNĐ)";
+		if (!isInputedValue(value)) {
+			return "Chưa nhập giá trị";
+		}
+		if (!isInputedCostMin(costMin)) {
+			return "Chưa nhập mức tối thiểu (VNĐ)";
+		}
+		if (!isInputedCostMax(costMax)) {
+			return "Chưa nhập mức tối đa (VNĐ)";
 		}
 		if (!isSelectedDateStart(dateStart)) {
 			return "Chưa chọn ngày bắt đầu";
@@ -231,32 +278,45 @@ public class DiscountBLL {
 		if (!isSelectedDateEnd(dateEnd)) {
 			return "Chưa chọn ngày kết thúc";
 		}
-		if (!isValidName(name) && !isValidPercent(percent) && !isValidRoomCost(roomCost) && !isDateStartAfterDateEnd(dateStart, dateEnd) && !isDateStartEqualDateEnd(dateStart, dateEnd)) {
+		if (!isSelectedStatus(status)) {
+			return "Chưa chọn trạng thái";
+		}
+		if (!isValidId(id) && !isValidName(name) && !isValidValue(value) && !isValidCostMin(costMin) && !isValidCostMax(costMax)
+				&& !isDateStartAfterDateEnd(dateStart, dateEnd) && !isDateStartEqualDateEnd(dateStart, dateEnd)) {
 			return "Nhập sai định thông tin khuyến mãi";
+		}
+		if (!isValidId(id)) {
+			return "Nhập sai định dạng mã khuyến mãi";
 		}
 		if (!isValidName(name)) {
 			return "Nhập sai định dạng tên khuyến mãi";
 		}
-		if (!isValidPercent(percent)) {
-			return "Nhập sai định dạng phần trăm (%)";
+		if (!isValidValue(value)) {
+			return "Nhập sai định dạng giá trị";
 		}
-		if (!isValidRoomCost(roomCost)) {
-			return "Nhập sai định dạng mức áp dụng (VNĐ)";
+		if (!isValidCostMin(costMin)) {
+			return "Nhập sai định dạng mức tối thiểu (VNĐ)";
+		}
+		if (!isValidCostMax(costMax)) {
+			return "Nhập sai định dạng mức tối đa (VNĐ)";
 		}
 		if (CommonBLL.compareBetweenTwoDate(dateStart, dateEnd) == 1) {
 			return "Ngày bắt đầu cần phải là trước hoặc bằng ngày kết thúc";
 		}
 
+
 		// - Nếu thoả mãn hết thì thêm vào CSDL
 		String discountId = id;
 		String discountName = name;
-		int discountPercent = Integer.parseInt(percent);
-		long discountRoomCost = Long.parseLong(roomCost);
+		String discountType = type;
+		long discountValue = Long.parseLong(value);
+		long discountCostMin = Long.parseLong(costMin);
+		long discountCostMax = Long.parseLong(costMax);
 		String discountDateStart = dateStart;
 		String discountDateEnd = dateEnd;
 		boolean discountStatus = status.equals("Hoạt động") ? true : false;
 		String discountDateUpdate = dateUpdate;
-		DiscountDTO updatediscountDTO = new DiscountDTO(discountId, discountName, discountPercent, discountRoomCost,
+		DiscountDTO updatediscountDTO = new DiscountDTO(discountId, discountName, discountType, discountValue, discountCostMin, discountCostMax,
 				discountDateStart, discountDateEnd, discountStatus, discountDateUpdate);
 		discountDAL.update(updatediscountDTO);
 
