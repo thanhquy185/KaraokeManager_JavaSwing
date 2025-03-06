@@ -41,23 +41,18 @@ public class Admin_InputTicketManagerPL extends JPanel {
 	private JXDatePicker dateCreateBeforeDatePicker;
 	private JLabel dateCreateRectangleLabel;
 	private JXDatePicker dateCreateAfterDatePicker;
-
 	private JLabel dateContractLabel;
 	private JButton dateContractInformButton;
 	private JXDatePicker dateContractBeforeDatePicker;
 	private JLabel dateContractRectangleLabel;
 	private JXDatePicker dateContractAfterDatePicker;
-
 	private JLabel statusLabel;
 	private Map<String, Boolean> statusRadios;
 	private JButton statusButton;
-	private JLabel numbersOfRowLabel;
-	private JTextField numbersOfRowTextField;
 	private JButton filterApplyButton;
 	private JButton filterResetButton;
 	private JPanel filterPanel;
 	// - Các Component của Data Panel
-	private JButton excelButton;
 	private JButton addButton;
 	private JButton updateButton;
 	private JTable tableData;
@@ -118,11 +113,11 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortButton.setBounds(390, 45, 360, 40);
 
-		// - Tuỳ chỉnh Begin To Create Date Label
+		// - Tuỳ chỉnh Date Create Label
 		dateCreateLabel = CommonPL.getParagraphLabel("Ngày lập phiếu", Color.BLACK, CommonPL.getFontParagraphPlain());
 		dateCreateLabel.setBounds(765, 15, 135, 24);
 
-		// - Tuỳ chỉnh Begin To Create Date Inform Button
+		// - Tuỳ chỉnh Date Create Inform Button
 		dateCreateInformButton = CommonPL.getQuestionIconForm("?", "Chú thích sử dụng lọc Ngày lập phiếu",
 				"Lọc những ngày có trong đoạn từ Ngày trước đến Ngày sau và chỉ cho phép nhập các định dạng như: ddmmyyyy, dd-mm-yyyy.",
 				Color.BLACK, CommonPL.getFontQuestionIcon());
@@ -145,11 +140,11 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				20, 40);
 		dateCreateAfterDatePicker.setBounds(955, 45, 170, 40);
 
-		// - Tuỳ chỉnh Begin To Contract Date Label
+		// - Tuỳ chỉnh Date Contract Label
 		dateContractLabel = CommonPL.getParagraphLabel("Ngày hợp đồng", Color.BLACK, CommonPL.getFontParagraphPlain());
 		dateContractLabel.setBounds(15, 100, 138, 24);
 
-		// - Tuỳ chỉnh Begin To Contract Date Inform Button
+		// - Tuỳ chỉnh Date Contract Inform Button
 		dateContractInformButton = CommonPL.getQuestionIconForm("?", "Chú thích sử dụng lọc Ngày hợp đồng",
 				"Lọc những ngày có trong đoạn từ Ngày trước đến Ngày sau và chỉ cho phép nhập các định dạng như: ddmmyyyy, dd-mm-yyyy.",
 				Color.BLACK, CommonPL.getFontQuestionIcon());
@@ -186,15 +181,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		statusButton.setBounds(390, 130, 360, 40);
 
-		// - Tuỳ chỉnh Numbers Of Row Label
-		numbersOfRowLabel = CommonPL.getParagraphLabel("Số dòng:", Color.BLACK, new Font("Airal", Font.PLAIN, 14));
-		numbersOfRowLabel.setBounds(765, 100, 62, 24);
-
-		// - Tuỳ chỉnh Numbers Of Row Text Field
-		numbersOfRowTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập số dòng", Color.LIGHT_GRAY, Color.BLACK,
-				new Font("Airal", Font.PLAIN, 14));
-		numbersOfRowTextField.setBounds(832, 100, 293, 24);
-
 		// - Tuỳ chỉnh Filter Apply Button
 		filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
@@ -227,30 +213,22 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		filterPanel.add(dateContractAfterDatePicker);
 		filterPanel.add(statusLabel);
 		filterPanel.add(statusButton);
-//		filterPanel.add(numbersOfRowLabel);
-//		filterPanel.add(numbersOfRowTextField);
 		filterPanel.add(filterApplyButton);
 		filterPanel.add(filterResetButton);
 		// <==================== ====================>
 
 		// <===== Cấu trúc Data Panel =====>
-		// - Tuỳ chỉnh Excel Button
-		excelButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
-				CommonPL.getMiddlePathToShowIcon() + "excel-icon.png", "Excel", Color.BLACK, Color.decode("#4C8CFA"),
-				Color.BLACK, Color.decode("#4C8CFA"), CommonPL.getFontParagraphBold());
-		excelButton.setBounds(15, 15, 210, 40);
-
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
 				Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
-		addButton.setBounds(240, 15, 210, 40);
+		addButton.setBounds(15, 15, 210, 40);
 
 		// - Tuỳ chỉnh Update Button
 		updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK,
 				Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
-		updateButton.setBounds(465, 15, 210, 40);
+		updateButton.setBounds(240, 15, 210, 40);
 
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		tableData = CommonPL.createTableData(columns, widthColumns, datas, "input ticket manager");
@@ -262,7 +240,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		dataPanel.setLayout(null);
 		dataPanel.setBackground(Color.WHITE);
 		dataPanel.setBounds(30, 330, 1140, 485);
-		dataPanel.add(excelButton);
 		dataPanel.add(addButton);
 		dataPanel.add(updateButton);
 		dataPanel.add(tableScrollPane);
@@ -305,7 +282,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 
 	// - Các Component của Add Or Update Dialog
 	private JLabel addOrUpdateIdLabel;
-	private JButton addOrUpdateIdButton;
 	private JTextField addOrUpdateIdTextField;
 	private JLabel addOrUpdateDateCreateLabel;
 	private JXDatePicker addOrUpdateDateCreateDatePicker;
@@ -456,34 +432,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		// - Tuỳ chỉnh Add Or Update Id Label
 		addOrUpdateIdLabel = CommonPL.getParagraphLabel("Mã phiếu", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateIdLabel.setBounds(20, 10, 140, 40);
-
-		// - Tuỳ chỉnh Add Or Update Id Button
-		addOrUpdateIdButton = CommonPL.getButtonHasIcon(40, 28, 20, 20, 10, 4,
-				CommonPL.getMiddlePathToShowIcon() + "rotate-icon.png", null, null, null, null, null,
-				new Font("Arial", Font.BOLD, 14));
-		addOrUpdateIdButton.setOpaque(true);
-		addOrUpdateIdButton.setBackground(Color.BLACK);
-		addOrUpdateIdButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent evt) {
-				try {
-					Thread.sleep(100);
-					addOrUpdateIdButton.setBorder(BorderFactory.createLineBorder(Color.decode("#42A5F5"), 2));
-					addOrUpdateIdButton.setBackground(Color.decode("#42A5F5"));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent evt) {
-				addOrUpdateIdButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				addOrUpdateIdButton.setBackground(Color.BLACK);
-			}
-		});
-		addOrUpdateIdButton.setBounds(120, 16, 40, 28);
-		if (object.size() != 0)
-			addOrUpdateIdButton.setVisible(false);
 
 		// - Tuỳ chỉnh Add Or Update Id Text Field
 		addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã", Color.LIGHT_GRAY, Color.BLACK,
@@ -785,7 +733,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		addOrUpdateBlockPanel.setBounds(0, 0, 1140, 630);
 		addOrUpdateBlockPanel.setBackground(Color.WHITE);
 		addOrUpdateBlockPanel.add(addOrUpdateIdLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateIdButton);
 		addOrUpdateBlockPanel.add(addOrUpdateIdTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateDateCreateLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateDateCreateDatePicker);

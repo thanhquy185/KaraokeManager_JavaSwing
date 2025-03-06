@@ -41,16 +41,16 @@ public class Admin_CustomerManagerPL extends JPanel {
 	private JLabel genderLabel;
 	private Map<String, Boolean> genderRadios;
 	private JButton genderButton;
+	private JLabel typeLabel;
+	private Map<String, Boolean> typeRadios;
+	private JButton typeButton;
 	private JLabel statusLabel;
 	private JButton statusButton;
 	private Map<String, Boolean> statusRadios;
-	private JLabel numbersOfRowLabel;
-	private JTextField numbersOfRowTextField;
 	private JButton filterApplyButton;
 	private JButton filterResetButton;
 	private JPanel filterPanel;
 	// - Các Component của Data Panel
-	private JButton excelButton;
 	private JButton addButton;
 	private JButton updateButton;
 	private JButton lockButton;
@@ -63,7 +63,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 	private JLabel addOrUpdateFullnameLabel;
 	private JTextField addOrUpdateFullnameTextField;
 	private JLabel addOrUpdateGenderLabel;
-	private JComboBox addOrUpdateGenderComboBox;
+	private JComboBox<String> addOrUpdateGenderComboBox;
 	private JLabel addOrUpdateBirthdayLabel;
 	private JXDatePicker addOrUpdateBirthdayDatePicker;
 	private JLabel addOrUpdatePhoneLabel;
@@ -99,12 +99,12 @@ public class Admin_CustomerManagerPL extends JPanel {
 
 	// - Các thông tin cần có của Table Data và Table Scroll Pane
 	// + Tiêu đề các cột
-	private final String[] columns = { "CCCD", "Họ và tên", "Ngày sinh", "Giới tính", "Số điện thoại", "Email",
-			"Địa chỉ", "Trạng thái" };
+	private final String[] columns = { "CCCD", "Loại khách hàng", "Họ và tên", "Ngày sinh", "Giới tính",
+			"Số điện thoại", "Email", "Địa chỉ", "Trạng thái" };
 	// + Chiều rộng các cột
-	private final int[] widthColumns = { 200, 500, 150, 150, 150, 400, 600, 150 };
+	private final int[] widthColumns = { 200, 200, 500, 150, 150, 150, 400, 600, 150 };
 	// + Dữ liệu
-	private Object[][] datas = { { "079205012482", "Trần Thanh Quy", "2005-08-01", "Nam", "0987654321",
+	private Object[][] datas = { { "079205012482", "Kim cương", "Trần Thanh Quy", "2005-08-01", "Nam", "0987654321",
 			"thanhquyfu@gmail.com", "475/57/1 Đường CMT8, Phường 13, Quận 10, Thành phố Hồ Chí Minh", "Hoạt động" } };
 	// + Dòng hiện tại đang được chọn
 	private int rowSelected = -1;
@@ -149,9 +149,22 @@ public class Admin_CustomerManagerPL extends JPanel {
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortButton.setBounds(390, 45, 360, 40);
 
+		// - Tuỳ chỉnh Type Label
+		typeLabel = CommonPL.getParagraphLabel("Loại khách hàng", Color.BLACK, CommonPL.getFontParagraphPlain());
+		typeLabel.setBounds(765, 15, 360, 24);
+
+		// - Tuỳ chỉnh Type Radios
+		String[] types = new String[] { "Tất cả", "Thường", "Bạc", "Vàng", "Kim cương" };
+		typeRadios = CommonPL.getMapHasValues(types);
+
+		// - Tuỳ chỉnh Type Button
+		typeButton = CommonPL.ButtonHasRadios.createButtonHasRadios(typeRadios, types[0], Color.LIGHT_GRAY, Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		typeButton.setBounds(765, 45, 360, 40);
+
 		// - Tuỳ chỉnh Gender Label
 		genderLabel = CommonPL.getParagraphLabel("Giới tính", Color.BLACK, CommonPL.getFontParagraphPlain());
-		genderLabel.setBounds(765, 15, 360, 24);
+		genderLabel.setBounds(15, 100, 360, 24);
 
 		// - Tuỳ chỉnh Gender Radios
 		String[] genders = new String[] { "Tất cả", "Nam", "Nữ" };
@@ -160,11 +173,11 @@ public class Admin_CustomerManagerPL extends JPanel {
 		// - Tuỳ chỉnh Gender Button
 		genderButton = CommonPL.ButtonHasRadios.createButtonHasRadios(genderRadios, genders[0], Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
-		genderButton.setBounds(765, 45, 360, 40);
+		genderButton.setBounds(15, 130, 360, 40);
 
 		// - Tuỳ chỉnh status Label
 		statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
-		statusLabel.setBounds(15, 100, 360, 24);
+		statusLabel.setBounds(390, 100, 360, 24);
 
 		// - Tuỳ chỉnh status Radios
 		String[] status = new String[] { "Tất cả", "Hoạt động", "Tạm dừng" };
@@ -173,16 +186,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		// - Tuỳ chỉnh status Button
 		statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusRadios, status[0], Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
-		statusButton.setBounds(15, 130, 360, 40);
-
-		// - Tuỳ chỉnh Numbers Of Row Label
-		numbersOfRowLabel = CommonPL.getParagraphLabel("Số dòng:", Color.BLACK, new Font("Airal", Font.PLAIN, 14));
-		numbersOfRowLabel.setBounds(765, 100, 62, 24);
-
-		// - Tuỳ chỉnh Numbers Of Row Text Field
-		numbersOfRowTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập số dòng", Color.LIGHT_GRAY, Color.BLACK,
-				new Font("Airal", Font.PLAIN, 14));
-		numbersOfRowTextField.setBounds(832, 100, 293, 24);
+		statusButton.setBounds(390, 130, 360, 40);
 
 		// - Tuỳ chỉnh Filter Apply Button
 		filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
@@ -204,40 +208,34 @@ public class Admin_CustomerManagerPL extends JPanel {
 		filterPanel.add(findInputTextField);
 		filterPanel.add(sortLabel);
 		filterPanel.add(sortButton);
-		filterPanel.add(statusLabel);
-		filterPanel.add(statusButton);
+		filterPanel.add(typeLabel);
+		filterPanel.add(typeButton);
 		filterPanel.add(genderLabel);
 		filterPanel.add(genderButton);
-//		filterPanel.add(numbersOfRowLabel);
-//		filterPanel.add(numbersOfRowTextField);
+		filterPanel.add(statusLabel);
+		filterPanel.add(statusButton);
 		filterPanel.add(filterResetButton);
 		filterPanel.add(filterApplyButton);
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Data Panel =====>
-		// - Tuỳ chỉnh Excel Button
-		excelButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
-				CommonPL.getMiddlePathToShowIcon() + "excel-icon.png", "Excel", Color.BLACK, Color.decode("#4C8CFA"),
-				Color.BLACK, Color.decode("#4C8CFA"), CommonPL.getFontParagraphBold());
-		excelButton.setBounds(15, 15, 210, 40);
-
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
 				Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
-		addButton.setBounds(240, 15, 210, 40);
+		addButton.setBounds(15, 15, 210, 40);
 
 		// - Tuỳ chỉnh Update Button
 		updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK,
 				Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
-		updateButton.setBounds(465, 15, 210, 40);
+		updateButton.setBounds(240, 15, 210, 40);
 
 		// - Tuỳ chỉnh Lock Button
 		lockButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "lock-icon.png", "Khoá", Color.BLACK, Color.decode("#9f4d4d"),
 				Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
-		lockButton.setBounds(690, 15, 210, 40);
+		lockButton.setBounds(465, 15, 210, 40);
 
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		// + Tạo cấu trúc bảng dữ liệu
@@ -250,7 +248,6 @@ public class Admin_CustomerManagerPL extends JPanel {
 		dataPanel.setLayout(null);
 		dataPanel.setBackground(Color.WHITE);
 		dataPanel.setBounds(30, 330, 1140, 485);
-		dataPanel.add(excelButton);
 		dataPanel.add(addButton);
 		dataPanel.add(updateButton);
 		dataPanel.add(lockButton);
@@ -447,17 +444,32 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addressDetailDialog.setVisible(true);
 	}
 
+	private JLabel addOrUpdateTypeLabel;
+	private JComboBox<String> addOrUpdateTypeComboBox;
+
 	// Hàm tạo một Dialog cho phép "Thêm" hoặc "Thay đổi" Khách hàng
 	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
 		// <===== Cấu trúc của Add Or Update Block Panel =====>
 		// - Tuỳ chỉnh Add Or Update Id Card Label
 		addOrUpdateIdCardLabel = CommonPL.getParagraphLabel("CCCD", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateIdCardLabel.setBounds(20, 10, 460, 40);
+		addOrUpdateIdCardLabel.setBounds(20, 10, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id Card Text Field
 		addOrUpdateIdCardTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập CCCD", Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateIdCardTextField.setBounds(20, 50, 460, 40);
+		addOrUpdateIdCardTextField.setBounds(20, 50, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Type Label
+		addOrUpdateTypeLabel = CommonPL.getParagraphLabel("Loại khách hàng", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addOrUpdateTypeLabel.setBounds(260, 10, 220, 40);
+
+		// - Tuỳ chỉnh Add Or Update Type Text Field
+		String[] typesArray = { "Chọn Loại khách hàng", "Thường", "Bạc", "Vàng", "Kim cương" };
+		Vector<String> typesVector = CommonPL.getVectorHasValues(typesArray);
+		addOrUpdateTypeComboBox = CommonPL.CustomComboBox(typesVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
+				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateTypeComboBox.setBounds(260, 50, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Fullname Label
 		addOrUpdateFullnameLabel = CommonPL.getParagraphLabel("Họ và tên", Color.BLACK,
@@ -480,11 +492,11 @@ public class Admin_CustomerManagerPL extends JPanel {
 				CommonPL.getFontParagraphPlain(), 40, 40);
 		addOrUpdateBirthdayDatePicker.setBounds(20, 230, 220, 40);
 
-		// - Tuỳ chỉnh Add Or Update Times Of Day Label
+		// - Tuỳ chỉnh Add Or Update Gender Label
 		addOrUpdateGenderLabel = CommonPL.getParagraphLabel("Giới tính", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateGenderLabel.setBounds(260, 190, 220, 40);
 
-		// - Tuỳ chỉnh Add Or Update Times Of Day Text Field
+		// - Tuỳ chỉnh Add Or Update Gender Text Field
 		String[] gendersArray = { "Chọn Giới tính", "Nam", "Nữ" };
 		Vector<String> gendersVector = CommonPL.getVectorHasValues(gendersArray);
 		addOrUpdateGenderComboBox = CommonPL.CustomComboBox(gendersVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
@@ -578,18 +590,23 @@ public class Admin_CustomerManagerPL extends JPanel {
 		// Khi "Thay đổi" một Khách hàng
 		if (title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi") && object.size() != 0) {
 			// - Gán dữ liệu là "Mã CCCD"
-			addOrUpdateIdCardTextField.setText((String) object.get(0));
+			addOrUpdateIdCardTextField.setText(String.valueOf(object.get(0)));
 			addOrUpdateIdCardTextField.setCaretPosition(0);
 			addOrUpdateIdCardTextField.setForeground(Color.BLACK);
+			
+			// - Gán dữ liệu là "Loại khách hàng"
+			addOrUpdateGenderComboBox.setSelectedItem(String.valueOf(object.get(1)));
+			((JTextField) addOrUpdateGenderComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+			addOrUpdateGenderComboBox.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Họ và tên"
-			addOrUpdateFullnameTextField.setText((String) object.get(1));
+			addOrUpdateFullnameTextField.setText(String.valueOf(object.get(2)));
 			addOrUpdateFullnameTextField.setCaretPosition(0);
 			addOrUpdateFullnameTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Ngày sinh"
 			try {
-				Date date = CommonPL.getDateFormat().parse((String) object.get(2));
+				Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(3)));
 				addOrUpdateBirthdayDatePicker.setDate(date);
 				((JButton) addOrUpdateBirthdayDatePicker.getComponent(1))
 						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
@@ -601,27 +618,27 @@ public class Admin_CustomerManagerPL extends JPanel {
 			}
 
 			// - Gán dữ liệu là "Giới tính"
-			addOrUpdateGenderComboBox.setSelectedItem((String) object.get(3));
+			addOrUpdateGenderComboBox.setSelectedItem(String.valueOf(object.get(4)));
 			((JTextField) addOrUpdateGenderComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			addOrUpdateGenderComboBox.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Số điện thoại"
-			addOrUpdatePhoneTextField.setText((String) object.get(4));
+			addOrUpdatePhoneTextField.setText(String.valueOf(object.get(5)));
 			addOrUpdatePhoneTextField.setCaretPosition(0);
 			addOrUpdatePhoneTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Email"
-			addOrUpdateEmailTextField.setText((String) object.get(5));
+			addOrUpdateEmailTextField.setText(String.valueOf(object.get(6)));
 			addOrUpdateEmailTextField.setCaretPosition(0);
 			addOrUpdateEmailTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Địa chỉ"
-			addOrUpdateAddressTextField.setText((String) object.get(6));
+			addOrUpdateAddressTextField.setText(String.valueOf(object.get(7)));
 			addOrUpdateAddressTextField.setCaretPosition(0);
 			addOrUpdateAddressTextField.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Trạng thái"
-			addOrUpdateStatusComboBox.setSelectedItem((String) object.get(7));
+			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(8)));
 			addOrUpdateStatusComboBox.setEnabled(false);
 			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
@@ -638,6 +655,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateBlockPanel.setBackground(Color.WHITE);
 		addOrUpdateBlockPanel.add(addOrUpdateIdCardLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateIdCardTextField);
+		addOrUpdateBlockPanel.add(addOrUpdateTypeLabel);
+		addOrUpdateBlockPanel.add(addOrUpdateTypeComboBox);
 		addOrUpdateBlockPanel.add(addOrUpdateFullnameLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateFullnameTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateBirthdayLabel);
@@ -653,8 +672,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateBlockPanel.add(addOrUpdateAddressTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusComboBox);
-		addOrUpdateBlockPanel.add(addOrUpdateTimeLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateTimeDetailLabel);
+//		addOrUpdateBlockPanel.add(addOrUpdateTimeLabel);
+//		addOrUpdateBlockPanel.add(addOrUpdateTimeDetailLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateButton);
 		// <==================== ====================>
 

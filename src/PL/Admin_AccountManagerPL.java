@@ -26,6 +26,7 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import BLL.AccountBLL;
+import BLL.CommonBLL;
 import BLL.FunctionBLL;
 import BLL.PrivilegeBLL;
 import BLL.PrivilegeDetailBLL;
@@ -56,20 +57,17 @@ public class Admin_AccountManagerPL extends JPanel {
 	private JLabel statusLabel;
 	private Map<String, Boolean> statusRadios;
 	private JButton statusButton;
-	private JLabel numbersOfRowLabel;
-	private JTextField numbersOfRowTextField;
 	private JButton filterApplyButton;
 	private JButton filterResetButton;
 	private JPanel filterPanel;
 	// - Các Component của Data Panel
-	private JButton excelButton;
 	private JButton addButton;
 	private JButton updateButton;
 	private JButton lockButton;
 	private JTable tableData;
 	private JScrollPane tableScrollPane;
 	private JPanel dataPanel;
-	// - Các Component của Add Dialog (dialog thêm một người dùng)
+	// - Các Component của Add Or Update Accont Dialog (dialog thêm một người dùng)
 	private JLabel addOrUpdateIdLabel;
 	private JTextField addOrUpdateIdTextField;
 	private JLabel addOrUpdateFullnameLabel;
@@ -218,15 +216,6 @@ public class Admin_AccountManagerPL extends JPanel {
 				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		statusButton.setBounds(15, 130, 360, 40);
 
-		// - Tuỳ chỉnh Numbers Of Row Label
-		numbersOfRowLabel = CommonPL.getParagraphLabel("Số dòng:", Color.BLACK, new Font("Airal", Font.PLAIN, 14));
-		numbersOfRowLabel.setBounds(765, 100, 62, 24);
-
-		// - Tuỳ chỉnh Numbers Of Row Text Field
-		numbersOfRowTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập số dòng", Color.LIGHT_GRAY, Color.BLACK,
-				new Font("Airal", Font.PLAIN, 14));
-		numbersOfRowTextField.setBounds(832, 100, 293, 24);
-
 		// - Tuỳ chỉnh Filter Apply Button
 		filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
 				CommonPL.getFontParagraphBold());
@@ -251,36 +240,43 @@ public class Admin_AccountManagerPL extends JPanel {
 		filterPanel.add(privilegesButton);
 		filterPanel.add(statusLabel);
 		filterPanel.add(statusButton);
-//		filterPanel.add(numbersOfRowLabel);
-//		filterPanel.add(numbersOfRowTextField);
 		filterPanel.add(filterApplyButton);
 		filterPanel.add(filterResetButton);
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Data Pane =====>
-		// - Tuỳ chỉnh Excel Button
-		excelButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
-				CommonPL.getMiddlePathToShowIcon() + "excel-icon.png", "Excel", Color.BLACK, Color.decode("#4C8CFA"),
-				Color.BLACK, Color.decode("#4C8CFA"), CommonPL.getFontParagraphBold());
-		excelButton.setBounds(15, 15, 210, 40);
+//		// - Tuỳ chỉnh Add Button
+//		addButton = CommonPL.getRoundedBorderButton(20, "Thêm", Color.decode("#699f4c"), Color.WHITE,
+//				CommonPL.getFontParagraphBold());
+//		addButton.setBounds(15, 15, 210, 40);
+//
+//		// - Tuỳ chỉnh Update Button
+//		updateButton = CommonPL.getRoundedBorderButton(20, "Thay đổi", Color.decode("#bf873e"), Color.WHITE,
+//				CommonPL.getFontParagraphBold());
+//		updateButton.setBounds(240, 15, 210, 40);
+//
+//		// - Tuỳ chỉnh Lock Button
+//		lockButton = CommonPL.getRoundedBorderButton(20, "Khoá", Color.decode("#9f4d4d"), Color.WHITE,
+//				CommonPL.getFontParagraphBold());
+//		lockButton.setBounds(465, 15, 210, 40);
 
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
 				Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
-		addButton.setBounds(240, 15, 210, 40);
+		addButton.setBounds(15, 15, 210, 40);
 
 		// - Tuỳ chỉnh Update Button
 		updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK,
 				Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
-		updateButton.setBounds(465, 15, 210, 40);
+		updateButton.setBounds(240, 15, 210, 40);
 
 		// - Tuỳ chỉnh Lock Button
 		lockButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "lock-icon.png", "Khoá", Color.BLACK, Color.decode("#9f4d4d"),
 				Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
-		lockButton.setBounds(690, 15, 210, 40);
+		lockButton.setBounds(465, 15, 210, 40);
 
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		tableData = CommonPL.createTableData(columns, widthColumns, datas, "account manager");
@@ -292,7 +288,6 @@ public class Admin_AccountManagerPL extends JPanel {
 		dataPanel.setLayout(null);
 		dataPanel.setBackground(Color.WHITE);
 		dataPanel.setBounds(30, 330, 1140, 485);
-		dataPanel.add(excelButton);
 		dataPanel.add(addButton);
 		dataPanel.add(updateButton);
 		dataPanel.add(lockButton);
@@ -409,8 +404,8 @@ public class Admin_AccountManagerPL extends JPanel {
 			String[] join = null;
 			String condition = (findValue != null ? String.format(
 					"(maNguoiDung = %s OR hoVaTen LIKE '%%%s%%' OR soDienThoai LIKE '%%%s%%' OR email LIKE '%%%s%%' OR tenTaiKhoan LIKE '%%%s%%')",
-					CommonPL.isValidStringType04(findValue) ? Integer.parseInt(findValue) : 0, findValue,
-					CommonPL.isValidStringType04(findValue) ? Integer.parseInt(findValue) : 0, findValue, findValue)
+					CommonBLL.isValidStringType04(findValue) ? Integer.parseInt(findValue) : 0, findValue,
+					CommonBLL.isValidStringType04(findValue) ? Integer.parseInt(findValue) : 0, findValue, findValue)
 					: "")
 					+ (privilegesValue != null ? (findValue != null ? " AND " + privilegesValue : privilegesValue) : "")
 					+ (statusValue != null

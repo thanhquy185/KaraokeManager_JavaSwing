@@ -65,7 +65,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra mã người dùng đã hợp lệ hay chưa ?
 	public boolean isValidId(String id) {
-		if (!CommonPL.isValidStringType04(id)) {
+		if (!CommonBLL.isValidStringType04(id)) {
 			return false;
 		}
 
@@ -74,7 +74,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra họ và tên đã hợp lệ hay chưa ?
 	public boolean isValidFullname(String fullname) {
-		if (fullname != null && !CommonPL.isValidStringType01(fullname)) {
+		if (fullname != null && !CommonBLL.isValidStringType01(fullname)) {
 			return false;
 		}
 
@@ -83,7 +83,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra số điện thoại đã hợp lệ hay chưa ?
 	public boolean isValidPhone(String phone) {
-		if (phone != null && (phone.length() != 10 || !CommonPL.isValidStringType04(phone))) {
+		if (phone != null && (phone.length() != 10 || !CommonBLL.isValidStringType04(phone))) {
 			return false;
 		}
 
@@ -92,7 +92,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra email đã hợp lệ hay chưa ?
 	public boolean isValidEmail(String email) {
-		if (email != null && !CommonPL.isValidStringType06(email)) {
+		if (email != null && !CommonBLL.isValidStringType06(email)) {
 			return false;
 		}
 
@@ -101,7 +101,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra địa chỉ đã hợp lệ hay chưa ?
 	public boolean isValidAddress(String address) {
-		if (address != null && !CommonPL.isValidStringType05(address)) {
+		if (address != null && !CommonBLL.isValidStringType05(address)) {
 			return false;
 		}
 
@@ -110,7 +110,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra tên tài khoản đã hợp lệ hay chưa ?
 	public boolean isValidUsername(String username) {
-		if (!CommonPL.isValidStringType02(username)) {
+		if (!CommonBLL.isValidStringType02(username)) {
 			return false;
 		}
 
@@ -119,7 +119,7 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra mật khẩu đã hợp lệ hay chưa ?
 	public boolean isValidPassword(String password) {
-		if (!CommonPL.isValidStringType02(password)) {
+		if (!CommonBLL.isValidStringType02(password)) {
 			return false;
 		}
 

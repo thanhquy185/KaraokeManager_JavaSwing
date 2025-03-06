@@ -1,24 +1,26 @@
 package DTO;
 
+import java.math.BigInteger;
+
 public class DiscountDTO {
 	// Properties
 	private String id;
 	private String name;
 	private Integer percent;
-	private Integer level;
+	private Long roomCost;
 	private String dateStart;
 	private String dateEnd;
 	private Boolean status;
 	private String dateUpdate;
 
 	// Constructors
-	public DiscountDTO(String id, String name, Integer percent, Integer level, String dateStart, String dateEnd,
+	public DiscountDTO(String id, String name, Integer percent, Long roomCost, String dateStart, String dateEnd,
 			Boolean status, String dateUpdate) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.percent = percent;
-		this.level = level;
+		this.roomCost = roomCost;
 		this.dateStart = dateStart;
 		this.dateEnd = dateEnd;
 		this.status = status;
@@ -38,8 +40,8 @@ public class DiscountDTO {
 		this.percent = percent;
 	}
 
-	public void setLevel(Integer level) {
-		this.level = level;
+	public void setRoomCost(Long roomCost) {
+		this.roomCost = roomCost;
 	}
 
 	public void setDateStart(String dateStart) {
@@ -70,8 +72,8 @@ public class DiscountDTO {
 		return percent;
 	}
 
-	public Integer getLevel() {
-		return level;
+	public Long getRoomCost() {
+		return roomCost;
 	}
 
 	public String getDateStart() {

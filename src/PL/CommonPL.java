@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -85,6 +86,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
 import DTO.AccountDTO;
+import PL.CommonPL.CustomCornerDatePicker.CustomRoundedBorder;
 
 public class CommonPL {
 	// Kích thước màn hình tiêu chuẩn (dựa trên máy của Quy)
@@ -250,97 +252,56 @@ public class CommonPL {
 	public static long moneyFormatToMoneyLong(String moneyFormat) {
 		return Long.parseLong(moneyFormat.replace(".", ""));
 	}
-
-	// Hàm kiểm tra chuỗi hợp lệ kiểu 1 (cho phép: chữ không dấu, chữ có dấu và số)
-	public static boolean isValidStringType01(String s) {
-		if (s == null || s == "") {
-			return false;
-		}
-
-		String pattern = " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃẢẠÈÉÊẼẺẸÌÍĨỈỊÒÓÔÕỎỌÙÚŨỦỤỲÝỸỶỴĂẰẮẲẴẶÂẦẤẨẪẬÊỀẾỂỄỆÔỒỐỔỖỘƠỜỚỞỠỢƯỪỨỬỮỰĐàáâãảạèéêẽẻẹìíĩỉịòóôõỏọùúũủụỳýỹỷỵăằắẳẵặâầấẩẫậêềếểễệôồốổỗộơờớởỡợưừứửữựđ0123456789";
-		for (int i = 0; i < s.length(); i++) {
-			if (pattern.indexOf(s.charAt(i)) == -1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// Hàm kiểm tra chuỗi hợp lệ kiểu 2 (cho phép: chữ không dấu, số và đặc biệt)
-	public static boolean isValidStringType02(String s) {
-		if (s == null || s == "") {
-			return false;
-		}
-
-		String pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz@#$%^&*()_+={}[]|:;\"'<>,.?/0123456789";
-		for (int i = 0; i < s.length(); i++) {
-			if (pattern.indexOf(s.charAt(i)) == -1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// Hàm kiểm tra chuỗi hợp lệ kiểu 3 (cho phép: chữ không dấu, số)
-	public static boolean isValidStringType03(String s) {
-		if (s == null || s == "") {
-			return false;
-		}
-
-		String pattern = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-		for (int i = 0; i < s.length(); i++) {
-			if (pattern.indexOf(s.charAt(i)) == -1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// Hàm kiểm tra chuỗi hợp lệ kiểu 4 (cho phép: số)
-	public static boolean isValidStringType04(String s) {
-		if (s == null || s == "") {
-			return false;
-		}
-
-		String pattern = "0123456789";
-		for (int i = 0; i < s.length(); i++) {
-			if (pattern.indexOf(s.charAt(i)) == -1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// Hàm kiểm tra chuỗi hợp lệ kiểu 5 (địa chỉ hợp lệ)
-	public static boolean isValidStringType05(String s) {
-		if (s == null || s == "") {
-			return false;
-		}
-
-		String pattern = " /,ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃẢẠÈÉÊẼẺẸÌÍĨỈỊÒÓÔÕỎỌÙÚŨỦỤỲÝỸỶỴĂẰẮẲẴẶÂẦẤẨẪẬÊỀẾỂỄỆÔỒỐỔỖỘƠỜỚỞỠỢƯỪỨỬỮỰĐàáâãảạèéêẽẻẹìíĩỉịòóôõỏọùúũủụỳýỹỷỵăằắẳẵặâầấẩẫậêềếểễệôồốổỗộơờớởỡợưừứửữựđ0123456789";
-		for (int i = 0; i < s.length(); i++) {
-			if (pattern.indexOf(s.charAt(i)) == -1) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	// Hàm kiểm tra chuỗi hợp lệ kiểu 6 (email hợp lệ)
-	public static boolean isValidStringType06(String s) {
-		if (s == null || s == "") {
-			return false;
-		}
-
-		String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-		return Pattern.matches(EMAIL_REGEX, s);
-	}
-
+	
+	// Hàm trả về danh sách các tuần trong tháng
+	public static String[][] getWeeksOfMonth(int year, int month) {
+        List<String[]> weeksList = new ArrayList<>();
+        LocalDate firstDay = LocalDate.of(year, month, 1);
+        LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        
+        LocalDate current = firstDay;
+        int weekNumber = 1;
+        
+        while (!current.isAfter(lastDay)) {
+            LocalDate startOfWeek = current;
+            LocalDate endOfWeek = current.plusDays(6);
+            
+            if (endOfWeek.isAfter(lastDay)) {
+                endOfWeek = lastDay;
+            }
+            
+            weeksList.add(new String[]{
+                String.valueOf(weekNumber),
+                startOfWeek.format(formatter),
+                endOfWeek.format(formatter)
+            });
+            
+            current = endOfWeek.plusDays(1);
+            weekNumber++;
+        }
+        
+        return weeksList.toArray(new String[0][3]);
+    }
+	
+	// Hàm trả về danh sách các tháng trong năm
+	public static String[][] getMonthsOfYear(int year) {
+        String[][] monthsArray = new String[12][3];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        
+        for (int month = 1; month <= 12; month++) {
+            LocalDate firstDay = LocalDate.of(year, month, 1);
+            LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+            
+            monthsArray[month - 1][0] = String.valueOf(month);
+            monthsArray[month - 1][1] = firstDay.format(formatter);
+            monthsArray[month - 1][2] = lastDay.format(formatter);
+        }
+        
+        return monthsArray;
+    }
+	
 	// Hàm tách địa chỉ từ 1 địa chỉ hợp lệ
 
 	// Thiết lập các địa chỉ cho Address Info khi chương trình chạy
@@ -577,6 +538,14 @@ public class CommonPL {
 				entry.setValue(false);
 			}
 		}
+	}
+	
+	// Cập nhật lại giá trị cho JXDatePicker (tìm kiếm / lọc)
+	public static void resetDatePickerForFilter(JXDatePicker datePicker, String text, Color color, int roundLength) {
+		datePicker.getEditor().setText(text);
+		datePicker.getEditor().setForeground(color);
+		datePicker.getEditor().setBorder(new CustomRoundedBorder(color, roundLength, 0, 0, roundLength));
+		((JButton) datePicker.getComponent(1)).setBorder(new CustomRoundedBorder(color, 0, roundLength, roundLength, 0));
 	}
 
 	// Gán giá trị vào Vector
@@ -2065,7 +2034,7 @@ public class CommonPL {
 				String status = String.valueOf(value).trim();
 				JLabel statusLabel = new JLabel(status, JLabel.CENTER);
 
-				if (status.equals("Tổng cộng")) {
+				if (status.equals("TỔNG")) {
 					statusLabel.setBackground(Color.decode("#DEDEDE"));
 					statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
 				} else {

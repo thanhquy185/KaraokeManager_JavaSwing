@@ -27,7 +27,6 @@ public class FunctionDAL implements DAL<FunctionDTO> {
 			pstmt.setBoolean(3, functionDTO.getStatus());
 			pstmt.setString(4, functionDTO.getDateUpdate());
 			rowChange = pstmt.executeUpdate();
-			System.out.println(sql);
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -46,7 +45,7 @@ public class FunctionDAL implements DAL<FunctionDTO> {
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
 			String sql = "UPDATE Karaoke.ChucNang" + "\nSET tenChucNang = ?, trangThai = ?, ngayCapNhat = ?"
-					+ "\nWHERE maNguoiDung = ?";
+					+ "\nWHERE maChucNang = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, functionDTO.getName());
 			pstmt.setBoolean(2, functionDTO.getStatus());
@@ -70,7 +69,7 @@ public class FunctionDAL implements DAL<FunctionDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.ChucNang" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE maNguoiDung = ?";
+			String sql = "UPDATE Karaoke.ChucNang" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE maChucNang = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setBoolean(1, functionDTO.getStatus());
 			pstmt.setString(2, functionDTO.getDateUpdate());

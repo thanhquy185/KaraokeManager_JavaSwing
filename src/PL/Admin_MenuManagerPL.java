@@ -57,7 +57,6 @@ public class Admin_MenuManagerPL extends JPanel {
 	private JButton addOrUpdateAvatarButton;
 	private JTextField addOrUpdateAvatarTextField;
 	private JLabel addOrUpdateIdLabel;
-	private JButton addOrUpdateIdButton;
 	private JTextField addOrUpdateIdTextField;
 	private JLabel addOrUpdateGroupLabel;
 	private JComboBox<String> addOrUpdateGroupComboBox;
@@ -297,34 +296,6 @@ public class Admin_MenuManagerPL extends JPanel {
 		// - Tuỳ chỉnh Add Or Update Id Label
 		addOrUpdateIdLabel = CommonPL.getParagraphLabel("Mã sản phẩm", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateIdLabel.setBounds(500, 10, 220, 40);
-
-		// - Tuỳ chỉnh Add Or Update Id Button
-		addOrUpdateIdButton = CommonPL.getButtonHasIcon(40, 28, 20, 20, 10, 4,
-				CommonPL.getMiddlePathToShowIcon() + "rotate-icon.png", null, null, null, null, null,
-				new Font("Arial", Font.BOLD, 14));
-		addOrUpdateIdButton.setOpaque(true);
-		addOrUpdateIdButton.setBackground(Color.BLACK);
-		addOrUpdateIdButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent evt) {
-				try {
-					Thread.sleep(100);
-					addOrUpdateIdButton.setBorder(BorderFactory.createLineBorder(Color.decode("#42A5F5"), 2));
-					addOrUpdateIdButton.setBackground(Color.decode("#42A5F5"));
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent evt) {
-				addOrUpdateIdButton.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
-				addOrUpdateIdButton.setBackground(Color.BLACK);
-			}
-		});
-		addOrUpdateIdButton.setBounds(680, 16, 40, 28);
-		if (object.size() != 0)
-			addOrUpdateIdButton.setVisible(false);
 
 		// - Tuỳ chỉnh Add Or Update Id TextField
 		addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã sản phẩm", Color.LIGHT_GRAY,
@@ -598,7 +569,6 @@ public class Admin_MenuManagerPL extends JPanel {
 		addOrUpdateBlockPanel.add(addOrUpdateAvatarButton);
 		addOrUpdateBlockPanel.add(addOrUpdateAvatarTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateIdLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateIdButton);
 		addOrUpdateBlockPanel.add(addOrUpdateIdTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateGroupLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateGroupComboBox);

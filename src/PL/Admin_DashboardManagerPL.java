@@ -2,6 +2,7 @@ package PL;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Vector;
 
@@ -52,8 +53,8 @@ public class Admin_DashboardManagerPL extends JPanel {
 
 		// <===== Cấu trúc của Data Panel =====>
 		// - Tuỳ chỉnh Dashboard Type ComboBox
-		String[] dashboardTypes = { "Chọn Loại thống kê", "Thống kê Lợi nhuận", "Thống kê Doanh thu", "Tài sản",
-				"Thống kê Hồ sơ" };
+		String[] dashboardTypes = { "Chọn Loại thống kê", "Thống kê Lợi nhuận", "Thống kê Doanh thu",
+				"Thống kê Phiếu nhập", };
 		Vector<String> dashboardTypesVector = CommonPL.getVectorHasValues(dashboardTypes);
 		dashboardTypeComboBox = CommonPL.CustomComboBox(dashboardTypesVector, Color.WHITE, Color.LIGHT_GRAY,
 				Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontComboBox);
@@ -162,20 +163,19 @@ public class Admin_DashboardManagerPL extends JPanel {
 					if (!subValueSelected.equals("Chọn Mốc thời gian")) {
 						// Nếu chọn "Theo năm"
 						if (subValueSelected.equals("Theo năm")) {
-							// Tính từ năm 1900 đến năm 2100
+							// Tính năm 1900 - năm 2100
 							for (int year = 1900; year <= 2100; year++) {
-								timeDetailsVector.add("Năm " + String.valueOf(year));
+								timeDetailsVector.add(String.format("Năm %04d", year));
 							}
 						}
 
 						// Nếu chọn "Theo tháng"
 						if (subValueSelected.equals("Theo tháng")) {
-							// Tính từ năm 1900 đến năm 2100
+							// Tính năm 1900 - năm 2100
 							for (int year = 1900; year <= 2100; year++) {
-								// Tính từ tháng 1 đến tháng 12
+								// Tính tháng 1 - tháng 12
 								for (int month = 1; month <= 12; month++) {
-									timeDetailsVector
-											.add("Tháng " + String.valueOf(month) + "-" + String.valueOf(year));
+									timeDetailsVector.add(String.format("Tháng %02d/%04d", month, year));
 								}
 							}
 						}
@@ -200,161 +200,193 @@ public class Admin_DashboardManagerPL extends JPanel {
 
 	// Hàm thay đổi lại Table Data và Table Scroll Pane khi "lọc thống kê"
 	private void renderTableAfterFiltered() {
-		// Tên, kịch thước các cột và mảng chứa dữ liệu tương ứng cho từng loại thống kê
+		// Tên, kịch thước các cột và mảng chứa dữ liệu tương ứng cho ng loại thống kê
 		// - Thống kê Thống kê Lợi nhuận
 		// + Tên các cột
-		final String[] profitColumns01 = { "Tháng", "Đầu tư (VNĐ)", "Doanh thu (VNĐ)", "Lợi nhuận (VNĐ)" };
-		final String[] profitColumns02 = { "Tháng", "Đầu tư (VNĐ)", "Doanh thu (VNĐ)", "Lợi nhuận (VNĐ)" };
+		final String[] profitColumns01 = { "Tháng", "Chi (VNĐ)", "Doanh thu (VNĐ)", "Lợi nhuận (VNĐ)" };
+		final String[] profitColumns02 = { "Tuần", "Chi (VNĐ)", "Doanh thu (VNĐ)", "Lợi nhuận (VNĐ)" };
 		// + Chiều rộng các cột
-		final int[] profitWidthColumns = { 444, 222, 222, 222 };
+		final int[] profitWidthColumns = { 280, 240, 240, 350 };
+		// - Thống kê Thống kê Doanh thu
+		// + Tên các cột
+		final String[] revenueColumns01 = { "Tháng", "Số hoá đơn", "Tiền phòng (VNĐ)", "Tiền sản phẩm (VNĐ)",
+				"Tiền giảm (VNĐ)", "Doanh thu (VNĐ)" };
+		final String[] revenueColumns02 = { "Tuần", "Số hoá đơn", "Tiền phòng (VNĐ)", "Tiền sản phẩm (VNĐ)",
+				"Tiền giảm (VNĐ)", "Doanh thu (VNĐ)" };
+		// + Chiều rộng các cột
+		final int[] revenueWidthColumns = { 280, 110, 170, 170, 170, 210 };
+		// - Thống kê Thống kê Phiếu nhập
+		// + Tên các cột
+		final String[] inputTicketColumns01 = { "Tháng", "Số phiếu nhập", "Tổng số nguyên liệu nhập", "Chi (VNĐ)" };
+		final String[] inputTicketColumns02 = { "Tuần", "Số phiếu nhập", "Tổng số nguyên liệu nhập", "Chi (VNĐ)" };
+		// + Chiều rộng các cột
+		final int[] inputTicketWidthColumns = { 280, 240, 240, 350 };
 		// + Dữ liệu
-		Object[][] profitDatas01 = { { "Tháng 01 (từ 01-01-yyyy đến 31-01-yyyy)", "Thống kê Lợi nhuận", "", "" },
-				{ "Tháng 02 (từ 01-02-yyyy đến 31-02-yyyy)", "", "", "" }, { "Tháng 3", "", "", "" },
+		Object[][] inputTicketDatas01 = { { "Tháng 01 (01-01-yyyy - 31-01-yyyy)", "Số phiếu nhập", "", "" },
+				{ "Tháng 02 (01-02-yyyy - 31-02-yyyy)", "", "", "" }, { "Tháng 03", "", "", "" },
 				{ "Tháng 04", "", "", "" }, { "Tháng 05", "", "", "" }, { "Tháng 06", "", "", "" },
 				{ "Tháng 07", "", "", "" }, { "Tháng 08", "", "", "" }, { "Tháng 09", "", "", "" },
 				{ "Tháng 10", "", "", "" }, { "Tháng 11", "", "", "" }, { "Tháng 12", "", "", "" },
 				{ "Tổng cộng", "", "", "" }, };
-		Object[][] profitDatas02 = { { "Tuần 01 (từ 01-mm-yyyy đến 07-mm-yyyy)", "Thống kê Lợi nhuận", "", "" },
-				{ "Tuần 02 (từ 08-mm-yyyy đến 14-mm-yyyy)", "", "", "" },
-				{ "Tuần 03 (từ 15-mm-yyyy đến 21-mm-yyyy)", "", "", "" },
-				{ "Tuần 04 (từ 22-mm-yyyy đến 27-mm-yyyy)", "", "", "" },
-				{ "Tuần 05 (từ 28-mm-yyyy đến 31-mm-yyyy)", "", "", "" }, { "Tổng cộng", "", "", "" }, };
-		// - Thống kê Thống kê Doanh thu
-		// + Tên các cột
-		final String[] revenueColumns01 = { "Tháng", "Đơn hàng", "Thiết bị", "Vật tư", "Thuốc", "Thành tiền (VNĐ)" };
-		final String[] revenueColumns02 = { "Tuần", "Đơn hàng", "Thiết bị", "Vật tư", "Thuốc", "Thành tiền (VNĐ)" };
-		// + Chiều rộng các cột
-		final int[] revenueWidthColumns = { 350, 140, 140, 140, 140, 200 };
-		// + Dữ liệu
-		Object[][] revenueDatas01 = { { "Tháng 01 (từ 01-01-yyyy đến 31-01-yyyy)", "Đơn hàng", "", "", "", "" },
-				{ "Tháng 02 (từ 01-02-yyyy đến 31-02-yyyy)", "", "", "", "", "" }, { "Tháng 03", "", "", "", "", "" },
-				{ "Tháng 04", "", "", "", "", "" }, { "Tháng 05", "", "", "", "", "" },
-				{ "Tháng 06", "", "", "", "", "" }, { "Tháng 07", "", "", "", "", "" },
-				{ "Tháng 08", "", "", "", "", "" }, { "Tháng 09", "", "", "", "", "" },
-				{ "Tháng 10", "", "", "", "", "" }, { "Tháng 11", "", "", "", "", "" },
-				{ "Tháng 12", "", "", "", "", "" }, { "Tổng cộng", "", "", "", "", "" }, };
-		Object[][] revenueDatas02 = { { "Tuần 01 (từ 01-mm-yyyy đến 07-mm-yyyy)", "Đơn hàng", "", "", "", "" },
-				{ "Tuần 02 (từ 08-mm-yyyy đến 14-mm-yyyy)", "", "", "", "", "" },
-				{ "Tuần 03 (từ 15-mm-yyyy đến 21-mm-yyyy)", "", "", "", "", "" },
-				{ "Tuần 04 (từ 22-mm-yyyy đến 27-mm-yyyy)", "", "", "", "", "" },
-				{ "Tuần 05 (từ 28-mm-yyyy đến 31-mm-yyyy)", "", "", "", "", "" },
-				{ "Tổng cộng", "", "", "", "", "" }, };
-//		// - Thống kê Tài sản
-//		// + Tên các cột
-//		final String[] richesColumns01 = { "Tháng", "Thiết bị", "Thành tiền (VNĐ)", "Vật tư", "Thành tiền (VNĐ)",
-//				"Thuốc", "Thành tiền (VNĐ)" };
-//		final String[] richesColumns02 = { "Tuần", "Thiết bị", "Thành tiền (VNĐ)", "Vật tư", "Thành tiền (VNĐ)",
-//				"Thuốc", "Thành tiền (VNĐ)" };
-//		// + Chiều rộng các cột
-//		final int[] richesWidthColumns = { 300, 100, 170, 100, 170, 100, 170 };
-//		// + Dữ liệu
-//		Object[][] richesDatas01 = { { "Tháng 1", "", "", "", "", "", "" }, { "Tháng 2", "", "", "", "", "", "" },
-//				{ "Tháng 3", "", "", "", "", "", "" }, { "Tháng 4", "", "", "", "", "", "" },
-//				{ "Tháng 5", "", "", "", "", "", "" }, { "Tháng 6", "", "", "", "", "", "" },
-//				{ "Tháng 7", "", "", "", "", "", "" }, { "Tháng 8", "", "", "", "", "", "" },
-//				{ "Tháng 9", "", "", "", "", "", "" }, { "Tháng 10", "", "", "", "", "", "" },
-//				{ "Tháng 11", "", "", "", "", "", "" }, { "Tháng 12", "", "", "", "", "", "" },
-//				{ "Tổng cộng", "", "", "", "", "", "" }, };
-//		Object[][] richesDatas02 = { { "Tuần 1 (từ 01-01-yyyy đến 07-01-yyyy)", "", "", "", "", "", "" },
-//				{ "Tuần 2 (từ 08-01-yyyy đến 14-01-yyyy)", "", "", "", "", "", "" },
-//				{ "Tuần 3 (từ 15-01-yyyy đến 21-01-yyyy)", "", "", "", "", "", "" },
-//				{ "Tuần 4 (từ 22-01-yyyy đến 27-01-yyyy)", "", "", "", "", "", "" },
-//				{ "Tuần 5 (từ 28-01-yyyy đến 31-01-yyyy)", "", "", "", "", "", "" }, { "Tổng cộng", "", "", "" }, };
-		// - Thống kê Thống kê Hồ sơ
-		// + Tên các cột
-		final String[] briefColumns01 = { "Tháng", "Đơn khám", "Tiền thu (VNĐ)", "Bệnh án", "Tiền thu (VNĐ)",
-				"Thành tiền (VNĐ)" };
-		final String[] briefColumns02 = { "Tuần", "Đơn khám", "Tiền thu (VNĐ)", "Bệnh án", "Tiền thu (VNĐ)",
-				"Thành tiền (VNĐ)" };
-		// + Chiều rộng các cột
-		final int[] briefWidthColumns = { 350, 120, 180, 120, 180, 180 };
-		// + Dữ liệu
-		Object[][] briefDatas01 = {
-				{ "Tháng 01 (từ 01-01-yyyy đến 31-01-yyyy)", "Đơn đăng ký - Bệnh án", "", "", "", "" },
-				{ "Tháng 02 (từ 01-02-yyyy đến 31-02-yyyy)", "", "", "", "", "" }, { "Tháng 03", "", "", "", "", "" },
-				{ "Tháng 04", "", "", "", "", "" }, { "Tháng 05", "", "", "", "", "" },
-				{ "Tháng 06", "", "", "", "", "" }, { "Tháng 07", "", "", "", "", "" },
-				{ "Tháng 08", "", "", "", "", "" }, { "Tháng 09", "", "", "", "", "" },
-				{ "Tháng 10", "", "", "", "", "" }, { "Tháng 11", "", "", "", "", "" },
-				{ "Tháng 12", "", "", "", "", "" }, { "Tổng cộng", "", "", "", "", "" }, };
-		Object[][] briefDatas02 = {
-				{ "Tuần 01 (từ 01-mm-yyyy đến 07-mm-yyyy)", "Đơn đăng ký - Bệnh án", "", "", "", "" },
-				{ "Tuần 02 (từ 08-mm-yyyy đến 14-mm-yyyy)", "", "", "", "" },
-				{ "Tuần 03 (từ 15-mm-yyyy đến 21-mm-yyyy)", "", "", "", "" },
-				{ "Tuần 04 (từ 22-mm-yyyy đến 27-mm-yyyy)", "", "", "", "" },
-				{ "Tuần 05 (từ 28-mm-yyyy đến 31-mm-yyyy)", "", "", "", "" }, { "Tổng cộng", "", "", "", "" }, };
+		Object[][] inputTicketDatas02 = { { "Tuần 01 (01-mm-yyyy - 07-mm-yyyy)", "", "", "", "" },
+				{ "Tuần 02 (08-mm-yyyy - 14-mm-yyyy)", "", "", "" },
+				{ "Tuần 03 (15-mm-yyyy - 21-mm-yyyy)", "", "", "" },
+				{ "Tuần 04 (22-mm-yyyy - 27-mm-yyyy)", "", "", "" },
+				{ "Tuần 05 (28-mm-yyyy - 31-mm-yyyy)", "", "", "" }, { "Tổng cộng", "", "", "" }, };
 
 		// Nếu là lần đầu nhấn vào mục "Thống kê"
 		// PHẢI XỬ LÝ LÀ THỐNG KÊ THEO NĂM HIỆN TẠI
-		if (!isFirstClickToReadDashboard) {
-			// Cập nhật lại định dạng và các mục cho Dashboard Type ComboBox
-			dashboardTypeComboBox.setSelectedItem("Thống kê Lợi nhuận");
-			dashboardTypeComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-			dashboardTypeComboBox.setForeground(Color.BLACK);
-
-			// Cập nhật lại định dạng và các mục cho Time Type ComboBox
-			String[] timeTypes = { "Chọn Mốc thời gian", "Theo năm", "Theo tháng" };
-			Vector<String> timeTypesVector = CommonPL.getVectorHasValues(timeTypes);
-			CommonPL.updateComboBox(timeTypeComboBox, timeTypesVector, "Theo năm");
-			timeTypeComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-			timeTypeComboBox.setForeground(Color.BLACK);
-
-			// Cập nhật lại định dạng và các mục cho Time Detail ComboBox
-			Vector<String> timeDetailsVector = new Vector<>();
-			for (int year = 1900; year <= 2100; year++) {
-				timeDetailsVector.add("Năm " + String.valueOf(year));
-			}
-			CommonPL.updateComboBox(timeDetailComboBox, timeDetailsVector,
-					String.valueOf("Năm " + LocalDateTime.now().getYear()));
-			timeDetailComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-			timeDetailComboBox.setForeground(Color.BLACK);
-
-			// Cập nhật lại bảng dữ liệu và thêm vào Data Panel
-			CommonPL.updateTableData(tableData, profitColumns01, profitWidthColumns, profitDatas01);
-			isYearFiltered = true;
-			tableScrollPane.setBounds(15, 60, 1110, 630);
-
-			isFirstClickToReadDashboard = true;
-		}
+//		if (!isFirstClickToReadDashboard) {
+//			// Cập nhật lại định dạng và các mục cho Dashboard Type ComboBox
+//			dashboardTypeComboBox.setSelectedItem("Thống kê Lợi nhuận");
+//			dashboardTypeComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+//			dashboardTypeComboBox.setForeground(Color.BLACK);
+//
+//			// Cập nhật lại định dạng và các mục cho Time Type ComboBox
+//			String[] timeTypes = { "Chọn Mốc thời gian", "Theo năm", "Theo tháng" };
+//			Vector<String> timeTypesVector = CommonPL.getVectorHasValues(timeTypes);
+//			CommonPL.updateComboBox(timeTypeComboBox, timeTypesVector, "Theo năm");
+//			timeTypeComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+//			timeTypeComboBox.setForeground(Color.BLACK);
+//
+//			// Cập nhật lại định dạng và các mục cho Time Detail ComboBox
+//			Vector<String> timeDetailsVector = new Vector<>();
+//			for (int year = 1900; year <= 2100; year++) {
+//				timeDetailsVector.add("Năm " + String.valueOf(year));
+//			}
+//			CommonPL.updateComboBox(timeDetailComboBox, timeDetailsVector,
+//					String.valueOf("Năm " + LocalDateTime.now().getYear()));
+//			timeDetailComboBox.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+//			timeDetailComboBox.setForeground(Color.BLACK);
+//
+//			// Cập nhật lại bảng dữ liệu và thêm vào Data Panel
+//			CommonPL.updateTableData(tableData, profitColumns01, profitWidthColumns, profitDatas01);
+//			isYearFiltered = true;
+//			tableScrollPane.setBounds(15, 60, 1110, 630);
+//
+//			isFirstClickToReadDashboard = true;
+//		}
 
 		// Thay đổi khi nhấn nút "Lọc"
 		filterButton.addActionListener(e -> {
 			// Lấy ra giá trị được hiện tại của các ComboBox
-			String currentDashboardType = (String) dashboardTypeComboBox.getSelectedItem();
-			String currentTimeType = (String) timeTypeComboBox.getSelectedItem();
-			String currentTimeDetail = (String) timeDetailComboBox.getSelectedItem();
+			String currentDashboardType = String.valueOf(dashboardTypeComboBox.getSelectedItem());
+			String currentTimeType = String.valueOf(timeTypeComboBox.getSelectedItem());
+			String currentTimeDetail = String.valueOf(timeDetailComboBox.getSelectedItem());
 
+			// Gán tháng và năm tuỳ theo Mốc theo gian
+			int month = -1, year = -1;
+			if (currentTimeType.equals("Theo năm")) {
+				year = Integer.parseInt(currentTimeDetail.split(" ")[1]);
+			} else if (currentTimeType.equals("Theo tháng")) {
+				month = Integer.parseInt(currentTimeDetail.substring(6, 8));
+				year = Integer.parseInt(currentTimeDetail.substring(9));
+			}
+
+			// Tuỳ theo mục đã chọn mà in ra bảng thống kê tương ứng
 			if (!currentDashboardType.equals("Chọn Loại thống kê") && !currentTimeType.equals("Chọn Mốc thời gian")
 					&& !currentTimeDetail.equals("Chọn Thời gian cụ thể")) {
+				String[][] times = month != -1 ? CommonPL.getWeeksOfMonth(year, month) : CommonPL.getMonthsOfYear(year);
+
 				if (currentDashboardType.equals("Thống kê Lợi nhuận")) {
+					Object[][] profitDatas = new Object[times.length + 1][profitWidthColumns.length];
+					
+					BigInteger totalInvest = new BigInteger("0");
+					BigInteger totalRevenue = new BigInteger("0");
+					BigInteger totalProfit = new BigInteger("0");
+					
+					for (int i = 0; i < profitDatas.length - 1; i++) {
+						profitDatas[i][0] = String.format("%s %02d (%s - %s)", month != -1 ? "Tuần" : "Tháng",
+								Integer.parseInt(times[i][0]), times[i][1], times[i][2]);
+						profitDatas[i][1] = i + 1;
+						profitDatas[i][2] = i + 1;
+						profitDatas[i][3] = Integer.parseInt(String.valueOf(profitDatas[i][1])) - Integer.parseInt(String.valueOf(profitDatas[i][2]));
+						
+						totalInvest = totalInvest.add(new BigInteger(String.valueOf(profitDatas[i][1])));
+						totalRevenue = totalRevenue.add(new BigInteger(String.valueOf(profitDatas[i][2])));
+						totalProfit = totalProfit.add(new BigInteger(String.valueOf(profitDatas[i][3])));
+					}
+					profitDatas[profitDatas.length - 1][0] = "TỔNG";
+					profitDatas[profitDatas.length - 1][1] = totalInvest;
+					profitDatas[profitDatas.length - 1][2] = totalRevenue;
+					profitDatas[profitDatas.length - 1][3] = totalProfit;
+
 					if (currentTimeType.equals("Theo năm")) {
-						CommonPL.updateTableData(tableData, profitColumns01, profitWidthColumns, profitDatas01);
+						CommonPL.updateTableData(tableData, profitColumns01, profitWidthColumns, profitDatas);
 						isYearFiltered = true;
 					} else if (currentTimeType.equals("Theo tháng")) {
-						CommonPL.updateTableData(tableData, profitColumns02, profitWidthColumns, profitDatas02);
+						CommonPL.updateTableData(tableData, profitColumns02, profitWidthColumns, profitDatas);
 						isYearFiltered = false;
 					}
 				} else if (currentDashboardType.equals("Thống kê Doanh thu")) {
+					Object[][] revenueDatas = new Object[times.length + 1][revenueWidthColumns.length];
+					
+					BigInteger totalBill = new BigInteger("0");
+					BigInteger totalRoomCost = new BigInteger("0");
+					BigInteger totalProductCost = new BigInteger("0");
+					BigInteger totalDiscountCost = new BigInteger("0");
+					BigInteger totalRevenue = new BigInteger("0");
+					
+					for (int i = 0; i < revenueDatas.length - 1; i++) {
+						revenueDatas[i][0] = String.format("%s %02d (%s - %s)", month != -1 ? "Tuần" : "Tháng",
+								Integer.parseInt(times[i][0]), times[i][1], times[i][2]);
+						revenueDatas[i][1] = i + 1;
+						revenueDatas[i][2] = i + 1;
+						revenueDatas[i][3] = i + 1;
+						revenueDatas[i][4] = i + 1;
+						revenueDatas[i][5] = Integer.parseInt(String.valueOf(revenueDatas[i][1])) +  Integer.parseInt(String.valueOf(revenueDatas[i][2])) +  Integer.parseInt(String.valueOf(revenueDatas[i][3])) - Integer.parseInt(String.valueOf(revenueDatas[i][4]));
+						
+						totalBill = totalBill.add(new BigInteger(String.valueOf(revenueDatas[i][1])));
+						totalRoomCost = totalRoomCost.add(new BigInteger(String.valueOf(revenueDatas[i][2])));
+						totalProductCost = totalProductCost.add(new BigInteger(String.valueOf(revenueDatas[i][3])));
+						totalDiscountCost = totalDiscountCost.add(new BigInteger(String.valueOf(revenueDatas[i][4])));
+						totalRevenue = totalRevenue.add(new BigInteger(String.valueOf(revenueDatas[i][5])));
+					}
+					revenueDatas[revenueDatas.length - 1][0] = "TỔNG";
+					revenueDatas[revenueDatas.length - 1][1] = totalBill;
+					revenueDatas[revenueDatas.length - 1][2] = totalRoomCost;
+					revenueDatas[revenueDatas.length - 1][3] = totalProductCost;
+					revenueDatas[revenueDatas.length - 1][4] = totalDiscountCost;
+					revenueDatas[revenueDatas.length - 1][5] = totalRevenue;
+					
 					if (currentTimeType.equals("Theo năm")) {
-						CommonPL.updateTableData(tableData, revenueColumns01, revenueWidthColumns, revenueDatas01);
+						CommonPL.updateTableData(tableData, revenueColumns01, revenueWidthColumns, revenueDatas);
 						isYearFiltered = true;
 					} else if (currentTimeType.equals("Theo tháng")) {
-						CommonPL.updateTableData(tableData, revenueColumns02, revenueWidthColumns, revenueDatas02);
+						CommonPL.updateTableData(tableData, revenueColumns02, revenueWidthColumns, revenueDatas);
 						isYearFiltered = false;
 					}
-				} else if (currentDashboardType.equals("Thống kê Hồ sơ")) {
+				} else if (currentDashboardType.equals("Thống kê Phiếu nhập")) {
+					Object[][] inputTicketDatas = new Object[times.length + 1][inputTicketWidthColumns.length];
+					
+					BigInteger totalTicket = new BigInteger("0");
+					BigInteger totalIngredient = new BigInteger("0");
+					BigInteger totalInvest = new BigInteger("0");
+					
+					for (int i = 0; i < inputTicketDatas.length - 1; i++) {
+						inputTicketDatas[i][0] = String.format("%s %02d (%s - %s)", month != -1 ? "Tuần" : "Tháng",
+								Integer.parseInt(times[i][0]), times[i][1], times[i][2]);
+						inputTicketDatas[i][1] = i + 1;
+						inputTicketDatas[i][2] = i + 1;
+						inputTicketDatas[i][3] = 0;
+						
+						totalTicket = totalTicket.add(new BigInteger(String.valueOf(inputTicketDatas[i][1])));
+						totalIngredient = totalIngredient.add(new BigInteger(String.valueOf(inputTicketDatas[i][2])));
+						totalInvest = totalInvest.add(new BigInteger(String.valueOf(inputTicketDatas[i][3])));
+					}
+					inputTicketDatas[inputTicketDatas.length - 1][0] = "TỔNG";
+					inputTicketDatas[inputTicketDatas.length - 1][1] = totalTicket;
+					inputTicketDatas[inputTicketDatas.length - 1][2] = totalIngredient;
+					inputTicketDatas[inputTicketDatas.length - 1][3] = totalInvest;
+					
 					if (currentTimeType.equals("Theo năm")) {
-						CommonPL.updateTableData(tableData, briefColumns01, briefWidthColumns, briefDatas01);
+						CommonPL.updateTableData(tableData, inputTicketColumns01, inputTicketWidthColumns,
+								inputTicketDatas);
 						isYearFiltered = true;
 					} else if (currentTimeType.equals("Theo tháng")) {
-						CommonPL.updateTableData(tableData, briefColumns02, briefWidthColumns, briefDatas02);
+						CommonPL.updateTableData(tableData, inputTicketColumns02, inputTicketWidthColumns,
+								inputTicketDatas);
 						isYearFiltered = false;
-					}
-				} else if (currentDashboardType.equals("")) {
-					if (currentTimeType.equals("Theo năm")) {
-
-					} else if (currentTimeType.equals("Theo tháng")) {
-
 					}
 				}
 
