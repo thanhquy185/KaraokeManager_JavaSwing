@@ -1,8 +1,5 @@
 package Program;
 
-import java.util.Arrays;
-
-import PL.CommonPL;
 import PL.FramePL;
 
 public class Program {
