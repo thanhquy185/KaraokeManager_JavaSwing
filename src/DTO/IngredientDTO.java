@@ -5,12 +5,12 @@ public class IngredientDTO {
 	private String id;
 	private String name;
 	private String unit;
-	private String inventory;
+	private int inventory;
 	private Boolean status;
 	private String dateUpdate;
 
 	// Constructors
-	public IngredientDTO(String id, String name, String unit, String inventory, Boolean status, String dateUpdate) {
+	public IngredientDTO(String id, String name, String unit, int inventory, Boolean status, String dateUpdate) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -33,7 +33,7 @@ public class IngredientDTO {
 		this.unit = unit;
 	}
 
-	public void setInventory(String inventory) {
+	public void setInventory(int inventory) {
 		this.inventory = inventory;
 	}
 
@@ -57,7 +57,7 @@ public class IngredientDTO {
 		return unit;
 	}
 
-	public String getInventory() {
+	public int getInventory() {
 		return inventory;
 	}
 

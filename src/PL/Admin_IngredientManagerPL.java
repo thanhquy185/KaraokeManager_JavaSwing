@@ -4,9 +4,9 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 
@@ -24,412 +24,459 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import BLL.IngredientBLL;
+import DTO.IngredientDTO;
 import PL.CommonPL.CustomTextField;
 
 public class Admin_IngredientManagerPL extends JPanel {
-	// Các Component
-	private JLabel titleLabel;
-	// - Các Component của Filter Panel
-	private JLabel findLabel;
-	private JTextField findInputTextField;
-	private JButton findInformButton;
-	private JLabel sortLabel;
-	private Map<String, Boolean> sortCheckboxs;
-	private JButton sortButton;
-	private JLabel unitLabel;
-	private Map<String, Boolean> unitCheckboxs;
-	private JButton unitButton;
-	private JLabel inventoryLabel;
-	private Map<String, Boolean> inventoryCheckboxs;
-	private JButton inventoryButton;
-	private JLabel statusLabel;
-	private Map<String, Boolean> statusCheckboxs;
-	private JButton statusButton;
-	private JButton filterApplyButton;
-	private JButton filterResetButton;
-	private JPanel filterPanel;
-	// - Các Component của Data Panel
-	private JButton addButton;
-	private JButton updateButton;
-	private JButton lockButton;
-	private JTable tableData;
-	private JScrollPane tableScrollPane;
-	private JPanel dataPanel;
-	// - Các Component của Add Or Update Dialog
-	private JLabel addOrUpdateIdLabel;
-	private JTextField addOrUpdateIdTextField;
-	private JLabel addOrUpdateNameLabel;
-	private JTextField addOrUpdateNameTextField;
-	private JLabel addOrUpdateUnitLabel;
-	private JComboBox<String> addOrUpdateUnitComboBox;
-	private JLabel addOrUpdateStatusLabel;
-	private JComboBox<String> addOrUpdateStatusComboBox;
-	private JLabel addOrUpdateTimeLabel;
-	private JLabel addOrUpdateTimeDetailLabel;
-	private JButton addOrUpdateButton;
-	private JPanel addOrUpdateBlockPanel;
-	private JDialog addOrUpdateDialog;
-	// - Các thông tin cần có của Table Data và Table Scroll Pane
-	// + Tiêu đề các cột
-	private final String[] columns = { "Mã nguyên liệu", "Tên nguyên liệu", "Đơn vị", "Tồn kho", "Trạng thái" };
-	// + Chiều rộng các cột
-	private final int[] widthColumns = { 150, 510, 150, 150, 150 };
-	// + Dữ liệu
-	private Object[][] datas = { { "NL0001", "Trứng gà", "Quả", "0", "Hoạt động" },
-			{ "NL0002", "Mì gói Hảo Hảo", "Gói", "10", "Hoạt động" } };
+    // Đối tượng từ tầng Business Logic Layer
+    private IngredientBLL ingredientBLL;
 
-	// + Dòng hiện tại đang được chọn
-	private int rowSelected = -1;
-	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
-	private Boolean[] valueSelected = { null };
+    // Các Component
+    private JLabel titleLabel;
+    // - Các Component của Filter Panel
+    private JLabel findLabel;
+    private JTextField findInputTextField;
+    private JButton findInformButton;
+    private JLabel sortLabel;
+    private Map<String, Boolean> sortCheckboxs;
+    private JButton sortButton;
+    private JLabel unitLabel;
+    private Map<String, Boolean> unitCheckboxs;
+    private JButton unitButton;
+    private JLabel inventoryLabel;
+    private Map<String, Boolean> inventoryCheckboxs;
+    private JButton inventoryButton;
+    private JLabel statusLabel;
+    private Map<String, Boolean> statusCheckboxs;
+    private JButton statusButton;
+    private JButton filterApplyButton;
+    private JButton filterResetButton;
+    private JPanel filterPanel;
+    // - Các Component của Data Panel
+    private JButton addButton;
+    private JButton updateButton;
+    private JButton lockButton;
+    private JTable tableData;
+    private JScrollPane tableScrollPane;
+    private JPanel dataPanel;
+    // - Các Component của Add Or Update Dialog
+    private JLabel addOrUpdateIdLabel;
+    private JTextField addOrUpdateIdTextField;
+    private JLabel addOrUpdateNameLabel;
+    private JTextField addOrUpdateNameTextField;
+    private JLabel addOrUpdateUnitLabel;
+    private JComboBox<String> addOrUpdateUnitComboBox;
+    private JLabel addOrUpdateInventoryLabel;
+    private JTextField addOrUpdateInventoryTextField;
+    private JLabel addOrUpdateStatusLabel;
+    private JComboBox<String> addOrUpdateStatusComboBox;
+    private JLabel addOrUpdateTimeLabel;
+    private JLabel addOrUpdateTimeDetailLabel;
+    private JButton addOrUpdateButton;
+    private JPanel addOrUpdateBlockPanel;
+    private JDialog addOrUpdateDialog;
+    // - Các thông tin cần có của Table Data và Table Scroll Pane
+    private final String[] columns = { "Mã nguyên liệu", "Tên nguyên liệu", "Đơn vị", "Tồn kho", "Trạng thái" };
+    private final int[] widthColumns = { 150, 510, 150, 150, 150 };
+    private Object[][] datas = {};
+    private int rowSelected = -1;
+    private Boolean[] valueSelected = { null };
+    // - Các thông tin cần thiết cho lọc và sắp xếp
+    private final String[] sortsString = { "Mã nguyên liệu tăng dần", "Mã nguyên liệu giảm dần", "Tên nguyên liệu tăng dần", "Tên nguyên liệu giảm dần" };
+    private final String[] sortsSQL = { "maNguyenLieu ASC", "maNguyenLieu DESC", "tenNguyenLieu ASC", "tenNguyenLieu DESC" };
+    private final String[] unitsString = { "Tất cả", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" };
+    private final String[] unitsSQL = { "", "donVi = 'Gói'", "donVi = 'Quả'", "donVi = 'Hộp'", "donVi = 'Thẻ'", "donVi = 'Chai'", "donVi = 'Lon'", "donVi = 'Bó'" };
+    private final String[] inventoryString = { "Tất cả", "Còn hàng", "Hết hàng" };
+    private final String[] inventorySQL = { "", "tonKho > 0", "tonKho = 0" }; 
+    private final String[] statusStringForFilter = { "Tất cả", "Hoạt động", "Tạm dừng" };
+    private final String[] statusSQL = { "", "trangThai = 1", "trangThai = 0" };
+    
+    public Admin_IngredientManagerPL() {
+        // Khởi tạo đối tượng BLL
+        ingredientBLL = new IngredientBLL();
 
-	public Admin_IngredientManagerPL() {
-		// <===== Cấu trúc Title Label =====>
-		// - Tuỳ chỉnh Title Label
-		titleLabel = CommonPL.getTitleLabel("Nguyên liệu", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER,
-				SwingConstants.CENTER);
-		titleLabel.setBounds(30, 0, 1110, 115);
-		// <==================== ====================>
+        // <===== Cấu trúc Title Label =====>
+        titleLabel = CommonPL.getTitleLabel("Nguyên liệu", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER, SwingConstants.CENTER);
+        titleLabel.setBounds(30, 0, 1140, 115);
 
-		// <===== Cấu trúc Filter Panel =====>
-		// - Tuỳ chỉnh Find Input Label
-		findLabel = CommonPL.getParagraphLabel("Tìm kiếm", Color.BLACK, CommonPL.getFontParagraphPlain());
-		findLabel.setBounds(15, 15, 90, 24);
+        // <===== Cấu trúc Filter Panel =====>
+        findLabel = CommonPL.getParagraphLabel("Tìm kiếm", Color.BLACK, CommonPL.getFontParagraphPlain());
+        findLabel.setBounds(15, 15, 90, 24);
 
-		// - Tuỳ chỉnh Find Input Inform Button
-		findInformButton = CommonPL.getQuestionIconForm("?", "Thông tin bạn có thể tìm kiếm",
-				"Bạn có thể tìm kiếm bằng các thông tin như: mã Nguyên liệu, tên Nguyên liệu", Color.BLACK,
-				CommonPL.getFontQuestionIcon());
-		findInformButton.setBounds(110, 15, 24, 24);
+        findInformButton = CommonPL.getQuestionIconForm("?", "Thông tin bạn có thể tìm kiếm",
+                "Bạn có thể tìm kiếm bằng các thông tin như: mã Nguyên liệu, tên Nguyên liệu", Color.BLACK, CommonPL.getFontQuestionIcon());
+        findInformButton.setBounds(110, 15, 24, 24);
 
-		// - Tuỳ chỉnh Find Input Text Field
-		findInputTextField = new CommonPL.CustomTextField(0, 20, 20, "Nhập thông tin", Color.LIGHT_GRAY, Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		findInputTextField.setBounds(15, 45, 360, 40);
+        findInputTextField = new CommonPL.CustomTextField(0, 20, 20, "Nhập thông tin", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        findInputTextField.setBounds(15, 45, 360, 40);
 
-		// - Tuỳ chỉnh Sort Label
-		sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
-		sortLabel.setBounds(390, 15, 360, 24);
+        sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
+        sortLabel.setBounds(390, 15, 360, 24);
 
-		// - Tuỳ chỉnh Sort Checkboxs
-		String[] sorts = new String[] { "Mã Nguyên liệu tăng dần", "Mã Nguyên liệu giảm dần",
-				"Tên Nguyên liệu tăng dần", "Tên Nguyên liệu giảm dần" };
-		sortCheckboxs = CommonPL.getMapHasValues(sorts);
+        sortCheckboxs = CommonPL.getMapHasValues(sortsString);
+        sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sortsString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        sortButton.setBounds(390, 45, 360, 40);
 
-		// - Tuỳ chỉnh Sort Button
-		sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sorts[0], Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		sortButton.setBounds(390, 45, 360, 40);
+        unitLabel = CommonPL.getParagraphLabel("Đơn vị", Color.BLACK, CommonPL.getFontParagraphPlain());
+        unitLabel.setBounds(765, 15, 360, 24);
 
-		// - Tuỳ chỉnh Unit Label
-		unitLabel = CommonPL.getParagraphLabel("Đơn vị", Color.BLACK, CommonPL.getFontParagraphPlain());
-		unitLabel.setBounds(765, 15, 360, 24);
+        unitCheckboxs = CommonPL.getMapHasValues(unitsString);
+        unitButton = CommonPL.ButtonHasRadios.createButtonHasRadios(unitCheckboxs, unitsString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        unitButton.setBounds(765, 45, 360, 40);
 
-		// - Tuỳ chỉnh Unit Checkboxs
-		String[] units = new String[] { "Tất cả", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" };
-		unitCheckboxs = CommonPL.getMapHasValues(units);
+        inventoryLabel = CommonPL.getParagraphLabel("Tồn kho", Color.BLACK, CommonPL.getFontParagraphPlain());
+        inventoryLabel.setBounds(15, 100, 360, 24);
 
-		// - Tuỳ chỉnh Unit Button
-		unitButton = CommonPL.ButtonHasRadios.createButtonHasRadios(unitCheckboxs, units[0], Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		unitButton.setBounds(765, 45, 360, 40);
+        inventoryCheckboxs = CommonPL.getMapHasValues(inventoryString);
+        inventoryButton = CommonPL.ButtonHasRadios.createButtonHasRadios(inventoryCheckboxs, inventoryString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        inventoryButton.setBounds(15, 130, 360, 40);
 
-		// - Tuỳ chỉnh Inventory Label
-		inventoryLabel = CommonPL.getParagraphLabel("Tồn kho", Color.BLACK, CommonPL.getFontParagraphPlain());
-		inventoryLabel.setBounds(15, 100, 360, 24);
+        statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
+        statusLabel.setBounds(390, 100, 360, 24);
 
-		// - Tuỳ chỉnh Inventory Checkboxs
-		String[] inventorys = new String[] { "Tất cả", "Còn hàng", "Hết hàng" };
-		inventoryCheckboxs = CommonPL.getMapHasValues(inventorys);
+        statusCheckboxs = CommonPL.getMapHasValues(statusStringForFilter);
+        statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusCheckboxs, statusStringForFilter[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        statusButton.setBounds(390, 130, 360, 40);
 
-		// - Tuỳ chỉnh Inventory Button
-		inventoryButton = CommonPL.ButtonHasRadios.createButtonHasRadios(inventoryCheckboxs, inventorys[0],
-				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		inventoryButton.setBounds(15, 130, 360, 40);
+        filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE, CommonPL.getFontParagraphBold());
+        filterApplyButton.setBounds(765, 130, 170, 40);
 
-		// - Tuỳ chỉnh Status Label
-		statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
-		statusLabel.setBounds(390, 100, 360, 24);
+        filterResetButton = CommonPL.getRoundedBorderButton(20, "Đặt lại", Color.decode("#f44336"), Color.WHITE, CommonPL.getFontParagraphBold());
+        filterResetButton.setBounds(955, 130, 170, 40);
 
-		// - Tuỳ chỉnh Status Checkboxs
-		String[] status = new String[] { "Tất cả", "Hoạt động", "Tạm dừng" };
-		statusCheckboxs = CommonPL.getMapHasValues(status);
+        filterPanel = new CommonPL.RoundedPanel(12);
+        filterPanel.setLayout(null);
+        filterPanel.setBounds(30, 115, 1140, 185);
+        filterPanel.setBackground(Color.WHITE);
+        filterPanel.add(findLabel);
+        filterPanel.add(findInformButton);
+        filterPanel.add(findInputTextField);
+        filterPanel.add(sortLabel);
+        filterPanel.add(sortButton);
+        filterPanel.add(unitLabel);
+        filterPanel.add(unitButton);
+        filterPanel.add(inventoryLabel);
+        filterPanel.add(inventoryButton);
+        filterPanel.add(statusLabel);
+        filterPanel.add(statusButton);
+        filterPanel.add(filterApplyButton);
+        filterPanel.add(filterResetButton);
 
-		// - Tuỳ chỉnh Status Button
-		statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusCheckboxs, status[0], Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		statusButton.setBounds(390, 130, 360, 40);
+        // <===== Cấu trúc Data Panel =====>
+        addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+                CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"), Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
+        addButton.setBounds(15, 15, 210, 40);
 
-		// - Tuỳ chỉnh Filter Apply Button
-		filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
-				CommonPL.getFontParagraphBold());
-		filterApplyButton.setBounds(765, 130, 170, 40);
+        updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+                CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK, Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
+        updateButton.setBounds(240, 15, 210, 40);
 
-		// - Tuỳ chỉnh Filter Reset Button
-		filterResetButton = CommonPL.getRoundedBorderButton(20, "Đặt lại", Color.decode("#f44336"), Color.WHITE,
-				CommonPL.getFontParagraphBold());
-		filterResetButton.setBounds(955, 130, 170, 40);
+        lockButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+                CommonPL.getMiddlePathToShowIcon() + "lock-icon.png", "Khoá", Color.BLACK, Color.decode("#9f4d4d"), Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
+        lockButton.setBounds(465, 15, 210, 40);
 
-		// - Tuỳ chỉnh Add Or Update Filter Panel
-		filterPanel = new CommonPL.RoundedPanel(12);
-		filterPanel.setLayout(null);
-		filterPanel.setBounds(30, 115, 1140, 185);
-		filterPanel.setBackground(Color.WHITE);
-		filterPanel.add(findLabel);
-		filterPanel.add(findInformButton);
-		filterPanel.add(findInputTextField);
-		filterPanel.add(sortLabel);
-		filterPanel.add(sortButton);
-		filterPanel.add(statusLabel);
-		filterPanel.add(statusButton);
-		filterPanel.add(inventoryLabel);
-		filterPanel.add(inventoryButton);
-		filterPanel.add(unitLabel);
-		filterPanel.add(unitButton);
-		filterPanel.add(filterApplyButton);
-		filterPanel.add(filterResetButton);
+        tableData = CommonPL.createTableData(columns, widthColumns, datas, "ingredient manager");
+        tableScrollPane = CommonPL.createScrollPane(true, true, tableData);
+        tableScrollPane.setBounds(15, 70, 1110, 400);
 
-		// <===== Cấu trúc Data Panel =====>
-		// - Tuỳ chỉnh Add Button
-		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
-				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
-				Color.BLACK, Color.decode("#699f4c"), CommonPL.getFontParagraphBold());
-		addButton.setBounds(15, 15, 210, 40);
+        dataPanel = new CommonPL.RoundedPanel(12);
+        dataPanel.setLayout(null);
+        dataPanel.setBackground(Color.WHITE);
+        dataPanel.setBounds(30, 330, 1140, 485);
+        dataPanel.add(addButton);
+        dataPanel.add(updateButton);
+        dataPanel.add(lockButton);
+        dataPanel.add(tableScrollPane);
 
-		// - Tuỳ chỉnh Update Button
-		updateButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
-				CommonPL.getMiddlePathToShowIcon() + "update-icon.png", "Thay đổi", Color.BLACK,
-				Color.decode("#bf873e"), Color.BLACK, Color.decode("#bf873e"), CommonPL.getFontParagraphBold());
-		updateButton.setBounds(240, 15, 210, 40);
+        // Định nghĩa tính chất cho PL
+        this.setSize(CommonPL.getMainWidth(), CommonPL.getScreenHeightByOwner());
+        this.setLayout(null);
+        this.add(titleLabel);
+        this.add(filterPanel);
+        this.add(dataPanel);
 
-		// - Tuỳ chỉnh Lock Button
-		lockButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
-				CommonPL.getMiddlePathToShowIcon() + "lock-icon.png", "Khoá", Color.BLACK, Color.decode("#9f4d4d"),
-				Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
-		lockButton.setBounds(465, 15, 210, 40);
+        // Sự kiện chọn dòng trong bảng
+        tableData.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                rowSelected = tableData.getSelectedRow();
+            }
+        });
 
-		// - Tuỳ chỉnh Table Data và Table Scroll Pane
-		tableData = CommonPL.createTableData(columns, widthColumns, datas, "medicine supplier manager");
-		tableScrollPane = CommonPL.createScrollPane(true, false, tableData);
-		tableScrollPane.setBounds(15, 70, 1110, 400);
+        // Sự kiện nút "Thêm"
+        addButton.addActionListener(e -> {
+            showAddOrUpdateDialog("Thêm Nguyên liệu", "Thêm", new Vector<Object>());
+            rowSelected = -1;
+            valueSelected[0] = false;
+            tableData.clearSelection();
+        });
 
-		// - Tuỳ chỉnh Data Pane;
-		dataPanel = new CommonPL.RoundedPanel(12);
-		dataPanel.setLayout(null);
-		dataPanel.setBackground(Color.WHITE);
-		dataPanel.setBounds(30, 330, 1140, 485);
-		dataPanel.add(addButton);
-		dataPanel.add(updateButton);
-		dataPanel.add(lockButton);
-		dataPanel.add(tableScrollPane);
+        // Sự kiện nút "Thay đổi"
+        updateButton.addActionListener(e -> {
+            if (rowSelected != -1) {
+                Vector<Object> currentObject = new Vector<>();
+                for (int i = 0; i < widthColumns.length; i++) {
+                    currentObject.add(tableData.getValueAt(rowSelected, i));
+                }
+                showAddOrUpdateDialog("Thay đổi Nguyên liệu", "Thay đổi", currentObject);
+            } else {
+                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần thay đổi");
+            }
+            rowSelected = -1;
+            valueSelected[0] = false;
+            tableData.clearSelection();
+        });
 
-		// Đĩnh nghĩa tính chất cho Supplier Manager PL
-		this.setSize(CommonPL.getMainWidth(), CommonPL.getScreenHeightByOwner());
-		this.setLayout(null);
-		this.add(titleLabel);
-		this.add(filterPanel);
-		this.add(dataPanel);
+        // Sự kiện nút "Khóa"
+        lockButton.addActionListener(e -> {
+            if (rowSelected != -1) {
+                Vector<Object> currentObject = new Vector<>();
+                for (int i = 0; i < widthColumns.length; i++) {
+                    currentObject.add(tableData.getValueAt(rowSelected, i));
+                }
+                CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+                        String.format("Có chắc chắn muốn %s nguyên liệu này?", currentObject.get(4).equals("Hoạt động") ? "khóa" : "mở khóa"),
+                        valueSelected);
 
-		tableData.getSelectionModel().addListSelectionListener(e -> {
-			if (!e.getValueIsAdjusting()) {
-				rowSelected = tableData.getSelectedRow();
-			}
-		});
-		addButton.addActionListener(e -> {
-			showAddOrUpdateDialog("Thêm Nguyên liệu", "Thêm", new Vector<Object>());
+                if (valueSelected[0]) {
+                    String result = ingredientBLL.lockIngredient((String) currentObject.get(0), CommonPL.getCurrentDate());
+                    if (result.equals("Có thể thay đổi trạng thái nguyên liệu")) {
+                        CommonPL.createSuccessDialog("Thông báo thành công",
+                                currentObject.get(4).equals("Hoạt động") ? "Khóa thành công" : "Mở khóa thành công");
+                        renderTableData(null, null, null);
+                    } else {
+                        CommonPL.createErrorDialog("Thông báo lỗi", result);
+                    }
+                }
+            } else {
+                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần khóa");
+            }
+            rowSelected = -1;
+            valueSelected[0] = false;
+            tableData.clearSelection();
+        });
 
-			valueSelected[0] = null;
-			rowSelected = -1;
-			tableData.clearSelection();
-		});
-		updateButton.addActionListener(e -> {
-			if (rowSelected != -1) {
-				Vector<Object> currentObject = new Vector<>();
-				for (int i = 0; i < widthColumns.length; i++) {
-					currentObject.add(tableData.getValueAt(rowSelected, i));
-				}
+        // Thiết lập sự kiện lọc dữ liệu
+        filterDatasInTable();
 
-				showAddOrUpdateDialog("Thay đổi Nguyên liệu", "Thay đổi", currentObject);
-			} else {
-				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần thay đổi");
-			}
+        // Hiển thị dữ liệu ban đầu
+        renderTableData(null, null, null);
+    }
 
-			valueSelected[0] = null;
-			rowSelected = -1;
-			tableData.clearSelection();
-		});
-		lockButton.addActionListener(e -> {
-			if (rowSelected != -1) {
-				CommonPL.createSelectionsDialog("Thông báo lựa chọn", "Có chắc chắn muốn khoá dòng dữ liệu này ?",
-						valueSelected);
-				System.out.println(valueSelected[0]);
-			} else {
-				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần khoá");
-			}
-			rowSelected = -1;
-			valueSelected[0] = false;
-			tableData.clearSelection();
-		});
-	}
+    // Hàm cập nhật dữ liệu cho bảng từ BLL
+    private void renderTableData(String[] join, String condition, String order) {
+        ArrayList<IngredientDTO> ingredientList = ingredientBLL.getAllIngredientsByCondition(join, condition, order);
+        Object[][] datasQuery = new Object[ingredientList.size()][columns.length];
+        for (int i = 0; i < ingredientList.size(); i++) {
+            datasQuery[i][0] = ingredientList.get(i).getId();       // String
+            datasQuery[i][1] = ingredientList.get(i).getName();     // String
+            datasQuery[i][2] = ingredientList.get(i).getUnit();     // String
+            datasQuery[i][3] = ingredientList.get(i).getInventory(); // int
+            datasQuery[i][4] = ingredientList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng"; // String
+        }
+        datas = datasQuery;
+        CommonPL.updateRowsInTableData(tableData, datas);
+    }
 
-	private JLabel addOrUpdateInventoryLabel;
-	private JTextField addOrUpdateInventoryTextField;
+    // Hàm xử lý sự kiện lọc dữ liệu
+    private void filterDatasInTable() {
+        filterApplyButton.addActionListener(e -> {
+            String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText() : null;
+            String sortValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
+            String unitValue = CommonPL.getSQLFromRadios(unitCheckboxs, unitsSQL);
+            String inventoryValue = CommonPL.getSQLFromRadios(inventoryCheckboxs, inventorySQL);
+            String statusValue = CommonPL.getSQLFromRadios(statusCheckboxs, statusSQL);
 
-	// Hàm tạo Dialog cho phép thêm hoặc sửa một Nguyên liệu
-	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
-		// <===== Cấu trúc Add Or Update Block Panel =====>
-		// - Tuỳ chỉnh Add Or Update Id Label
-		addOrUpdateIdLabel = CommonPL.getParagraphLabel("Mã nguyên liệu", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addOrUpdateIdLabel.setBounds(20, 10, 460, 40);
+            String condition = (findValue != null ? String.format("(maNguyenLieu LIKE '%%%s%%' OR tenNguyenLieu LIKE '%%%s%%')", findValue, findValue) : "")
+                    + (unitValue != null ? (findValue != null ? " AND " + unitValue : unitValue) : "")
+                    + (inventoryValue != null ? (findValue != null || unitValue != null ? " AND " + inventoryValue : inventoryValue) : "")
+                    + (statusValue != null ? (findValue != null || unitValue != null || inventoryValue != null ? " AND " + statusValue : statusValue) : "");
+            if (condition.length() == 0) condition = null;
+            String orderStr = sortValue;
 
-		// - Tuỳ chỉnh Add Or Update Id Text Field
-		addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã nguyên liệu", Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateIdTextField.setBounds(20, 50, 460, 40);
+            renderTableData(null, condition, orderStr);
+        });
 
-		// - Tuỳ chỉnh Add Or Update Name Label
-		addOrUpdateNameLabel = CommonPL.getParagraphLabel("Tên nguyên liệu", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addOrUpdateNameLabel.setBounds(20, 100, 460, 40);
+        filterResetButton.addActionListener(e -> {
+            findInputTextField.setText("Nhập thông tin");
+            findInputTextField.setForeground(Color.LIGHT_GRAY);
+            CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
+            CommonPL.resetMapForFilter(unitCheckboxs, unitsString, unitButton);
+            CommonPL.resetMapForFilter(inventoryCheckboxs, inventoryString, inventoryButton);
+            CommonPL.resetMapForFilter(statusCheckboxs, statusStringForFilter, statusButton);
+            renderTableData(null, null, null);
+        });
+    }
 
-		// - Tuỳ chỉnh Add Or Update Name Text Field
-		addOrUpdateNameTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Tên nguyên liệu", Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateNameTextField.setBounds(20, 140, 460, 40);
+    // Hàm hiển thị Dialog thêm hoặc cập nhật nguyên liệu
+    private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
+        // <===== Cấu trúc Add Or Update Block Panel =====>
+        addOrUpdateIdLabel = CommonPL.getParagraphLabel(
+                "<html>Mã nguyên liệu <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateIdLabel.setBounds(20, 10, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Unit Label
-		addOrUpdateUnitLabel = CommonPL.getParagraphLabel("Đơn vị", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateUnitLabel.setBounds(20, 190, 460, 40);
+        addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã nguyên liệu", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateIdTextField.setBounds(20, 50, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Unit Text Field
-		String[] units = new String[] { "Chọn Đơn vị", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" };
-		Vector<String> unitsVector = CommonPL.getVectorHasValues(units);
-		addOrUpdateUnitComboBox = CommonPL.CustomComboBox(unitsVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
-				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateUnitComboBox.setBounds(20, 230, 460, 40);
+        addOrUpdateNameLabel = CommonPL.getParagraphLabel(
+                "<html>Tên nguyên liệu <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateNameLabel.setBounds(20, 100, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Inventory Label
-		addOrUpdateInventoryLabel = CommonPL.getParagraphLabel("Tồn kho", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addOrUpdateInventoryLabel.setBounds(20, 280, 460, 40);
+        addOrUpdateNameTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Tên nguyên liệu", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateNameTextField.setBounds(20, 140, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Inventory Text Field
-		addOrUpdateInventoryTextField = new CommonPL.CustomTextField(0, 0, 0, "Đang cập nhật", Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateInventoryTextField.setBounds(20, 320, 460, 40);
-		addOrUpdateInventoryTextField.setEnabled(false);
-		addOrUpdateInventoryTextField.setBackground(Color.decode("#dedede"));
+        addOrUpdateUnitLabel = CommonPL.getParagraphLabel(
+                "<html>Đơn vị <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateUnitLabel.setBounds(20, 190, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Status Label
-		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addOrUpdateStatusLabel.setBounds(20, 370, 460, 40);
+        Vector<String> unitsVector = CommonPL.getVectorHasValues(new String[] { "Chọn Đơn vị", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" });
+        addOrUpdateUnitComboBox = CommonPL.CustomComboBox(unitsVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateUnitComboBox.setBounds(20, 230, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Status ComboBox
-		String[] status = new String[] { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
-		Vector<String> statusVector = CommonPL.getVectorHasValues(status);
-		addOrUpdateStatusComboBox = CommonPL.CustomComboBox(statusVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
-				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateStatusComboBox.setBounds(20, 410, 460, 40);
+        addOrUpdateInventoryLabel = CommonPL.getParagraphLabel("Tồn kho", Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateInventoryLabel.setBounds(20, 280, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Time Label
-		addOrUpdateTimeLabel = CommonPL.getParagraphLabel("Cập nhật gần đây:", Color.GRAY,
-				new Font("Arial", Font.ITALIC, 18));
-		addOrUpdateTimeLabel.setBounds(20, 460, 148, 40);
+        addOrUpdateInventoryTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập tồn kho", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateInventoryTextField.setBounds(20, 320, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Time Detail Label
-		addOrUpdateTimeDetailLabel = CommonPL.getTitleLabel("yyyy-MM-dd HH:mm:ss", Color.GRAY,
-				new Font("Arial", Font.ITALIC, 18), SwingConstants.RIGHT, SwingConstants.CENTER);
-		addOrUpdateTimeDetailLabel.setBounds(173, 460, 307, 40);
-		// -- Tạo Timer cập nhật thời gian
-		Timer timer = new Timer(1000, e -> {
-			LocalDateTime currentDateTime = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String formattedDateTime = currentDateTime.format(formatter);
-			addOrUpdateTimeDetailLabel.setText(formattedDateTime);
-		});
-		timer.start();
+        addOrUpdateStatusLabel = CommonPL.getParagraphLabel(
+                "<html>Trạng thái <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateStatusLabel.setBounds(20, 370, 460, 40);
 
-		// - Tuỳ chỉnh Add Or Update Button
-		addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button,
-				button == "Thêm" ? Color.decode("#699f4c") : Color.decode("#bf873e"), Color.WHITE,
-				CommonPL.getFontParagraphBold());
-		addOrUpdateButton.setBounds(20, 500, 460, 40);
-		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
+        Vector<String> statusVector = CommonPL.getVectorHasValues(statusStringForFilter);
+        addOrUpdateStatusComboBox = CommonPL.CustomComboBox(statusVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateStatusComboBox.setBounds(20, 410, 460, 40);
 
-		// Khi "Thay đổi" một Nguyên liệu
-		if (title.equals("Thay đổi Nguyên liệu") && button.equals("Thay đổi") && object.size() != 0) {
-			// - Gán dữ liệu là "Mã nguyên liệu"
-			addOrUpdateIdTextField.setText((String) object.get(0));
-			addOrUpdateIdTextField.setEnabled(false);
-			addOrUpdateIdTextField.setCaretPosition(0);
-			((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
-			addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
+        addOrUpdateTimeLabel = CommonPL.getParagraphLabel("Cập nhật gần đây:", Color.GRAY, new Font("Arial", Font.ITALIC, 18));
+        addOrUpdateTimeLabel.setBounds(20, 460, 148, 40);
 
-			// - Gán dữ liệu là "Tên nguyên liệu"
-			addOrUpdateNameTextField.setText((String) object.get(1));
-			addOrUpdateNameTextField.setCaretPosition(0);
-			addOrUpdateNameTextField.setForeground(Color.BLACK);
+        addOrUpdateTimeDetailLabel = CommonPL.getTitleLabel("yyyy-MM-dd HH:mm:ss", Color.GRAY, new Font("Arial", Font.ITALIC, 18), SwingConstants.RIGHT, SwingConstants.CENTER);
+        addOrUpdateTimeDetailLabel.setBounds(173, 460, 307, 40);
+        Timer timer = new Timer(1000, e -> {
+            LocalDateTime currentDateTime = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateTime = currentDateTime.format(formatter);
+            addOrUpdateTimeDetailLabel.setText(formattedDateTime);
+        });
+        timer.start();
 
-			// - Gán dữ liệu là "Đơn vị"
-			addOrUpdateUnitComboBox.setSelectedItem((String) object.get(2));
-			((JTextField) addOrUpdateUnitComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-			addOrUpdateUnitComboBox.setForeground(Color.BLACK);
+        addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button, button.equals("Thêm") ? Color.decode("#699f4c") : Color.decode("#bf873e"), Color.WHITE, CommonPL.getFontParagraphBold());
+        addOrUpdateButton.setBounds(20, 500, 460, 40);
+        SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 
-			// - Gán dữ liệu là "Tồn kho"
-			addOrUpdateInventoryTextField.setText((String) object.get(3));
-			addOrUpdateInventoryTextField.setEnabled(false);
-			addOrUpdateInventoryTextField.setCaretPosition(0);
-			((CustomTextField) addOrUpdateInventoryTextField).setBorderColor(Color.decode("#dedede"));
-			addOrUpdateInventoryTextField.setBackground(Color.decode("#dedede"));
+        // Khi "Thêm" nguyên liệu
+        if (title.equals("Thêm Nguyên liệu") && button.equals("Thêm") && object.size() == 0) {
+            String id = "NL" + String.format("%04d", Integer.parseInt(ingredientBLL.getLastIngredient().getId().substring(2)) + 1);
+            addOrUpdateIdTextField.setText(id);
+            addOrUpdateIdTextField.setEnabled(false);
+            ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
+            addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
+            addOrUpdateInventoryTextField.setText("0"); // Giá trị mặc định khi thêm mới
+            addOrUpdateInventoryTextField.setForeground(Color.BLACK);
+        }
 
-			// - Gán dữ liệu là "Trạng thái"
-			addOrUpdateStatusComboBox.setSelectedItem((String) object.get(4));
-			addOrUpdateStatusComboBox.setEnabled(false);
-			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
-			addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
+        // Khi "Thay đổi" nguyên liệu
+        if (title.equals("Thay đổi Nguyên liệu") && button.equals("Thay đổi") && object.size() != 0) {
+            addOrUpdateIdTextField.setText((String) object.get(0));
+            addOrUpdateIdTextField.setEnabled(false);
+            ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
+            addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
 
-			// - Gán dữ liệu là "Thời gian cập nhật gần đây"
-//					addOrUpdateTimeDetailLabel.setText((String) object.get(11));
-		}
+            addOrUpdateNameTextField.setText((String) object.get(1));
+            addOrUpdateNameTextField.setForeground(Color.BLACK);
 
-		// - Tuỳ chỉnh Add Or Update Block Panel
-		addOrUpdateBlockPanel = new JPanel();
-		addOrUpdateBlockPanel.setLayout(null);
-		addOrUpdateBlockPanel.setBounds(0, 0, 500, 590);
-		addOrUpdateBlockPanel.setBackground(Color.WHITE);
-		addOrUpdateBlockPanel.add(addOrUpdateIdLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateIdTextField);
-		addOrUpdateBlockPanel.add(addOrUpdateNameLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateNameTextField);
-		addOrUpdateBlockPanel.add(addOrUpdateUnitLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateUnitComboBox);
-		addOrUpdateBlockPanel.add(addOrUpdateInventoryLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateInventoryTextField);
-		addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateStatusComboBox);
-		addOrUpdateBlockPanel.add(addOrUpdateTimeLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateTimeDetailLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateButton);
+            addOrUpdateUnitComboBox.setSelectedItem((String) object.get(2));
+            addOrUpdateUnitComboBox.setForeground(Color.BLACK);
 
-		// Định nghĩa tính chất cho Medicine Supplier Manager Add Dialog
-		addOrUpdateDialog = new JDialog();
-		addOrUpdateDialog.setTitle(title);
-		addOrUpdateDialog.setLayout(null);
-		addOrUpdateDialog.setSize(500, 590);
-		addOrUpdateDialog.setResizable(false);
-		addOrUpdateDialog.setLocationRelativeTo(null);
-		addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		addOrUpdateDialog.addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowDeactivated(WindowEvent e) {
-//				addOrUpdateDialog.dispose(); // Đóng Dialog khi mất focus (nhấn ngoài)
-//			}
-		});
-		addOrUpdateDialog.add(addOrUpdateBlockPanel);
-		addOrUpdateDialog.setModal(true);
-		addOrUpdateDialog.setVisible(true);
-	}
+            // Sửa lỗi: Chuyển Integer thành String
+            addOrUpdateInventoryTextField.setText(String.valueOf(object.get(3))); // Dòng 392
+            addOrUpdateInventoryTextField.setForeground(Color.BLACK);
+
+            addOrUpdateStatusComboBox.setSelectedItem((String) object.get(4));
+            addOrUpdateStatusComboBox.setEnabled(false);
+            UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
+            addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
+        }
+
+        // Sự kiện nút "Thêm" hoặc "Thay đổi"
+        addOrUpdateButton.addActionListener(e -> {
+            String id = addOrUpdateIdTextField.getText();
+            String name = !addOrUpdateNameTextField.getText().equals("Nhập Tên nguyên liệu") ? addOrUpdateNameTextField.getText() : null;
+            String unit = !addOrUpdateUnitComboBox.getSelectedItem().equals("Chọn Đơn vị") ? (String) addOrUpdateUnitComboBox.getSelectedItem() : null;
+            String inventoryStr = !addOrUpdateInventoryTextField.getText().equals("Nhập tồn kho") ? addOrUpdateInventoryTextField.getText() : "0";
+            String statusStr = (String) addOrUpdateStatusComboBox.getSelectedItem();
+            boolean status = statusStr.equals("Hoạt động");
+            String updatedAt = CommonPL.getCurrentDate();
+
+            // Kiểm tra dữ liệu đầu vào
+            if (name == null || unit == null || statusStr.equals("Chọn Trạng thái")) {
+                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng điền đầy đủ thông tin bắt buộc");
+                return;
+            }
+
+            int inventory;
+            try {
+                inventory = Integer.parseInt(inventoryStr); // Chuyển String thành int
+            } catch (NumberFormatException ex) {
+                CommonPL.createErrorDialog("Thông báo lỗi", "Tồn kho phải là một số nguyên");
+                return;
+            }
+
+            try {
+                if (title.equals("Thêm Nguyên liệu")) {
+                    String result = ingredientBLL.insertIngredient(id, name, unit, inventory, status, updatedAt);
+                    if (result.equals("Có thể thêm một nguyên liệu")) {
+                        CommonPL.createSuccessDialog("Thông báo thành công", "Thêm nguyên liệu thành công");
+                        addOrUpdateDialog.dispose();
+                        renderTableData(null, null, null);
+                    } else {
+                        CommonPL.createErrorDialog("Thông báo lỗi", result);
+                    }
+                } else if (title.equals("Thay đổi Nguyên liệu")) {
+                    String result = ingredientBLL.updateIngredient(id, name, unit, inventory, status, updatedAt);
+                    if (result.equals("Có thể thay đổi một nguyên liệu")) {
+                        CommonPL.createSuccessDialog("Thông báo thành công", "Cập nhật nguyên liệu thành công");
+                        addOrUpdateDialog.dispose();
+                        renderTableData(null, null, null);
+                    } else {
+                        CommonPL.createErrorDialog("Thông báo lỗi", result);
+                    }
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                CommonPL.createErrorDialog("Thông báo lỗi", "Đã xảy ra lỗi: " + ex.getMessage());
+            }
+        });
+
+        // Cấu hình Add Or Update Block Panel
+        addOrUpdateBlockPanel = new JPanel();
+        addOrUpdateBlockPanel.setLayout(null);
+        addOrUpdateBlockPanel.setBounds(0, 0, 500, 590);
+        addOrUpdateBlockPanel.setBackground(Color.WHITE);
+        addOrUpdateBlockPanel.add(addOrUpdateIdLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateIdTextField);
+        addOrUpdateBlockPanel.add(addOrUpdateNameLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateNameTextField);
+        addOrUpdateBlockPanel.add(addOrUpdateUnitLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateUnitComboBox);
+        addOrUpdateBlockPanel.add(addOrUpdateInventoryLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateInventoryTextField);
+        addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateStatusComboBox);
+        addOrUpdateBlockPanel.add(addOrUpdateTimeLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateTimeDetailLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateButton);
+
+        // Định nghĩa tính chất cho Dialog
+        addOrUpdateDialog = new JDialog();
+        addOrUpdateDialog.setTitle(title);
+        addOrUpdateDialog.setLayout(null);
+        addOrUpdateDialog.setSize(500, 590);
+        addOrUpdateDialog.setResizable(false);
+        addOrUpdateDialog.setLocationRelativeTo(null);
+        addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        addOrUpdateDialog.add(addOrUpdateBlockPanel);
+        addOrUpdateDialog.setModal(true);
+        addOrUpdateDialog.setVisible(true);
+    }
 }
