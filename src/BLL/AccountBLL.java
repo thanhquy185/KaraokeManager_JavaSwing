@@ -65,11 +65,10 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra mã người dùng đã hợp lệ hay chưa ?
 	public boolean isValidId(String id) {
-		if (!CommonBLL.isValidStringType04(id)) {
-			return false;
-		}
-
-		return true;
+	    if (!CommonBLL.isValidStringType04(id)) {
+	        return false;
+	    }
+	    return true;
 	}
 
 	// - Hàm kiểm tra họ và tên đã hợp lệ hay chưa ?
