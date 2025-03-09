@@ -2,8 +2,6 @@ package PL;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,17 +36,17 @@ public class Admin_IngredientManagerPL extends JPanel {
     private JLabel findLabel;
     private JTextField findInputTextField;
     private JButton findInformButton;
-    private JLabel sortLabel;
-    private Map<String, Boolean> sortCheckboxs;
-    private JButton sortButton;
-    private JLabel unitLabel;
-    private Map<String, Boolean> unitCheckboxs;
-    private JButton unitButton;
+    private JLabel sortsLabel;
+    private Map<String, Boolean> sortsCheckboxs;
+    private JButton sortsButton;
+    private JLabel unitsLabel;
+    private Map<String, Boolean> unitsRadios;
+    private JButton unitsButton;
     private JLabel inventoryLabel;
-    private Map<String, Boolean> inventoryCheckboxs;
+    private Map<String, Boolean> inventoryRadios;
     private JButton inventoryButton;
     private JLabel statusLabel;
-    private Map<String, Boolean> statusCheckboxs;
+    private Map<String, Boolean> statusRadios;
     private JButton statusButton;
     private JButton filterApplyButton;
     private JButton filterResetButton;
@@ -85,13 +83,15 @@ public class Admin_IngredientManagerPL extends JPanel {
     // - Các thông tin cần thiết cho lọc và sắp xếp
     private final String[] sortsString = { "Mã nguyên liệu tăng dần", "Mã nguyên liệu giảm dần", "Tên nguyên liệu tăng dần", "Tên nguyên liệu giảm dần" };
     private final String[] sortsSQL = { "maNguyenLieu ASC", "maNguyenLieu DESC", "tenNguyenLieu ASC", "tenNguyenLieu DESC" };
-    private final String[] unitsString = { "Tất cả", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" };
+    private final String[] unitsStringForFilter = { "Tất cả", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" };
+    private final String[] unitsStringForAddOrUpdate = { "Chọn Đơn vị", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" };
     private final String[] unitsSQL = { "", "donVi = 'Gói'", "donVi = 'Quả'", "donVi = 'Hộp'", "donVi = 'Thẻ'", "donVi = 'Chai'", "donVi = 'Lon'", "donVi = 'Bó'" };
     private final String[] inventoryString = { "Tất cả", "Còn hàng", "Hết hàng" };
-    private final String[] inventorySQL = { "", "tonKho > 0", "tonKho = 0" }; 
+    private final String[] inventorySQL = { "", "tonKho > 0", "tonKho = 0" };
     private final String[] statusStringForFilter = { "Tất cả", "Hoạt động", "Tạm dừng" };
+    private final String[] statusStringForAddOrUpdate = { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
     private final String[] statusSQL = { "", "trangThai = 1", "trangThai = 0" };
-    
+
     public Admin_IngredientManagerPL() {
         // Khởi tạo đối tượng BLL
         ingredientBLL = new IngredientBLL();
@@ -111,32 +111,32 @@ public class Admin_IngredientManagerPL extends JPanel {
         findInputTextField = new CommonPL.CustomTextField(0, 20, 20, "Nhập thông tin", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         findInputTextField.setBounds(15, 45, 360, 40);
 
-        sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
-        sortLabel.setBounds(390, 15, 360, 24);
+        sortsLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
+        sortsLabel.setBounds(390, 15, 360, 24);
 
-        sortCheckboxs = CommonPL.getMapHasValues(sortsString);
-        sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sortsString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-        sortButton.setBounds(390, 45, 360, 40);
+        sortsCheckboxs = CommonPL.getMapHasValues(sortsString);
+        sortsButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortsCheckboxs, sortsString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        sortsButton.setBounds(390, 45, 360, 40);
 
-        unitLabel = CommonPL.getParagraphLabel("Đơn vị", Color.BLACK, CommonPL.getFontParagraphPlain());
-        unitLabel.setBounds(765, 15, 360, 24);
+        unitsLabel = CommonPL.getParagraphLabel("Đơn vị", Color.BLACK, CommonPL.getFontParagraphPlain());
+        unitsLabel.setBounds(765, 15, 360, 24);
 
-        unitCheckboxs = CommonPL.getMapHasValues(unitsString);
-        unitButton = CommonPL.ButtonHasRadios.createButtonHasRadios(unitCheckboxs, unitsString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-        unitButton.setBounds(765, 45, 360, 40);
+        unitsRadios = CommonPL.getMapHasValues(unitsStringForFilter);
+        unitsButton = CommonPL.ButtonHasRadios.createButtonHasRadios(unitsRadios, unitsStringForFilter[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        unitsButton.setBounds(765, 45, 360, 40);
 
         inventoryLabel = CommonPL.getParagraphLabel("Tồn kho", Color.BLACK, CommonPL.getFontParagraphPlain());
         inventoryLabel.setBounds(15, 100, 360, 24);
 
-        inventoryCheckboxs = CommonPL.getMapHasValues(inventoryString);
-        inventoryButton = CommonPL.ButtonHasRadios.createButtonHasRadios(inventoryCheckboxs, inventoryString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        inventoryRadios = CommonPL.getMapHasValues(inventoryString);
+        inventoryButton = CommonPL.ButtonHasRadios.createButtonHasRadios(inventoryRadios, inventoryString[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         inventoryButton.setBounds(15, 130, 360, 40);
 
         statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
         statusLabel.setBounds(390, 100, 360, 24);
 
-        statusCheckboxs = CommonPL.getMapHasValues(statusStringForFilter);
-        statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusCheckboxs, statusStringForFilter[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        statusRadios = CommonPL.getMapHasValues(statusStringForFilter);
+        statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusRadios, statusStringForFilter[0], Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         statusButton.setBounds(390, 130, 360, 40);
 
         filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE, CommonPL.getFontParagraphBold());
@@ -152,10 +152,10 @@ public class Admin_IngredientManagerPL extends JPanel {
         filterPanel.add(findLabel);
         filterPanel.add(findInformButton);
         filterPanel.add(findInputTextField);
-        filterPanel.add(sortLabel);
-        filterPanel.add(sortButton);
-        filterPanel.add(unitLabel);
-        filterPanel.add(unitButton);
+        filterPanel.add(sortsLabel);
+        filterPanel.add(sortsButton);
+        filterPanel.add(unitsLabel);
+        filterPanel.add(unitsButton);
         filterPanel.add(inventoryLabel);
         filterPanel.add(inventoryButton);
         filterPanel.add(statusLabel);
@@ -205,7 +205,7 @@ public class Admin_IngredientManagerPL extends JPanel {
 
         // Sự kiện nút "Thêm"
         addButton.addActionListener(e -> {
-            showAddOrUpdateDialog("Thêm Nguyên liệu", "Thêm", new Vector<Object>());
+            showAddOrUpdateDialog("Thêm Nguyên liệu", "Thêm", new Vector<>());
             rowSelected = -1;
             valueSelected[0] = false;
             tableData.clearSelection();
@@ -268,11 +268,11 @@ public class Admin_IngredientManagerPL extends JPanel {
         ArrayList<IngredientDTO> ingredientList = ingredientBLL.getAllIngredientsByCondition(join, condition, order);
         Object[][] datasQuery = new Object[ingredientList.size()][columns.length];
         for (int i = 0; i < ingredientList.size(); i++) {
-            datasQuery[i][0] = ingredientList.get(i).getId();       // String
-            datasQuery[i][1] = ingredientList.get(i).getName();     // String
-            datasQuery[i][2] = ingredientList.get(i).getUnit();     // String
-            datasQuery[i][3] = ingredientList.get(i).getInventory(); // int
-            datasQuery[i][4] = ingredientList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng"; // String
+            datasQuery[i][0] = ingredientList.get(i).getId();
+            datasQuery[i][1] = ingredientList.get(i).getName();
+            datasQuery[i][2] = ingredientList.get(i).getUnit();
+            datasQuery[i][3] = ingredientList.get(i).getInventory();
+            datasQuery[i][4] = ingredientList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng";
         }
         datas = datasQuery;
         CommonPL.updateRowsInTableData(tableData, datas);
@@ -282,17 +282,17 @@ public class Admin_IngredientManagerPL extends JPanel {
     private void filterDatasInTable() {
         filterApplyButton.addActionListener(e -> {
             String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText() : null;
-            String sortValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
-            String unitValue = CommonPL.getSQLFromRadios(unitCheckboxs, unitsSQL);
-            String inventoryValue = CommonPL.getSQLFromRadios(inventoryCheckboxs, inventorySQL);
-            String statusValue = CommonPL.getSQLFromRadios(statusCheckboxs, statusSQL);
+            String sortsValue = CommonPL.getSQLFromCheckboxs(sortsCheckboxs, sortsSQL);
+            String unitsValue = CommonPL.getSQLFromRadios(unitsRadios, unitsSQL);
+            String inventoryValue = CommonPL.getSQLFromRadios(inventoryRadios, inventorySQL);
+            String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);
 
             String condition = (findValue != null ? String.format("(maNguyenLieu LIKE '%%%s%%' OR tenNguyenLieu LIKE '%%%s%%')", findValue, findValue) : "")
-                    + (unitValue != null ? (findValue != null ? " AND " + unitValue : unitValue) : "")
-                    + (inventoryValue != null ? (findValue != null || unitValue != null ? " AND " + inventoryValue : inventoryValue) : "")
-                    + (statusValue != null ? (findValue != null || unitValue != null || inventoryValue != null ? " AND " + statusValue : statusValue) : "");
+                    + (unitsValue != null ? (findValue != null ? " AND " + unitsValue : unitsValue) : "")
+                    + (inventoryValue != null ? (findValue != null || unitsValue != null ? " AND " + inventoryValue : inventoryValue) : "")
+                    + (statusValue != null ? (findValue != null || unitsValue != null || inventoryValue != null ? " AND " + statusValue : statusValue) : "");
             if (condition.length() == 0) condition = null;
-            String orderStr = sortValue;
+            String orderStr = sortsValue;
 
             renderTableData(null, condition, orderStr);
         });
@@ -300,10 +300,10 @@ public class Admin_IngredientManagerPL extends JPanel {
         filterResetButton.addActionListener(e -> {
             findInputTextField.setText("Nhập thông tin");
             findInputTextField.setForeground(Color.LIGHT_GRAY);
-            CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
-            CommonPL.resetMapForFilter(unitCheckboxs, unitsString, unitButton);
-            CommonPL.resetMapForFilter(inventoryCheckboxs, inventoryString, inventoryButton);
-            CommonPL.resetMapForFilter(statusCheckboxs, statusStringForFilter, statusButton);
+            CommonPL.resetMapForFilter(sortsCheckboxs, sortsString, sortsButton);
+            CommonPL.resetMapForFilter(unitsRadios, unitsStringForFilter, unitsButton);
+            CommonPL.resetMapForFilter(inventoryRadios, inventoryString, inventoryButton);
+            CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
             renderTableData(null, null, null);
         });
     }
@@ -317,6 +317,9 @@ public class Admin_IngredientManagerPL extends JPanel {
 
         addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã nguyên liệu", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         addOrUpdateIdTextField.setBounds(20, 50, 460, 40);
+        addOrUpdateIdTextField.setEnabled(false);
+        ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
+        addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
 
         addOrUpdateNameLabel = CommonPL.getParagraphLabel(
                 "<html>Tên nguyên liệu <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
@@ -329,7 +332,7 @@ public class Admin_IngredientManagerPL extends JPanel {
                 "<html>Đơn vị <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
         addOrUpdateUnitLabel.setBounds(20, 190, 460, 40);
 
-        Vector<String> unitsVector = CommonPL.getVectorHasValues(new String[] { "Chọn Đơn vị", "Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó" });
+        Vector<String> unitsVector = CommonPL.getVectorHasValues(unitsStringForAddOrUpdate);
         addOrUpdateUnitComboBox = CommonPL.CustomComboBox(unitsVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         addOrUpdateUnitComboBox.setBounds(20, 230, 460, 40);
 
@@ -343,7 +346,7 @@ public class Admin_IngredientManagerPL extends JPanel {
                 "<html>Trạng thái <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
         addOrUpdateStatusLabel.setBounds(20, 370, 460, 40);
 
-        Vector<String> statusVector = CommonPL.getVectorHasValues(statusStringForFilter);
+        Vector<String> statusVector = CommonPL.getVectorHasValues(statusStringForAddOrUpdate);
         addOrUpdateStatusComboBox = CommonPL.CustomComboBox(statusVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         addOrUpdateStatusComboBox.setBounds(20, 410, 460, 40);
 
@@ -365,33 +368,23 @@ public class Admin_IngredientManagerPL extends JPanel {
         SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 
         // Khi "Thêm" nguyên liệu
-        if (title.equals("Thêm Nguyên liệu") && button.equals("Thêm") && object.size() == 0) {
+        if (title.equals("Thêm Nguyên liệu") && button.equals("Thêm") && object.isEmpty()) {
             String id = "NL" + String.format("%04d", Integer.parseInt(ingredientBLL.getLastIngredient().getId().substring(2)) + 1);
             addOrUpdateIdTextField.setText(id);
-            addOrUpdateIdTextField.setEnabled(false);
-            ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
-            addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
-            addOrUpdateInventoryTextField.setText("0"); // Giá trị mặc định khi thêm mới
+            addOrUpdateInventoryTextField.setText("0");
             addOrUpdateInventoryTextField.setForeground(Color.BLACK);
+            addOrUpdateStatusComboBox.setSelectedItem("Hoạt động");
         }
 
         // Khi "Thay đổi" nguyên liệu
-        if (title.equals("Thay đổi Nguyên liệu") && button.equals("Thay đổi") && object.size() != 0) {
+        if (title.equals("Thay đổi Nguyên liệu") && button.equals("Thay đổi") && !object.isEmpty()) {
             addOrUpdateIdTextField.setText((String) object.get(0));
-            addOrUpdateIdTextField.setEnabled(false);
-            ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
-            addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
-
             addOrUpdateNameTextField.setText((String) object.get(1));
             addOrUpdateNameTextField.setForeground(Color.BLACK);
-
             addOrUpdateUnitComboBox.setSelectedItem((String) object.get(2));
             addOrUpdateUnitComboBox.setForeground(Color.BLACK);
-
-            // Sửa lỗi: Chuyển Integer thành String
-            addOrUpdateInventoryTextField.setText(String.valueOf(object.get(3))); // Dòng 392
+            addOrUpdateInventoryTextField.setText(String.valueOf(object.get(3)));
             addOrUpdateInventoryTextField.setForeground(Color.BLACK);
-
             addOrUpdateStatusComboBox.setSelectedItem((String) object.get(4));
             addOrUpdateStatusComboBox.setEnabled(false);
             UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
@@ -404,47 +397,27 @@ public class Admin_IngredientManagerPL extends JPanel {
             String name = !addOrUpdateNameTextField.getText().equals("Nhập Tên nguyên liệu") ? addOrUpdateNameTextField.getText() : null;
             String unit = !addOrUpdateUnitComboBox.getSelectedItem().equals("Chọn Đơn vị") ? (String) addOrUpdateUnitComboBox.getSelectedItem() : null;
             String inventoryStr = !addOrUpdateInventoryTextField.getText().equals("Nhập tồn kho") ? addOrUpdateInventoryTextField.getText() : "0";
-            String statusStr = (String) addOrUpdateStatusComboBox.getSelectedItem();
-            boolean status = statusStr.equals("Hoạt động");
-            String updatedAt = CommonPL.getCurrentDate();
+            String status = !addOrUpdateStatusComboBox.getSelectedItem().equals("Chọn Trạng thái") ? (String) addOrUpdateStatusComboBox.getSelectedItem() : null;
+            String dateUpdate = CommonPL.getCurrentDate();
 
-            // Kiểm tra dữ liệu đầu vào
-            if (name == null || unit == null || statusStr.equals("Chọn Trạng thái")) {
-                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng điền đầy đủ thông tin bắt buộc");
-                return;
-            }
-
-            int inventory;
-            try {
-                inventory = Integer.parseInt(inventoryStr); // Chuyển String thành int
-            } catch (NumberFormatException ex) {
-                CommonPL.createErrorDialog("Thông báo lỗi", "Tồn kho phải là một số nguyên");
-                return;
-            }
-
-            try {
-                if (title.equals("Thêm Nguyên liệu")) {
-                    String result = ingredientBLL.insertIngredient(id, name, unit, inventory, status, updatedAt);
-                    if (result.equals("Có thể thêm một nguyên liệu")) {
-                        CommonPL.createSuccessDialog("Thông báo thành công", "Thêm nguyên liệu thành công");
-                        addOrUpdateDialog.dispose();
-                        renderTableData(null, null, null);
-                    } else {
-                        CommonPL.createErrorDialog("Thông báo lỗi", result);
-                    }
-                } else if (title.equals("Thay đổi Nguyên liệu")) {
-                    String result = ingredientBLL.updateIngredient(id, name, unit, inventory, status, updatedAt);
-                    if (result.equals("Có thể thay đổi một nguyên liệu")) {
-                        CommonPL.createSuccessDialog("Thông báo thành công", "Cập nhật nguyên liệu thành công");
-                        addOrUpdateDialog.dispose();
-                        renderTableData(null, null, null);
-                    } else {
-                        CommonPL.createErrorDialog("Thông báo lỗi", result);
-                    }
+            if (title.equals("Thêm Nguyên liệu")) {
+                String result = ingredientBLL.insertIngredient(id, name, unit, inventoryStr, status, dateUpdate);
+                if (result.equals("Có thể thêm một nguyên liệu")) {
+                    CommonPL.createSuccessDialog("Thông báo thành công", "Thêm thành công");
+                    addOrUpdateDialog.dispose();
+                    renderTableData(null, null, null);
+                } else {
+                    CommonPL.createErrorDialog("Thông báo lỗi", result);
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                CommonPL.createErrorDialog("Thông báo lỗi", "Đã xảy ra lỗi: " + ex.getMessage());
+            } else if (title.equals("Thay đổi Nguyên liệu")) {
+                String result = ingredientBLL.updateIngredient(id, name, unit, inventoryStr, status, dateUpdate);
+                if (result.equals("Có thể thay đổi một nguyên liệu")) {
+                    CommonPL.createSuccessDialog("Thông báo thành công", "Thay đổi thành công");
+                    addOrUpdateDialog.dispose();
+                    renderTableData(null, null, null);
+                } else {
+                    CommonPL.createErrorDialog("Thông báo lỗi", result);
+                }
             }
         });
 

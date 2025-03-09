@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import DAL.IngredientDAL;
 import DTO.IngredientDTO;
-import PL.CommonPL;
 
 public class IngredientBLL {
     // Properties
@@ -18,63 +17,49 @@ public class IngredientBLL {
     // Methods
     // - Hàm kiểm tra mã nguyên liệu đã được nhập hay chưa
     public boolean isInputedId(String id) {
-        if (id == null) {
-            return false;
-        }
-        return true;
+        return id != null;
     }
 
     // - Hàm kiểm tra tên nguyên liệu đã được nhập hay chưa
     public boolean isInputedName(String name) {
-        if (name == null) {
-            return false;
-        }
-        return true;
+        return name != null;
     }
 
     // - Hàm kiểm tra đơn vị đã được nhập hay chưa
     public boolean isInputedUnit(String unit) {
-        if (unit == null) {
-            return false;
-        }
-        return true;
+        return unit != null;
     }
 
     // - Hàm kiểm tra tồn kho đã được nhập hay chưa
     public boolean isInputedInventory(String inventory) {
-        if (inventory == null) {
-            return false;
-        }
-        return true;
+        return inventory != null;
     }
 
     // - Hàm kiểm tra trạng thái đã được chọn hay chưa
     public boolean isSelectedStatus(String status) {
-        if (status == null) {
-            return false;
-        }
-        return true;
+        return status != null;
     }
 
-    // - Hàm kiểm tra mã nguyên liệu có hợp lệ hay không
+    // - Hàm kiểm tra mã nguyên liệu có hợp lệ không
     public boolean isValidId(String id) {
-        if (id == null || !id.matches("NL\\d{4}")) {
-            return false;
-        }
-        return CommonBLL.isValidStringType03(id); // Giữ kiểm tra cũ nếu cần
-    }
-
-    // - Hàm kiểm tra tên nguyên liệu có hợp lệ hay không
-    public boolean isValidName(String name) {
-        if (!CommonBLL.isValidStringType01(name)) { // Giả sử tên nguyên liệu giống định dạng họ tên
+        if (!CommonBLL.isValidStringType03(id) || !id.matches("NL\\d{4}")) {
             return false;
         }
         return true;
     }
 
-    // - Hàm kiểm tra đơn vị có hợp lệ hay không
+    // - Hàm kiểm tra tên nguyên liệu có hợp lệ không
+    public boolean isValidName(String name) {
+        if (name != null && !CommonBLL.isValidStringType01(name)) {
+            return false;
+        }
+        return true;
+    }
+
+    // - Hàm kiểm tra đơn vị có hợp lệ không
     public boolean isValidUnit(String unit) {
         String[] validUnits = {"Gói", "Quả", "Hộp", "Thẻ", "Chai", "Lon", "Bó"};
+        if (unit == null) return false;
         for (String validUnit : validUnits) {
             if (unit.equals(validUnit)) {
                 return true;
@@ -83,50 +68,41 @@ public class IngredientBLL {
         return false;
     }
 
-    // - Hàm kiểm tra tồn kho có hợp lệ hay không
+    // - Hàm kiểm tra tồn kho có hợp lệ không
     public boolean isValidInventory(String inventory) {
         try {
             int value = Integer.parseInt(inventory);
-            return value >= 0; // Tồn kho phải là số không âm
+            return value >= 0;
         } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    // - Hàm kiểm tra trạng thái có hợp lệ hay không
+    // - Hàm kiểm tra trạng thái có hợp lệ không
     public boolean isValidStatus(String status) {
-        if (!status.equals("Hoạt động") && !status.equals("Tạm dừng")) {
-            return false;
-        }
-        return true;
+        return status.equals("Hoạt động") || status.equals("Tạm dừng");
     }
 
-    // - Hàm kiểm tra mã nguyên liệu đã tồn tại hay chưa
+    // - Hàm kiểm tra mã nguyên liệu đã tồn tại chưa
     public boolean isExistsId(String id) {
         String[] join = null;
         String condition = String.format("maNguyenLieu = '%s'", id);
         String order = null;
-        if (ingredientDAL.selectAllByCondition(join, condition, order).size() == 0) {
-            return false;
-        }
-        return true;
+        return !ingredientDAL.selectAllByCondition(join, condition, order).isEmpty();
     }
 
-    // - Hàm kiểm tra tên nguyên liệu đã tồn tại hay chưa
+    // - Hàm kiểm tra tên nguyên liệu đã tồn tại chưa
     public boolean isExistsName(String name) {
         String[] join = null;
         String condition = String.format("tenNguyenLieu = '%s'", name);
         String order = null;
-        if (ingredientDAL.selectAllByCondition(join, condition, order).size() == 0) {
-            return false;
-        }
-        return true;
+        return !ingredientDAL.selectAllByCondition(join, condition, order).isEmpty();
     }
 
     // - Hàm thêm một nguyên liệu
-    public String insertIngredient(String id, String name, String unit, int inventory, boolean status, String dateUpdate) {
+    public String insertIngredient(String id, String name, String unit, String inventoryStr, String status, String dateUpdate) {
         // Kiểm tra các trường hợp
-        if (!isInputedId(id) && !isInputedName(name) && !isInputedUnit(unit) && !isInputedInventory(String.valueOf(inventory)) && !isSelectedStatus(status ? "Hoạt động" : "Tạm dừng")) {
+        if (!isInputedId(id) && !isInputedName(name) && !isInputedUnit(unit) && !isInputedInventory(inventoryStr) && !isSelectedStatus(status)) {
             return "Chưa nhập đầy đủ thông tin nguyên liệu cần thiết";
         }
         if (!isInputedId(id)) {
@@ -138,17 +114,17 @@ public class IngredientBLL {
         if (!isInputedUnit(unit)) {
             return "Chưa nhập đơn vị";
         }
-        if (!isInputedInventory(String.valueOf(inventory))) {
+        if (!isInputedInventory(inventoryStr)) {
             return "Chưa nhập tồn kho";
         }
-        if (!isSelectedStatus(status ? "Hoạt động" : "Tạm dừng")) {
+        if (!isSelectedStatus(status)) {
             return "Chưa chọn trạng thái";
         }
-        if (!isValidId(id) && !isValidName(name) && !isValidUnit(unit) && !isValidInventory(String.valueOf(inventory))) {
+        if (!isValidId(id) || !isValidName(name) || !isValidUnit(unit) || !isValidInventory(inventoryStr) || !isValidStatus(status)) {
             return "Nhập sai định dạng thông tin nguyên liệu";
         }
         if (!isValidId(id)) {
-            return "Nhập sai định dạng mã nguyên liệu";
+            return "Nhập sai định dạng mã nguyên liệu (NLxxxx)";
         }
         if (!isValidName(name)) {
             return "Nhập sai định dạng tên nguyên liệu";
@@ -156,8 +132,14 @@ public class IngredientBLL {
         if (!isValidUnit(unit)) {
             return "Nhập sai định dạng đơn vị";
         }
-        if (!isValidInventory(String.valueOf(inventory))) {
-            return "Nhập sai định dạng tồn kho";
+        if (!isValidInventory(inventoryStr)) {
+            return "Nhập sai định dạng tồn kho (phải là số không âm)";
+        }
+        if (!isValidStatus(status)) {
+            return "Chọn sai định dạng trạng thái";
+        }
+        if (isExistsId(id) || isExistsName(name)) {
+            return "Thông tin nguyên liệu đã tồn tại";
         }
         if (isExistsId(id)) {
             return "Mã nguyên liệu đã tồn tại";
@@ -166,18 +148,19 @@ public class IngredientBLL {
             return "Tên nguyên liệu đã tồn tại";
         }
 
-        // Nếu thỏa mãn hết thì thêm vào CSDL
-        IngredientDTO newIngredient = new IngredientDTO(id, name, unit, inventory, status, dateUpdate);
-        if (ingredientDAL.insert(newIngredient) > 0) {
-            return "Có thể thêm một nguyên liệu";
-        }
-        return "Không thể thêm nguyên liệu do lỗi cơ sở dữ liệu";
+        // Nếu thỏa mãn, thêm vào CSDL
+        int inventory = Integer.parseInt(inventoryStr);
+        boolean ingredientStatus = status.equals("Hoạt động");
+        IngredientDTO newIngredient = new IngredientDTO(id, name, unit, inventory, ingredientStatus, dateUpdate);
+        ingredientDAL.insert(newIngredient);
+
+        return "Có thể thêm một nguyên liệu";
     }
 
     // - Hàm cập nhật một nguyên liệu
-    public String updateIngredient(String id, String name, String unit, int inventory, boolean status, String dateUpdate) {
+    public String updateIngredient(String id, String name, String unit, String inventoryStr, String status, String dateUpdate) {
         // Kiểm tra các trường hợp
-        if (!isInputedName(name) && !isInputedUnit(unit) && !isInputedInventory(String.valueOf(inventory))) {
+        if (!isInputedName(name) || !isInputedUnit(unit) || !isInputedInventory(inventoryStr)) {
             return "Chưa nhập đầy đủ thông tin nguyên liệu cần thiết";
         }
         if (!isInputedName(name)) {
@@ -186,10 +169,10 @@ public class IngredientBLL {
         if (!isInputedUnit(unit)) {
             return "Chưa nhập đơn vị";
         }
-        if (!isInputedInventory(String.valueOf(inventory))) {
+        if (!isInputedInventory(inventoryStr)) {
             return "Chưa nhập tồn kho";
         }
-        if (!isValidName(name) && !isValidUnit(unit) && !isValidInventory(String.valueOf(inventory))) {
+        if (!isValidName(name) || !isValidUnit(unit) || !isValidInventory(inventoryStr)) {
             return "Nhập sai định dạng thông tin nguyên liệu";
         }
         if (!isValidName(name)) {
@@ -198,53 +181,47 @@ public class IngredientBLL {
         if (!isValidUnit(unit)) {
             return "Nhập sai định dạng đơn vị";
         }
-        if (!isValidInventory(String.valueOf(inventory))) {
-            return "Nhập sai định dạng tồn kho";
+        if (!isValidInventory(inventoryStr)) {
+            return "Nhập sai định dạng tồn kho (phải là số không âm)";
         }
         IngredientDTO existingIngredient = getOneIngredientById(id);
         if (existingIngredient == null) {
-            return "Không tìm thấy nguyên liệu để cập nhật";
+            return "Nguyên liệu không tồn tại";
         }
         if (!existingIngredient.getName().equals(name) && isExistsName(name)) {
             return "Tên nguyên liệu đã tồn tại";
         }
 
-        // Nếu thỏa mãn hết thì cập nhật vào CSDL
-        IngredientDTO updatedIngredient = new IngredientDTO(id, name, unit, inventory, status, dateUpdate);
-        if (ingredientDAL.update(updatedIngredient) > 0) {
-            return "Có thể thay đổi một nguyên liệu";
-        }
-        return "Không thể cập nhật nguyên liệu do lỗi cơ sở dữ liệu";
+        // Nếu thỏa mãn, cập nhật vào CSDL
+        int inventory = Integer.parseInt(inventoryStr);
+        boolean ingredientStatus = status.equals("Hoạt động");
+        IngredientDTO updatedIngredient = new IngredientDTO(id, name, unit, inventory, ingredientStatus, dateUpdate);
+        ingredientDAL.update(updatedIngredient);
+
+        return "Có thể thay đổi một nguyên liệu";
     }
 
     // - Hàm khóa/mở khóa một nguyên liệu
     public String lockIngredient(String id, String dateUpdate) {
-        IngredientDTO existingIngredient = getOneIngredientById(id);
-        if (existingIngredient == null) {
-            return "Không tìm thấy nguyên liệu để khóa/mở khóa";
+        IngredientDTO ingredient = getOneIngredientById(id);
+        if (ingredient == null) {
+            return "Nguyên liệu không tồn tại";
         }
+        ingredient.setStatus(!ingredient.getStatus());
+        ingredient.setDateUpdate(dateUpdate);
+        ingredientDAL.update(ingredient);
 
-        // Đổi trạng thái và cập nhật
-        existingIngredient.setStatus(!existingIngredient.getStatus());
-        existingIngredient.setDateUpdate(dateUpdate);
-        if (ingredientDAL.update(existingIngredient) > 0) {
-            return "Có thể thay đổi trạng thái nguyên liệu";
-        }
-        return "Không thể thay đổi trạng thái do lỗi cơ sở dữ liệu";
+        return "Có thể thay đổi trạng thái nguyên liệu";
+    }
+
+    // - Hàm lấy tất cả nguyên liệu
+    public ArrayList<IngredientDTO> getAllIngredients() {
+        return ingredientDAL.selectAll();
     }
 
     // - Hàm lấy tất cả nguyên liệu theo điều kiện
     public ArrayList<IngredientDTO> getAllIngredientsByCondition(String[] join, String condition, String order) {
         return ingredientDAL.selectAllByCondition(join, condition, order);
-    }
-
-    // - Hàm lấy nguyên liệu cuối cùng
-    public IngredientDTO getLastIngredient() {
-        ArrayList<IngredientDTO> ingredients = getAllIngredientsByCondition(null, null, "maNguyenLieu DESC");
-        if (ingredients.isEmpty()) {
-            return new IngredientDTO("NL0000", "", "", 0, true, "");
-        }
-        return ingredients.get(0);
     }
 
     // - Hàm lấy một nguyên liệu theo mã
@@ -253,9 +230,12 @@ public class IngredientBLL {
         String condition = String.format("maNguyenLieu = '%s'", id);
         String order = null;
         ArrayList<IngredientDTO> result = ingredientDAL.selectAllByCondition(join, condition, order);
-        if (result.isEmpty()) {
-            return null;
-        }
-        return result.get(0);
+        return result.isEmpty() ? null : result.get(0);
+    }
+
+    // - Hàm lấy nguyên liệu cuối cùng
+    public IngredientDTO getLastIngredient() {
+        ArrayList<IngredientDTO> ingredients = ingredientDAL.selectAllByCondition(null, null, "maNguyenLieu DESC");
+        return ingredients.isEmpty() ? new IngredientDTO("NL0000", "", "", 0, true, "") : ingredients.get(0);
     }
 }
