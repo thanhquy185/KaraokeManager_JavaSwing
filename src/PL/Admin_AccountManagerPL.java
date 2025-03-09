@@ -370,17 +370,17 @@ public class Admin_AccountManagerPL extends JPanel {
 	private String[] renderPrivilegesString(String action) {
 		ArrayList<PrivilegeDTO> privilegeList = privilegeBLL.getAllPrivilege();
 		String[] result = new String[privilegeList.size() + 1];
-		if (action.equals("Thêm hoặc sửa")) {
-			result[0] = "Chọn Quyền";
-		} else if(action.equals("Tìm kiếm")) {
+		 if(action.equals("Tìm kiếm")) {
 			result[0] = "Tất cả";
-		} else if(action.equals("Truy vấn SQL")) {
+		} else if (action.equals("Thêm hoặc sửa")) {
+			result[0] = "Chọn Quyền";
+		}  else if(action.equals("Truy vấn SQL")) {
 			result[0] = "";
 		}
 		for (int i = 0; i < privilegeList.size(); i++) {
 			if (action.equals("Tìm kiếm")) {
 				result[i + 1] = String.format("%s", privilegeList.get(i).getName());
-			} else if(action.equals("Tìm kiếm")) {
+			} else if(action.equals("Thêm hoặc sửa")) {
 				result[i + 1] = String.format("%s - %s", privilegeList.get(i).getId(), privilegeList.get(i).getName());
 			} else if(action.equals("Truy vấn SQL")) {
 				result[i + 1] = String.format("maQuyen = '%s'", privilegeList.get(i).getId());

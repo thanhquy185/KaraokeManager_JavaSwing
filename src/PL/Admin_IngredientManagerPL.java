@@ -316,10 +316,10 @@ public class Admin_IngredientManagerPL extends JPanel {
         addOrUpdateIdLabel.setBounds(20, 10, 460, 40);
 
         addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã nguyên liệu", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-        addOrUpdateIdTextField.setBounds(20, 50, 460, 40);
         addOrUpdateIdTextField.setEnabled(false);
         ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
         addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
+        addOrUpdateIdTextField.setBounds(20, 50, 460, 40);
 
         addOrUpdateNameLabel = CommonPL.getParagraphLabel(
                 "<html>Tên nguyên liệu <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
@@ -340,6 +340,9 @@ public class Admin_IngredientManagerPL extends JPanel {
         addOrUpdateInventoryLabel.setBounds(20, 280, 460, 40);
 
         addOrUpdateInventoryTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập tồn kho", Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateInventoryTextField.setEnabled(false);
+        ((CustomTextField) addOrUpdateInventoryTextField).setBorderColor(Color.decode("#dedede"));
+        addOrUpdateInventoryTextField.setBackground(Color.decode("#dedede"));
         addOrUpdateInventoryTextField.setBounds(20, 320, 460, 40);
 
         addOrUpdateStatusLabel = CommonPL.getParagraphLabel(
@@ -371,24 +374,38 @@ public class Admin_IngredientManagerPL extends JPanel {
         if (title.equals("Thêm Nguyên liệu") && button.equals("Thêm") && object.isEmpty()) {
             String id = "NL" + String.format("%04d", Integer.parseInt(ingredientBLL.getLastIngredient().getId().substring(2)) + 1);
             addOrUpdateIdTextField.setText(id);
+            ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
+            
             addOrUpdateInventoryTextField.setText("0");
-            addOrUpdateInventoryTextField.setForeground(Color.BLACK);
-            addOrUpdateStatusComboBox.setSelectedItem("Hoạt động");
+            ((CustomTextField) addOrUpdateInventoryTextField).setBorderColor(Color.decode("#dedede"));
         }
 
         // Khi "Thay đổi" nguyên liệu
         if (title.equals("Thay đổi Nguyên liệu") && button.equals("Thay đổi") && !object.isEmpty()) {
             addOrUpdateIdTextField.setText((String) object.get(0));
+            ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
+            addOrUpdateIdTextField.setCaretPosition(0);
+            
             addOrUpdateNameTextField.setText((String) object.get(1));
             addOrUpdateNameTextField.setForeground(Color.BLACK);
+            addOrUpdateNameTextField.setCaretPosition(0);
+            
             addOrUpdateUnitComboBox.setSelectedItem((String) object.get(2));
             addOrUpdateUnitComboBox.setForeground(Color.BLACK);
+			((JTextField) addOrUpdateUnitComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+
+            
             addOrUpdateInventoryTextField.setText(String.valueOf(object.get(3)));
             addOrUpdateInventoryTextField.setForeground(Color.BLACK);
+            ((CustomTextField) addOrUpdateInventoryTextField).setBorderColor(Color.decode("#dedede"));
+            addOrUpdateInventoryTextField.setCaretPosition(0);
+            
             addOrUpdateStatusComboBox.setSelectedItem((String) object.get(4));
             addOrUpdateStatusComboBox.setEnabled(false);
             UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
             addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
+			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+
         }
 
         // Sự kiện nút "Thêm" hoặc "Thay đổi"

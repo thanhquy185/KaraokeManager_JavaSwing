@@ -293,7 +293,7 @@ public class CustomerBLL {
     // - Hàm khoá một khách hàng
 	public String lockCustomer(String id, String dateUpdate) {
 		// - Khoá hoặc mở khoá tuỳ vào trạng thái hiện tại
-		CustomertDTO lockCustomerDTO = getOneCustomerById(id);
+		CustomerDTO lockCustomerDTO = getOneCustomerById(id);
 		lockCustomerDTO.setStatus(lockCustomerDTO.getStatus() ? false : true);
 		lockCustomerDTO.setDateUpdate(dateUpdate);
 		customerDAL.lock(lockCustomerDTO);
