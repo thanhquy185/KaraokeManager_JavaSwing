@@ -17,12 +17,11 @@ public class CustomerDAL implements DAL<CustomerDTO> {
         int rowChange = 0;
 
         // - Kết nối CSDL để truy vấn
-        Connection c = JDBCUtil.getInstance().getConnection();
-        try 
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+        PreparedStatement pstmt = c.prepareStatement(
+            "INSERT INTO Karaoke.KhachHang(cccd, maLoaiKhachHang, hoVaTen, ngaySinh, gioiTinh, soDienThoai, email, diaChi, trangThai, ngayCapNhat)"
+                        + "\nVALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"))
         {
-            String sql = "INSERT INTO Karaoke.KhachHang(cccd, maLoaiKhachHang, hoVaTen, ngaySinh, gioiTinh, soDienThoai, email, diaChi, trangThai, ngayCapNhat)"
-                        + "\nVALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-            PreparedStatement pstmt = c.prepareStatement(sql);
             pstmt.setString(1, customerDTO.getId());
             pstmt.setString(2, customerDTO.getIdCard());
             pstmt.setString(3, customerDTO.getFullname());
@@ -34,7 +33,6 @@ public class CustomerDAL implements DAL<CustomerDTO> {
             pstmt.setBoolean(9, customerDTO.getStatus());
             pstmt.setString(10, customerDTO.getDateUpdate());
             rowChange = pstmt.executeUpdate();
-            JDBCUtil.getInstance().closeConnection(c);
         } catch (SQLException e)
         {
             e.printStackTrace();
@@ -49,13 +47,12 @@ public class CustomerDAL implements DAL<CustomerDTO> {
         int rowChange = 0;
 
         // - Kết nối cơ sở dữ liệu để truy vấn
-        Connection c = JDBCUtil.getInstance().getConnection();
-        try 
-        {
-            String sql = "UPDATE Karaoke.KhachHang"
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+        PreparedStatement pstmt = c.prepareStatement(
+            "UPDATE Karaoke.KhachHang"
                     + "\nSET maLoaiKhachHang = ?, hoVaTen = ?, ngaySinh = ?, gioiTinh = ?, soDienThoai = ?, email = ?, diaChi = ?, trangThai = ?, ngayCapNHat = ?"
-                    + "\nWHERE cccd = ?";
-            PreparedStatement pstmt = c.prepareStatement(sql);
+                    + "\nWHERE cccd = ?")) 
+        {
             pstmt.setString(1, customerDTO.getIdCard());
             pstmt.setString(2, customerDTO.getFullname());
 			pstmt.setString(3, customerDTO.getBirthday());
@@ -67,7 +64,6 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 			pstmt.setString(9, customerDTO.getDateUpdate());
 			pstmt.setString(10, customerDTO.getId());
             rowChange = pstmt.executeUpdate();
-			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -81,17 +77,15 @@ public class CustomerDAL implements DAL<CustomerDTO> {
         int rowChange = 0;
 
         // - Kết nối CSDL để truy vấn 
-        Connection c = JDBCUtil.getInstance().getConnection();
-        try
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+        PreparedStatement pstmt = c.prepareStatement(
+            "UPDATE Karaoke.KhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?"
+                    + "\nWHERE cccd = ?"))
         {
-            String sql ="UPDATE Karaoke.KhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?"
-                    + "\nWHERE cccd = ?";
-            PreparedStatement pstmt = c.prepareStatement(sql);
             pstmt.setBoolean(1,customerDTO.getStatus());
             pstmt.setString(2, customerDTO.getDateUpdate());
             pstmt.setString(3, customerDTO.getId());
             rowChange = pstmt.executeUpdate();
-            JDBCUtil.getInstance().closeConnection(c);
         } catch (SQLException e)
         {
             e.printStackTrace();
@@ -107,12 +101,10 @@ public class CustomerDAL implements DAL<CustomerDTO> {
         ArrayList<CustomerDTO> list = new ArrayList<>();
 
         // - Kết nối CSDL để truy vấn
-        Connection c = JDBCUtil.getInstance().getConnection();
-        try
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+        PreparedStatement pstmt = c.prepareStatement("SELECT * FROM Karaoke.KhachHang;");
+        ResultSet rs = pstmt.executeQuery())
         {
-            String sql = "SELEECT * FROM Karaoke.KhachHang;";
-            PreparedStatement pstmt = c.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
             while (rs.next())
             {
                 CustomerDTO customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"), rs.getString("hoVaTen"), 
@@ -120,7 +112,6 @@ public class CustomerDAL implements DAL<CustomerDTO> {
                         rs.getString("diaChi"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
                 list.add(customerDTO);
             }
-            JDBCUtil.getInstance().closeConnection(c);
         } catch (SQLException e)
         {
             e.printStackTrace();
@@ -134,16 +125,15 @@ public class CustomerDAL implements DAL<CustomerDTO> {
     {
         // Sử dụng ArrayList để lưu danh sách
         ArrayList<CustomerDTO> list = new ArrayList<>();
-
-        // - Kết nối CSDL để truy vấn
-        Connection c = JDBCUtil.getInstance().getConnection();
-        try
-        {
-            String sql = String.format("SELECT * FROM Karaoke.KhachHang%s%s%s;", 
+        String sql = String.format("SELECT * FROM Karaoke.KhachHang%s%s%s;", 
                     join != null ? CommonDAL.getJoinValues(join) : "", condition != null ? "\nWHERE "+ condition : "",
                     order != null ? "\nORDER BY "+ order : "");
+        
+                    // - Kết nối CSDL để truy vấn
+        try (Connection c = JDBCUtil.getInstance().getConnection();
             PreparedStatement pstmt = c.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
+            ResultSet rs = pstmt.executeQuery())
+        {
             while (rs.next())
             {
                 CustomerDTO customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"), rs.getString("hoVaTen"), 
@@ -151,7 +141,6 @@ public class CustomerDAL implements DAL<CustomerDTO> {
                         rs.getString("diaChi"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
                 list.add(customerDTO);
             }
-            JDBCUtil.getInstance().closeConnection(c);
         } catch (SQLException e)
         {
             e.printStackTrace();
@@ -163,22 +152,22 @@ public class CustomerDAL implements DAL<CustomerDTO> {
     @Override
     public CustomerDTO selectOneById(String id)
     {
+        if (id == null) return null;
         CustomerDTO customerDTO = null;
         
         // - Kết nối đến CSDL để truy vấn
-        Connection c = JDBCUtil.getInstance().getConnection();
-        try 
-        {
-            String sql = String.format("SELECT * FROM Karaoke.KhachHang \nWHERE cccd= %s;",id);
-            PreparedStatement pstmt = c.prepareStatement(sql);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next())
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+            PreparedStatement pstmt = c.prepareStatement("SELECT * FROM Karaoke.KhachHang \nWHERE cccd= ?")) {
+            pstmt.setString(1, id);
+            try (ResultSet rs = pstmt.executeQuery())
             {
-                customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"), rs.getString("hoVaTen"), 
-                        rs.getString("ngaySinh"), rs.getBoolean("gioiTinh"), rs.getString("soDienThoai"), rs.getString("email"),
-                        rs.getString("diaChi"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
-            }
-            JDBCUtil.getInstance().closeConnection(c);
+                while (rs.next())
+                {
+                    customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"), rs.getString("hoVaTen"), 
+                            rs.getString("ngaySinh"), rs.getBoolean("gioiTinh"), rs.getString("soDienThoai"), rs.getString("email"),
+                            rs.getString("diaChi"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+                }
+            } 
         } catch (SQLException e)
         {
             e.printStackTrace();

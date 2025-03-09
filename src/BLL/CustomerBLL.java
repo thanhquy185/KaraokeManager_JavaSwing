@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import DAL.CustomerDAL;
 import DTO.CustomerDTO;
-import PL.CommonPL;
+
 
 public class CustomerBLL {
     private CustomerDAL customerDAL;
@@ -41,10 +41,14 @@ public class CustomerBLL {
 
     // - Hàm kiểm tra mã loại khách hàng đã hợp lệ hay chưa ?
 	public boolean isValidIdCard(String idcard) {
-		if (!idcard.equals("Thường") && !idcard.equals("Bạc") && !idcard.equals("Vàng") && !idcard.equals("Kim cương")) {
-			return false;
-		}
-		return true;
+		String[] validIdCard = {"Thường", "Bạc", "Vàng", "Kim cương"};
+        if (idcard == null) return false;
+        for (String validIdcard : validIdCard) {
+            if (idcard.equals(validIdcard)) {
+                return true;
+            }
+        }
+        return false;
 	}
 
     // - Hàm kiểm tra số điện thoại đã được nhập hay chưa ?
@@ -147,7 +151,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm tạo một khách hàng
+    // - Hàm thêm một khách hàng
 	public String insertCustomer(String id, String idcard, String fullname, String  birthday, String gender, String phone, String email, 
             String address, String status, String dateUpdate) 
     {
@@ -263,16 +267,7 @@ public class CustomerBLL {
 		if (!isValidIdCard(idcard)) {
 			return "Chọn sai định dạng mã loại khách hàng";
 		}
-		if (isExistsPhone(phone) && isExistsEmail(email)) {
-			return "Nhiều thông tin khách hàng đã tồn tại";
-		}
-		if (isExistsPhone(phone)) {
-			return "Số điện thoại đã tồn tại";
-		}
-		if (isExistsEmail(email)) {
-			return "Email đã tồn tại";
-		}
-
+		
 		// - Nếu thoả mãn hết thì thêm vào CSDL
 		String customerId = id;
 		String customerFullname = fullname;
@@ -286,7 +281,7 @@ public class CustomerBLL {
 		String customerDateUpdate = dateUpdate;
 		CustomerDTO newCustomerDTO = new CustomerDTO(customerId, customerIdcard, customerFullname, customerBirthday, customerGender, 
                 customerPhone, customerEmail, customerAddress, customerStatus, customerDateUpdate);
-		customerDAL.insert(newCustomerDTO);
+		customerDAL.update(newCustomerDTO);
 		return "Có thể thay đổi một khách hàng";
 	}
 
