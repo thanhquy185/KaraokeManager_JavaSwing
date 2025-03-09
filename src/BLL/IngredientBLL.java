@@ -42,7 +42,7 @@ public class IngredientBLL {
 
     // - Hàm kiểm tra mã nguyên liệu có hợp lệ không
     public boolean isValidId(String id) {
-        if (!CommonBLL.isValidStringType03(id) || !id.matches("NL\\d{4}")) {
+        if (!CommonBLL.isValidStringType03(id) || !id.matches("NL\\d{5}")) {
             return false;
         }
         return true;
@@ -124,7 +124,7 @@ public class IngredientBLL {
             return "Nhập sai định dạng thông tin nguyên liệu";
         }
         if (!isValidId(id)) {
-            return "Nhập sai định dạng mã nguyên liệu (NLxxxx)";
+            return "Nhập sai định dạng mã nguyên liệu (NLxxxxx)";
         }
         if (!isValidName(name)) {
             return "Nhập sai định dạng tên nguyên liệu";
@@ -236,6 +236,6 @@ public class IngredientBLL {
     // - Hàm lấy nguyên liệu cuối cùng
     public IngredientDTO getLastIngredient() {
         ArrayList<IngredientDTO> ingredients = ingredientDAL.selectAllByCondition(null, null, "maNguyenLieu DESC");
-        return ingredients.isEmpty() ? new IngredientDTO("NL0000", "", "", 0, true, "") : ingredients.get(0);
+        return ingredients.isEmpty() ? new IngredientDTO("NL00000", "", "", 0, true, "") : ingredients.get(0);
     }
 }

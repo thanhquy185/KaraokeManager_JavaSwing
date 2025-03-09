@@ -372,7 +372,7 @@ public class Admin_IngredientManagerPL extends JPanel {
 
         // Khi "Thêm" nguyên liệu
         if (title.equals("Thêm Nguyên liệu") && button.equals("Thêm") && object.isEmpty()) {
-            String id = "NL" + String.format("%04d", Integer.parseInt(ingredientBLL.getLastIngredient().getId().substring(2)) + 1);
+            String id = "NL" + String.format("%05d", Integer.parseInt(ingredientBLL.getLastIngredient().getId().substring(2)) + 1);
             addOrUpdateIdTextField.setText(id);
             ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
             
