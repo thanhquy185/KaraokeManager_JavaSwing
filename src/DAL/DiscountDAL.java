@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import DTO.DiscountDTO;
-import DTO.FunctionDTO;
 
 public class DiscountDAL implements DAL<DiscountDTO> {
 	// Methods

@@ -61,19 +61,76 @@ public class Admin_InputTicketManagerPL extends JPanel {
 
 	// - Các thông tin cần có của Table Data và Table Scroll Pane
 	// + Tiêu đề các cột
-	private final String[] columns = { "Mã phiếu", "Ngày lập phiếu", "Ngày hợp đồng", "Nhân viên lập phiếu",
-			"Nhân viên nhận hàng", "Tổng tiền thanh toán", "Trạng thái" };
+	private final String[] columns = { "Mã phiếu", "Nhà cung cấp", "Ngày lập phiếu", "Ngày hợp đồng",
+			"Nhân viên lập phiếu", "Tổng tiền thanh toán", "Trạng thái" };
 	// + Chiều rộng các cột
-	private final int[] widthColumns = { 150, 150, 150, 200, 200, 450, 200 };
+	private final int[] widthColumns = { 150, 450, 150, 150, 450, 300, 150 };
 	// + Dữ liệu
-	private Object[][] datas = { { "1", "2024-01-25", "2024-01-25", "NV0001", "NV0001", "1000000000", "Đã hoàn thành" },
-			{ "1", "2024-01-25", "2024-01-25", "NV0001", "NV0001", "1000000000", "Chưa thanh toán" },
-			{ "1", "2024-01-25", "2024-01-25", "NV0002", "NV0001", "1000000000", "Đang chờ xác nhận" },
-			{ "1", "2024-01-25", "2024-01-25", "NV0001", "NV0001", "1000000000", "Đã huỷ phiếu" } };
+	private Object[][] datas = {
+			{ "1", "Mã nhà cung cấp - Tên nhà cung cấp", "2024-01-25", "2024-01-25",
+					"Mã người dùng - Tên người dùng (loại quyền là nhân viên)", "1000000000", "Đã hoàn thành" },
+			{ "1", "NCC001", "2024-01-25", "2024-01-25", "2 - Trần Thanh Quy", "1000000000", "Đang chờ xác nhận" },
+			{ "1", "NCC001", "2024-01-25", "2024-01-25", "2 - Trần Thanh Quy", "1000000000", "Đã huỷ phiếu" } };
 	// + Dòng hiện tại đang được chọn
 	private int rowSelected = -1;
 	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
 	private Boolean[] valueSelected = { null };
+	// - Các Component của Add Or Update Dialog
+	private JLabel addOrUpdateIdLabel;
+	private JTextField addOrUpdateIdTextField;
+	private JLabel addOrUpdateDateCreateLabel;
+	private JXDatePicker addOrUpdateDateCreateDatePicker;
+	private JLabel addOrUpdateDateContractLabel;
+	private JXDatePicker addOrUpdateDateContractDatePicker;
+	private JLabel addOrUpdateIdEmployeeCreatedLabel;
+	private JComboBox<String> addOrUpdateIdEmployeeCreatedComboBox;
+	private JPanel addOrUpdateLinePanel;
+	private JLabel addOrUpdateDataLabel;
+	private JButton addOrUpdateAddUnitButton;
+	private JButton addOrUpdateDeleteUnitButton;
+	private JTable addOrUpdateTableData;
+	private JScrollPane addOrUpdateTableScrollPane;
+	private JLabel addOrUpdateSupllierLabel;
+	private JComboBox<String> addOrUpdateSupllierComboBox;
+	private JLabel addOrUpdateCostLabel;
+	private JTextField addOrUpdateCostTextField;
+	private JLabel addOrUpdateStatusLabel;
+	private JTextField addOrUpdateStatusTextField;
+	private JButton addOrUpdateCompleteButton;
+	private JButton addOrUpdateDeleteButton;
+	private JButton addOrUpdateButton;
+	private JPanel addOrUpdateBlockPanel;
+	private JDialog addOrUpdateDialog;
+	// - Các thông tin cần có của Table Data và Table Scroll Pane
+	// + Tiêu đề các cột
+	private final String[] addOrUpdateColumns = { "Mã nguyên liệu", "Tên nguyên liệu", "Giá nhập (VNĐ)", "Số lượng", "Thành tiền (VNĐ)" };
+	// + Chiều rộng các cột
+	private final int[] addOrUpdateWidthColumns = { 150, 400, 200, 200, 300 };
+	// + Dữ liệu
+	private Object[][] addOrUpdateDatas = { { "NL00001", "Trứng gà", "200.000", "12", "2.400.000" } };
+	// + Dòng hiện tại đang được chọn
+	private int addOrUpdateRowSelected = -1;
+	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
+	private Boolean[] addOrUpdateValueSelected = { null };
+	// -
+	// +
+	private String[] employeesArray = { "Chọn Nhân viên", "NV0001", "NV0001" };
+	private Vector<String> employeesVector = CommonPL.getVectorHasValues(employeesArray);
+	// - Các Component của Add U Dialog
+	private JLabel addUUnitInforLabel;
+	private JComboBox<String> addUUnitInforComboBox;
+	private JLabel addUPriceInputLabel;
+	private JTextField addUPriceInputTextField;
+	private JLabel addUQuantityInputLabel;
+	private JTextField addUQuantityInputTextField;
+	private JButton addUButton;
+	private JPanel addUBlockPanel;
+	private JDialog addUDialog;
+	// -
+	// + Dòng hiện tại đang được chọn
+	private int addURowSelected = -1;
+	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
+	private Boolean[] addUValueSelected = { null };
 
 	public Admin_InputTicketManagerPL() {
 		// <===== Cấu trúc Title Label =====>
@@ -104,8 +161,9 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		sortLabel.setBounds(390, 15, 360, 24);
 
 		// - Tuỳ chỉnh Sort Checkboxs
-		String[] sorts = new String[] { "Mã phiếu tăng dần", "Mã phiếu giảm dần", "Ngày lập phiếu tăng dần",
-				"Ngày lập phiếu giảm dần", "Tổng tiền thanh toán tăng dần", "Tổng tiền thanh toán giảm dần" };
+		String[] sorts = new String[] { "Mã phiếu tăng dần", "Mã phiếu giảm dần", "Nhà cung cấp tăng dần",
+				"Nhà cung cấp giảm dần", "Ngày lập phiếu tăng dần", "Ngày lập phiếu giảm dần", "Ngày hợp đồng tăng dần",
+				"Ngày hợp đồng giảm dần", "Tổng tiền thanh toán tăng dần", "Tổng tiền thanh toán giảm dần" };
 		sortCheckboxs = CommonPL.getMapHasValues(sorts);
 
 		// - Tuỳ chỉnh Sort Button
@@ -280,122 +338,48 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		});
 	}
 
-	// - Các Component của Add Or Update Dialog
-	private JLabel addOrUpdateIdLabel;
-	private JTextField addOrUpdateIdTextField;
-	private JLabel addOrUpdateDateCreateLabel;
-	private JXDatePicker addOrUpdateDateCreateDatePicker;
-	private JLabel addOrUpdateDateContractLabel;
-	private JXDatePicker addOrUpdateDateContractDatePicker;
-	private JLabel addOrUpdateIdEmployeeCreatedLabel;
-	private JComboBox<String> addOrUpdateIdEmployeeCreatedComboBox;
-	private JLabel addOrUpdateIdEmployeeGottenLabel;
-	private JComboBox<String> addOrUpdateIdEmployeeGottenComboBox;
-	private JPanel addOrUpdateLinePanel;
-	private JLabel addOrUpdateDataLabel;
-	private JButton addOrUpdateAddUnitButton;
-	private JButton addOrUpdateDeleteUnitButton;
-	private JTable addOrUpdateTableData;
-	private JScrollPane addOrUpdateTableScrollPane;
-	private JLabel addOrUpdateCostLabel;
-	private JTextField addOrUpdateCostTextField;
-	private JLabel addOrUpdateStatusLabel;
-	private JTextField addOrUpdateStatusTextField;
-	private JButton addOrUpdateCompleteButton;
-	private JButton addOrUpdateNotPayButton;
-	private JButton addOrUpdateDeleteButton;
-	private JButton addOrUpdateButton;
-	private JPanel addOrUpdateBlockPanel;
-	private JDialog addOrUpdateDialog;
-	// - Các thông tin cần có của Table Data và Table Scroll Pane
-	// + Tiêu đề các cột
-	private final String[] addOrUpdateColumns = { "Mã NCC", "Mã nguyên liệu", "Giá nhập", "Số lượng" };
-	// + Chiều rộng các cột
-	private final int[] addOrUpdateWidthColumns = { 150, 150, 400, 200 };
-	// + Dữ liệu
-	private Object[][] addOrUpdateDatas = { { "NCC0001", "NL00001", "200000", "12" } };
-	// + Dòng hiện tại đang được chọn
-	private int addOrUpdateRowSelected = -1;
-	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
-	private Boolean[] addOrUpdateValueSelected = { null };
-	// -
-	// +
-	private String[] employeesArray = { "Chọn Nhân viên", "NV0001", "NV0001" };
-	private Vector<String> employeesVector = CommonPL.getVectorHasValues(employeesArray);
-
-	private JLabel addUSupllierInforLabel;
-	private JComboBox<String> addUSupllierInforComboBox;
-	private JLabel addUUnitInforLabel;
-	private JComboBox<String> addUUnitInforComboBox;
-	private JLabel addUPriceInputLabel;
-	private JTextField addUPriceInputTextField;
-	private JLabel addUQuantityInputLabel;
-	private JTextField addUQuantityInputTextField;
-	private JButton addUButton;
-	private JPanel addUBlockPanel;
-	private JDialog addUDialog;
-	// -
-	// + Dòng hiện tại đang được chọn
-	private int addURowSelected = -1;
-	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
-	private Boolean[] addUValueSelected = { null };
-
 	// Hàm hiện một Dialog cho phép thêm 1 nguyên liệu để nhập
 	private void showAddU() {
 		// <===== Các Component của Add U Block Panel =====>
-		// - Tuỳ chỉnh Add U Supplier Infor Label
-		addUSupllierInforLabel = CommonPL.getParagraphLabel("Nhà cung cấp", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addUSupllierInforLabel.setBounds(20, 10, 460, 40);
-
-		// - Tuỳ chỉnh Add U Supplier Infor ComboBox
-		String[] suppliersArray = { "Chọn Nhà cung cấp", "NCC0001 - Tiệm tạp hoá", "NCC0002 - Acecook" };
-		Vector<String> suppliersVector = CommonPL.getVectorHasValues(suppliersArray);
-		addUSupllierInforComboBox = CommonPL.CustomComboBox(suppliersVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
-				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUSupllierInforComboBox.setBounds(20, 50, 460, 40);
-
 		// - Tuỳ chỉnh Add U Unit Infor Label
 		addUUnitInforLabel = CommonPL.getParagraphLabel("Nguyên liệu", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUUnitInforLabel.setBounds(20, 100, 460, 40);
+		addUUnitInforLabel.setBounds(20, 10, 460, 40);
 
 		// - Tuỳ chỉnh Add U Unit Infor ComboBox
 		String[] unitsArray = { "Chọn Nguyên liệu", "NL0001 - Mì gói hảo hảo", "NL0002 - Trứng gà" };
 		Vector<String> unitsVector = CommonPL.getVectorHasValues(unitsArray);
 		addUUnitInforComboBox = CommonPL.CustomComboBox(unitsVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
 				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUUnitInforComboBox.setBounds(20, 140, 460, 40);
+		addUUnitInforComboBox.setBounds(20, 50, 460, 40);
 
 		// - Tuỳ chỉnh Add U Price Label
 		addUPriceInputLabel = CommonPL.getParagraphLabel("Giá nhập", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUPriceInputLabel.setBounds(20, 190, 220, 40);
+		addUPriceInputLabel.setBounds(20, 100, 220, 40);
 
 		// - Tuỳ chỉnh Add U Price Text Field
 		addUPriceInputTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Giá nhập", Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addUPriceInputTextField.setBounds(20, 230, 220, 40);
+		addUPriceInputTextField.setBounds(20, 140, 220, 40);
 
 		// - Tuỳ chỉnh Add U Quantity Label
 		addUQuantityInputLabel = CommonPL.getParagraphLabel("Số lượng", Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUQuantityInputLabel.setBounds(260, 190, 220, 40);
+		addUQuantityInputLabel.setBounds(260, 100, 220, 40);
 
 		// - Tuỳ chỉnh Add U Quantity Text Field
 		addUQuantityInputTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Số lượng", Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addUQuantityInputTextField.setBounds(260, 230, 220, 40);
+		addUQuantityInputTextField.setBounds(260, 140, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Button
 		addUButton = CommonPL.getButtonDefaultForm("Thêm", CommonPL.getFontParagraphBold());
-		addUButton.setBounds(20, 300, 460, 40);
+		addUButton.setBounds(20, 230, 460, 40);
 		SwingUtilities.invokeLater(() -> addUButton.requestFocusInWindow());
 
 		// - Tuỳ chỉnh Add U Block Panel
 		addUBlockPanel = new JPanel();
 		addUBlockPanel.setLayout(null);
 		addUBlockPanel.setBackground(Color.WHITE);
-		addUBlockPanel.setBounds(0, 0, 500, 390);
-		addUBlockPanel.add(addUSupllierInforLabel);
-		addUBlockPanel.add(addUSupllierInforComboBox);
+		addUBlockPanel.setBounds(0, 0, 500, 320);
 		addUBlockPanel.add(addUUnitInforLabel);
 		addUBlockPanel.add(addUUnitInforComboBox);
 		addUBlockPanel.add(addUPriceInputLabel);
@@ -409,7 +393,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		addUDialog = new JDialog();
 		addUDialog.setTitle("Thêm Nguyên liệu");
 		addUDialog.setLayout(null);
-		addUDialog.setSize(500, 390);
+		addUDialog.setSize(500, 320);
 		addUDialog.setResizable(false);
 		addUDialog.setAutoRequestFocus(false);
 		addUDialog.setLocationRelativeTo(null);
@@ -463,24 +447,13 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		// - Tuỳ chỉnh Add Or Update Id Employee Created Label
 		addOrUpdateIdEmployeeCreatedLabel = CommonPL.getParagraphLabel("Nhân viên lập phiếu", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateIdEmployeeCreatedLabel.setBounds(660, 10, 220, 40);
+		addOrUpdateIdEmployeeCreatedLabel.setBounds(660, 10, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id Employee Created ComboBox
 		addOrUpdateIdEmployeeCreatedComboBox = CommonPL.CustomComboBox(employeesVector, Color.WHITE, Color.LIGHT_GRAY,
 				Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateIdEmployeeCreatedComboBox.setBounds(660, 50, 220, 40);
-
-		// - Tuỳ chỉnh Add Or Update Id Employee Gotten Label
-		addOrUpdateIdEmployeeGottenLabel = CommonPL.getParagraphLabel("Nhân viên nhận hàng", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addOrUpdateIdEmployeeGottenLabel.setBounds(900, 10, 220, 40);
-
-		// - Tuỳ chỉnh Add Or Update Id Employee Gotten ComboBox
-		addOrUpdateIdEmployeeGottenComboBox = CommonPL.CustomComboBox(employeesVector, Color.WHITE, Color.LIGHT_GRAY,
-				Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK,
-				CommonPL.getFontParagraphPlain());
-		addOrUpdateIdEmployeeGottenComboBox.setBounds(900, 50, 220, 40);
+		addOrUpdateIdEmployeeCreatedComboBox.setBounds(660, 50, 460, 40);
 
 		// // - Tuỳ chỉnh Add Or Update Line Panel
 		addOrUpdateLinePanel = new CommonPL.RoundedPanel(8);
@@ -579,44 +552,51 @@ public class Admin_InputTicketManagerPL extends JPanel {
 			addOrUpdateTableData.clearSelection();
 		});
 
+		// - Tuỳ chỉnh Add Or Update Supplier Label
+		addOrUpdateSupllierLabel = CommonPL.getParagraphLabel("Nhà cung cấp", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addOrUpdateSupllierLabel.setBounds(660, 140, 460, 40);
+
+		// - Tuỳ chỉnh Add U Supplier ComboBox
+		String[] suppliersArray = { "Chọn Nhà cung cấp", "NCC0001 - Tiệm tạp hoá", "NCC0002 - Acecook" };
+		Vector<String> suppliersVector = CommonPL.getVectorHasValues(suppliersArray);
+		addOrUpdateSupllierComboBox = CommonPL.CustomComboBox(suppliersVector, Color.WHITE, Color.LIGHT_GRAY,
+				Color.BLACK, Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		addOrUpdateSupllierComboBox.setBounds(660, 180, 460, 40);
+
 		// - Tuỳ chỉnh Add Or Update Cost Label
 		addOrUpdateCostLabel = CommonPL.getParagraphLabel("Tổng tiền nhập (VNĐ)", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateCostLabel.setBounds(660, 140, 460, 40);
+		addOrUpdateCostLabel.setBounds(660, 230, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Cost Text Field
 		addOrUpdateCostTextField = new CommonPL.CustomTextField(0, 0, 0, "Đang cập nhật", Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateCostTextField.setBounds(660, 180, 460, 40);
+		addOrUpdateCostTextField.setBounds(660, 270, 460, 40);
 		addOrUpdateCostTextField.setEnabled(false);
 		addOrUpdateCostTextField.setBackground(Color.decode("#dedede"));
 
 		// - Tuỳ chỉnh Add Or Update Status Label
 		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
-		addOrUpdateStatusLabel.setBounds(660, 230, 460, 40);
+		addOrUpdateStatusLabel.setBounds(660, 320, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status Text Field
 		addOrUpdateStatusTextField = new CommonPL.CustomTextField(0, 0, 0, "Đang cập nhật", Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
-		addOrUpdateStatusTextField.setBounds(660, 270, 460, 40);
+		addOrUpdateStatusTextField.setBounds(660, 360, 460, 40);
 		addOrUpdateStatusTextField.setEnabled(false);
 		addOrUpdateStatusTextField.setBackground(Color.decode("#dedede"));
 
 		// - Tuỳ chỉnh Add Or Update Complete Button
-		addOrUpdateCompleteButton = CommonPL.getRoundedBorderButton(20, "Đã hoàn thành", Color.decode("#33CC00"),
+		addOrUpdateCompleteButton = CommonPL.getRoundedBorderButton(20, "Hoàn thành", Color.decode("#33CC00"),
 				Color.WHITE, CommonPL.getFontParagraphBold());
-		addOrUpdateCompleteButton.setBounds(900, 540, 220, 40);
+		addOrUpdateCompleteButton.setBounds(660, 540, 220, 40);
 		addOrUpdateCompleteButton.setVisible(false);
 
-		// - Tuỳ chỉnh Add Or Update Not Pay Button
-		addOrUpdateNotPayButton = CommonPL.getRoundedBorderButton(20, "Chưa thanh toán", Color.decode("#FFCC33"),
-				Color.WHITE, CommonPL.getFontParagraphBold());
-		addOrUpdateNotPayButton.setBounds(660, 540, 220, 40);
-		addOrUpdateNotPayButton.setVisible(false);
-
 		// - Tuỳ chỉnh Add Or Update Delete Button
-		addOrUpdateDeleteButton = CommonPL.getRoundedBorderButton(20, "Đã huỷ phiếu", Color.decode("#EE0000"),
+		addOrUpdateDeleteButton = CommonPL.getRoundedBorderButton(20, "Huỷ phiếu", Color.decode("#EE0000"),
 				Color.WHITE, CommonPL.getFontParagraphBold());
 		addOrUpdateDeleteButton.setBounds(900, 540, 220, 40);
 		addOrUpdateDeleteButton.setVisible(false);
@@ -672,11 +652,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 			((JTextField) addOrUpdateIdEmployeeCreatedComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			addOrUpdateIdEmployeeCreatedComboBox.setForeground(Color.BLACK);
 
-			// - Gán dữ liệu là "Nhân viên nhận hàng"
-			addOrUpdateIdEmployeeGottenComboBox.setSelectedItem((String) object.get(4));
-			((JTextField) addOrUpdateIdEmployeeGottenComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-			addOrUpdateIdEmployeeGottenComboBox.setForeground(Color.BLACK);
-
 			// - Gán dữ liệu là "Tổng tiền thanh toán"
 			addOrUpdateCostTextField.setText((String) object.get(5));
 			addOrUpdateCostTextField.setEnabled(false);
@@ -694,23 +669,13 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				addOrUpdateAddUnitButton.setVisible(false);
 				addOrUpdateDeleteUnitButton.setVisible(false);
 				addOrUpdateCompleteButton.setVisible(false);
-				addOrUpdateNotPayButton.setVisible(false);
-				addOrUpdateDeleteButton.setVisible(false);
-				addOrUpdateButton.setVisible(false);
-			}
-			if (addOrUpdateStatusTextField.getText().equals("Chưa thanh toán")) {
-				addOrUpdateAddUnitButton.setVisible(false);
-				addOrUpdateDeleteUnitButton.setVisible(false);
-				addOrUpdateCompleteButton.setVisible(true);
-				addOrUpdateNotPayButton.setVisible(false);
 				addOrUpdateDeleteButton.setVisible(false);
 				addOrUpdateButton.setVisible(false);
 			}
 			if (addOrUpdateStatusTextField.getText().equals("Đang chờ xác nhận")) {
 				addOrUpdateAddUnitButton.setVisible(true);
 				addOrUpdateDeleteUnitButton.setVisible(true);
-				addOrUpdateCompleteButton.setVisible(false);
-				addOrUpdateNotPayButton.setVisible(true);
+				addOrUpdateCompleteButton.setVisible(true);
 				addOrUpdateDeleteButton.setVisible(true);
 				addOrUpdateButton.setVisible(false);
 			}
@@ -718,7 +683,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 				addOrUpdateAddUnitButton.setVisible(false);
 				addOrUpdateDeleteUnitButton.setVisible(false);
 				addOrUpdateCompleteButton.setVisible(false);
-				addOrUpdateNotPayButton.setVisible(false);
 				addOrUpdateDeleteButton.setVisible(false);
 				addOrUpdateButton.setVisible(false);
 			}
@@ -740,19 +704,18 @@ public class Admin_InputTicketManagerPL extends JPanel {
 		addOrUpdateBlockPanel.add(addOrUpdateDateContractDatePicker);
 		addOrUpdateBlockPanel.add(addOrUpdateIdEmployeeCreatedLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateIdEmployeeCreatedComboBox);
-		addOrUpdateBlockPanel.add(addOrUpdateIdEmployeeGottenLabel);
-		addOrUpdateBlockPanel.add(addOrUpdateIdEmployeeGottenComboBox);
 		addOrUpdateBlockPanel.add(addOrUpdateLinePanel);
 		addOrUpdateBlockPanel.add(addOrUpdateDataLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateAddUnitButton);
 		addOrUpdateBlockPanel.add(addOrUpdateDeleteUnitButton);
 		addOrUpdateBlockPanel.add(addOrUpdateTableScrollPane);
+		addOrUpdateBlockPanel.add(addOrUpdateSupllierLabel);
+		addOrUpdateBlockPanel.add(addOrUpdateSupllierComboBox);
 		addOrUpdateBlockPanel.add(addOrUpdateCostLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateCostTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateCompleteButton);
-		addOrUpdateBlockPanel.add(addOrUpdateNotPayButton);
 		addOrUpdateBlockPanel.add(addOrUpdateDeleteButton);
 		addOrUpdateBlockPanel.add(addOrUpdateButton);
 		// <==================== ====================>

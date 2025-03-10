@@ -2,11 +2,11 @@ package DTO;
 
 public class CustomerDTO {
 	// Properties
-	private String id;
 	private String idCard;
+	private String type;
 	private String fullname;
 	private String birthday;
-	private Boolean gender;
+	private String gender;
 	private String phone;
 	private String email;
 	private String address;
@@ -14,10 +14,10 @@ public class CustomerDTO {
 	private String dateUpdate;
 
 	// Constructors
-	public CustomerDTO(String id, String idCard, String fullname, String birthday, Boolean gender, String phone,
+	public CustomerDTO(String idCard, String type, String fullname, String birthday, String gender, String phone,
 			String email, String address, Boolean status, String dateUpdate) {
-		this.id = id;
 		this.idCard = idCard;
+		this.type = type;
 		this.fullname = fullname;
 		this.birthday = birthday;
 		this.gender = gender;
@@ -29,12 +29,13 @@ public class CustomerDTO {
 	}
 
 	// Setter - Getter
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public void setIdCard(String idCard) {
 		this.idCard = idCard;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public void setFullname(String fullname) {
@@ -45,7 +46,7 @@ public class CustomerDTO {
 		this.birthday = birthday;
 	}
 
-	public void setGender(Boolean gender) {
+	public void setGender(String gender) {
 		this.gender = gender;
 	}
 
@@ -65,14 +66,15 @@ public class CustomerDTO {
 		this.status = status;
 	}
 
-	public String getId() {
-		return id;
-	}
 
 	public String getIdCard() {
 		return idCard;
 	}
 
+	public String getType() {
+		return type;
+	}
+	
 	public String getFullname() {
 		return fullname;
 	}
@@ -81,7 +83,7 @@ public class CustomerDTO {
 		return birthday;
 	}
 
-	public Boolean getGender() {
+	public String getGender() {
 		return gender;
 	}
 

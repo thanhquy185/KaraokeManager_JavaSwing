@@ -5,53 +5,52 @@ import java.util.ArrayList;
 import DAL.CustomerDAL;
 import DTO.CustomerDTO;
 
-
 public class CustomerBLL {
-    private CustomerDAL customerDAL;
+	private CustomerDAL customerDAL;
 
-    // - Constructors
-    public CustomerBLL()
-    {
-        customerDAL = new CustomerDAL();
-    }
+	// - Constructors
+	public CustomerBLL() {
+		customerDAL = new CustomerDAL();
+	}
 
-    // - Hàm kiểm tra CCCD đã được nhập hay chưa ?
-	public boolean isInputedId(String id) {
-		if (id == null) {
+	// - Hàm kiểm tra CCCD đã được nhập hay chưa ?
+	public boolean isInputedIdCard(String idCard) {
+		if (idCard == null) {
 			return false;
 		}
 		return true;
 	}
 
-    // - Hàm kiểm tra CCCD đã hợp lệ hay chưa ?
-	public boolean isValidId(String id) {
-		if (id.length() != 10 || !CommonBLL.isValidStringType04(id)) {
+	// - Hàm kiểm tra CCCD đã hợp lệ hay chưa ?
+	public boolean isValidIdCard(String idCard) {
+		if (idCard.length() != 12 || !CommonBLL.isValidStringType04(idCard)) {
 			return false;
 		}
 		return true;
 	}
 
-    // - Hàm kiểm tra mã loại khách hàng đã được chọn hay chưa ?
-	public boolean isSelectedIdCard(String idcard) {
-		if (idcard == null) {
+	// - Hàm kiểm tra mã loại khách hàng đã được chọn hay chưa ?
+	public boolean isSelectedType(String type) {
+		if (type == null) {
 			return false;
 		}
-	    return true;
+		return true;
 	}
 
-    // - Hàm kiểm tra mã loại khách hàng đã hợp lệ hay chưa ?
-	public boolean isValidIdCard(String idcard) {
-		String[] validIdCard = {"Thường", "Bạc", "Vàng", "Kim cương"};
-        if (idcard == null) return false;
-        for (String validIdcard : validIdCard) {
-            if (idcard.equals(validIdcard)) {
-                return true;
-            }
-        }
-        return false;
+	// - Hàm kiểm tra mã loại khách hàng đã hợp lệ hay chưa ?
+	public boolean isValidType(String type) {
+		String[] validIdCard = { "THUONG", "BAC", "VANG", "KIMCUONG" };
+		if (type == null)
+			return false;
+		for (String validIdcard : validIdCard) {
+			if (type.equals(validIdcard)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
-    // - Hàm kiểm tra số điện thoại đã được nhập hay chưa ?
+	// - Hàm kiểm tra số điện thoại đã được nhập hay chưa ?
 	public boolean isInputedPhone(String phone) {
 		if (phone == null) {
 			return false;
@@ -59,7 +58,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra số điện thoại đã hợp lệ hay chưa ?
+	// - Hàm kiểm tra số điện thoại đã hợp lệ hay chưa ?
 	public boolean isValidPhone(String phone) {
 		if (phone.length() != 10 || !CommonBLL.isValidStringType04(phone)) {
 			return false;
@@ -67,7 +66,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra trạng thái đã được chọn hay chưa ?
+	// - Hàm kiểm tra trạng thái đã được chọn hay chưa ?
 	public boolean isSelectedStatus(String status) {
 		if (status == null) {
 			return false;
@@ -75,7 +74,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra trạng thái đã hợp lệ hay chưa ?
+	// - Hàm kiểm tra trạng thái đã hợp lệ hay chưa ?
 	public boolean isValidStatus(String status) {
 		if (!status.equals("Hoạt động") && !status.equals("Tạm dừng")) {
 			return false;
@@ -84,7 +83,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra họ và tên đã được nhập hay chưa ?
+	// - Hàm kiểm tra họ và tên đã được nhập hay chưa ?
 	public boolean isInputedFullname(String fullname) {
 		if (fullname == null) {
 			return false;
@@ -92,7 +91,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra họ và tên đã hợp lệ hay chưa ?
+	// - Hàm kiểm tra họ và tên đã hợp lệ hay chưa ?
 	public boolean isValidFullname(String fullname) {
 		if (!CommonBLL.isValidStringType01(fullname)) {
 			return false;
@@ -100,7 +99,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra email đã hợp lệ hay chưa ?
+	// - Hàm kiểm tra email đã hợp lệ hay chưa ?
 	public boolean isValidEmail(String email) {
 		if (email != null && !CommonBLL.isValidStringType06(email)) {
 			return false;
@@ -108,7 +107,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra địa chỉ đã hợp lệ hay chưa ?
+	// - Hàm kiểm tra địa chỉ đã hợp lệ hay chưa ?
 	public boolean isValidAddress(String address) {
 		if (address != null && !CommonBLL.isValidStringType05(address)) {
 			return false;
@@ -116,20 +115,18 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra CCCD đã tồn tại hay chưa ?
-	public boolean isExistsId(String id) 
-    {
+	// - Hàm kiểm tra CCCD đã tồn tại hay chưa ?
+	public boolean isExistsIdCard(String idCard) {
 		String[] join = null;
-		String condition = String.format("cccd = '%s'", id);
+		String condition = String.format("cccd = '%s'", idCard);
 		String order = null;
-		if ((customerDAL.selectAllByCondition(join, condition, order)).size() == 0) 
-        {
+		if ((customerDAL.selectAllByCondition(join, condition, order)).size() == 0) {
 			return false;
-        }
+		}
 		return true;
 	}
 
-    // - Hàm kiểm tra số điện thoại đã tồn tại hay chưa ?
+	// - Hàm kiểm tra số điện thoại đã tồn tại hay chưa ?
 	public boolean isExistsPhone(String phone) {
 		String[] join = null;
 		String condition = String.format("soDienThoai = '%s'", phone);
@@ -140,7 +137,7 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm kiểm tra email đã tồn tại hay chưa ?
+	// - Hàm kiểm tra email đã tồn tại hay chưa ?
 	public boolean isExistsEmail(String email) {
 		String[] join = null;
 		String condition = String.format("email = '%s'", email);
@@ -151,16 +148,15 @@ public class CustomerBLL {
 		return true;
 	}
 
-    // - Hàm thêm một khách hàng
-	public String insertCustomer(String id, String idcard, String fullname, String  birthday, String gender, String phone, String email, 
-            String address, String status, String dateUpdate) 
-    {
-	    // - Kiểm tra các trường hợp
-		if (!isInputedId(id) && !isInputedPhone(phone) && !isInputedFullname(fullname)
-				&& !isSelectedIdCard(idcard) && !isSelectedStatus(status)) {
+	// - Hàm thêm một khách hàng
+	public String insertCustomer(String idCard, String type, String fullname, String birthday, String gender,
+			String phone, String email, String address, String status, String dateUpdate) {
+		// - Kiểm tra các trường hợp
+		if (!isInputedIdCard(idCard) && !isInputedPhone(phone) && !isInputedFullname(fullname) && !isSelectedType(type)
+				&& !isSelectedStatus(status)) {
 			return "Chưa nhập đầy đủ thông tin khách hàng cần thiết";
 		}
-		if (!isInputedId(id)) {
+		if (!isInputedIdCard(idCard)) {
 			return "Chưa nhập căn cước công dân";
 		}
 		if (!isInputedPhone(phone)) {
@@ -169,17 +165,17 @@ public class CustomerBLL {
 		if (!isInputedFullname(fullname)) {
 			return "Chưa nhập họ và tên";
 		}
-		if (!isSelectedIdCard(idcard)) {
+		if (!isSelectedType(type)) {
 			return "Chưa chọn loại khách hàng";
 		}
 		if (!isSelectedStatus(status)) {
 			return "Chưa chọn trạng thái";
 		}
-		if (!isValidId(id) && !isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email)
-				&& !isValidAddress(address) && !isValidIdCard(idcard) && !isValidStatus(status)) {
+		if (!isValidIdCard(idCard) && !isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email)
+				&& !isValidAddress(address)  && !isValidStatus(status)) {
 			return "Nhập sai định dạng thông tin khách hàng";
 		}
-		if (!isValidId(id)) {
+		if (!isValidIdCard(idCard)) {
 			return "Nhập sai định dạng CCCD";
 		}
 		if (!isValidFullname(fullname)) {
@@ -194,16 +190,13 @@ public class CustomerBLL {
 		if (!isValidAddress(address)) {
 			return "Nhập sai định dạng địa chỉ";
 		}
-		if (!isValidIdCard(idcard)) {
-			return "Chọn sai định dạng mã loại khách hàng";
-		}
 		if (!isValidStatus(status)) {
 			return "Chọn sai định dạng trạng thái";
 		}
-		if (isExistsId(id) && isExistsPhone(phone) && isExistsEmail(email)) {
+		if (isExistsIdCard(idCard) && isExistsPhone(phone) && isExistsEmail(email)) {
 			return "Nhiều thông tin khách hàng đã tồn tại";
 		}
-		if (isExistsId(id)) {
+		if (isExistsIdCard(idCard)) {
 			return "CCCD của khách hàng đã tồn tại";
 		}
 		if (isExistsPhone(phone)) {
@@ -214,29 +207,27 @@ public class CustomerBLL {
 		}
 
 		// - Nếu thoả mãn hết thì thêm vào CSDL
-		String customerId = id;
+		String customerIdCard = idCard;
+		String customerType = type;
 		String customerFullname = fullname;
 		String customerPhone = phone;
 		String customerEmail = email;
 		String customerAddress = address;
 		String customerBirthday = birthday;
-		Boolean customerGender = gender.equals("Nam") ? true : false;
-		String customerIdcard = idcard;
+		String customerGender = gender;
 		boolean customerStatus = status.equals("Hoạt động") ? true : false;
 		String customerDateUpdate = dateUpdate;
-		CustomerDTO newCustomerDTO = new CustomerDTO(customerId, customerIdcard, customerFullname, customerBirthday, customerGender, 
-                customerPhone, customerEmail, customerAddress, customerStatus, customerDateUpdate);
+		CustomerDTO newCustomerDTO = new CustomerDTO(customerIdCard, customerType, customerFullname, customerBirthday,
+				customerGender, customerPhone, customerEmail, customerAddress, customerStatus, customerDateUpdate);
 		customerDAL.insert(newCustomerDTO);
 		return "Có thể thêm một khách hàng";
 	}
 
-    // - Hàm cập nhật một khách hàng
-	public String updateCustomer(String id, String idcard, String fullname, String  birthday, String gender, String phone, String email, 
-            String address, String status, String dateUpdate) 
-    {
+	// - Hàm cập nhật một khách hàng
+	public String updateCustomer(String idCard, String type, String fullname, String birthday, String gender,
+			String phone, String email, String address, String status, String dateUpdate) {
 		// - Kiểm tra các trường hợp
-		if (!isInputedPhone(phone) && !isInputedFullname(fullname)
-				&& !isSelectedIdCard(idcard)) {
+		if (!isInputedPhone(phone) && !isInputedFullname(fullname) && !isSelectedType(type)) {
 			return "Chưa nhập đầy đủ thông tin khách hàng cần thiết";
 		}
 		if (!isInputedPhone(phone)) {
@@ -245,11 +236,11 @@ public class CustomerBLL {
 		if (!isInputedFullname(fullname)) {
 			return "Chưa nhập họ và tên";
 		}
-		if (!isSelectedIdCard(idcard)) {
+		if (!isSelectedType(type)) {
 			return "Chưa chọn loại khách hàng";
 		}
-		if (!isValidId(id) && !isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email)
-				&& !isValidAddress(address) && !isValidIdCard(idcard) && !isValidStatus(status)) {
+		if (!isValidIdCard(idCard) && !isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email)
+				&& !isValidAddress(address) && !isValidType(type) && !isValidStatus(status)) {
 			return "Nhập sai định dạng thông tin khách hàng";
 		}
 		if (!isValidFullname(fullname)) {
@@ -264,28 +255,29 @@ public class CustomerBLL {
 		if (!isValidAddress(address)) {
 			return "Nhập sai định dạng địa chỉ";
 		}
-		if (!isValidIdCard(idcard)) {
+		if (!isValidType(type)) {
 			return "Chọn sai định dạng mã loại khách hàng";
 		}
-		
+
 		// - Nếu thoả mãn hết thì thêm vào CSDL
-		String customerId = id;
+		String customerIdCard = idCard;
+		String customerType = type;
 		String customerFullname = fullname;
+		String customerBirthday = birthday;
+		String customerGender = gender;
 		String customerPhone = phone;
 		String customerEmail = email;
 		String customerAddress = address;
-		String customerBirthday = birthday;
-		Boolean customerGender = gender.equals("Nam") ? true : false;
-		String customerIdcard = idcard;
 		boolean customerStatus = status.equals("Hoạt động") ? true : false;
 		String customerDateUpdate = dateUpdate;
-		CustomerDTO newCustomerDTO = new CustomerDTO(customerId, customerIdcard, customerFullname, customerBirthday, customerGender, 
-                customerPhone, customerEmail, customerAddress, customerStatus, customerDateUpdate);
-		customerDAL.update(newCustomerDTO);
+		CustomerDTO updateCustomerDTO = new CustomerDTO(customerIdCard, customerType, customerFullname, customerBirthday,
+				customerGender, customerPhone, customerEmail, customerAddress, customerStatus, customerDateUpdate);
+		customerDAL.update(updateCustomerDTO);
+		
 		return "Có thể thay đổi một khách hàng";
 	}
 
-    // - Hàm khoá một khách hàng
+	// - Hàm khoá một khách hàng
 	public String lockCustomer(String id, String dateUpdate) {
 		// - Khoá hoặc mở khoá tuỳ vào trạng thái hiện tại
 		CustomerDTO lockCustomerDTO = getOneCustomerById(id);
@@ -296,7 +288,7 @@ public class CustomerBLL {
 		return "Có thể khoá một khách hàng";
 	}
 
-    // - Hàm lấy ra danh sách các khách hàng hiện có trong CSDL
+	// - Hàm lấy ra danh sách các khách hàng hiện có trong CSDL
 	public ArrayList<CustomerDTO> getAllCustomer() {
 		return customerDAL.selectAll();
 	}

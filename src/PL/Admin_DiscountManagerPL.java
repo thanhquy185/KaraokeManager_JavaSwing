@@ -2,10 +2,7 @@ package PL;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.math.BigInteger;
 import java.text.ParseException;
 import java.time.LocalDateTime;
@@ -36,7 +33,6 @@ import BLL.DiscountBLL;
 import BLL.DiscountTypeBLL;
 import DTO.DiscountDTO;
 import DTO.DiscountTypeDTO;
-import DTO.PrivilegeDTO;
 import PL.CommonPL.CustomCornerDatePicker.CustomRoundedBorder;
 import PL.CommonPL.CustomTextField;
 

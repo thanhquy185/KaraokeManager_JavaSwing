@@ -1,10 +1,8 @@
 package BLL;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 
 import DAL.DiscountDAL;
-import DTO.AccountDTO;
 import DTO.DiscountDTO;
 
 public class DiscountBLL {

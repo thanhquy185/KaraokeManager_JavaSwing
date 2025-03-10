@@ -813,37 +813,37 @@ public class CommonPL {
 	}
 
 	// Định dạng mẫu mặc định cho JButton có ý nghĩa là nút thao tác cuối cùng
-	public static JButton getLastButtonForm(String content, Color backgroundColor, Color fontColor, Font font) {
-		JButton button = new JButton();
-		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-		button.setContentAreaFilled(true);
-		button.setOpaque(true);
-		button.setBorderPainted(true);
-		button.setBorder(BorderFactory.createLineBorder(backgroundColor, 2));
-		button.setBackground(backgroundColor);
-		button.setText(content);
-		button.setFont(font);
-		button.setForeground(fontColor);
-		button.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				try {
-					Thread.sleep(100);
-					button.setForeground(backgroundColor);
-					button.setBackground(fontColor);
-				} catch (InterruptedException e1) {
-					e1.printStackTrace();
-				}
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				button.setBackground(backgroundColor);
-				button.setForeground(fontColor);
-			}
-		});
-		return button;
-	}
+//	public static JButton getLastButtonForm(String content, Color backgroundColor, Color fontColor, Font font) {
+//		JButton button = new JButton();
+//		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+//		button.setContentAreaFilled(true);
+//		button.setOpaque(true);
+//		button.setBorderPainted(true);
+//		button.setBorder(BorderFactory.createLineBorder(backgroundColor, 2));
+//		button.setBackground(backgroundColor);
+//		button.setText(content);
+//		button.setFont(font);
+//		button.setForeground(fontColor);
+//		button.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mouseEntered(MouseEvent e) {
+//				try {
+//					Thread.sleep(100);
+//					button.setForeground(backgroundColor);
+//					button.setBackground(fontColor);
+//				} catch (InterruptedException e1) {
+//					e1.printStackTrace();
+//				}
+//			}
+//
+//			@Override
+//			public void mouseExited(MouseEvent e) {
+//				button.setBackground(backgroundColor);
+//				button.setForeground(fontColor);
+//			}
+//		});
+//		return button;
+//	}
 
 	// Định dạng mẫu mặc định cho icon (?)
 	public static JButton getQuestionIconForm(String icon, String inform, String informDetail, Color color, Font font) {
@@ -888,24 +888,24 @@ public class CommonPL {
 	}
 
 	// Tạo viền nét đứt cho Panel
-	public static class DashedBorder extends AbstractBorder {
-		@Override
-		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-			Graphics2D g2d = (Graphics2D) g.create();
-			g2d.setColor(Color.BLACK); // Màu của viền
-			float[] dashPattern = { 10, 2 }; // Độ dài nét đứt và khoảng cách giữa các nét
-			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, dashPattern, 0));
-
-			// Vẽ viền
-			g2d.drawRect(x, y, width - 1, height - 1);
-			g2d.dispose();
-		}
-
-		@Override
-		public Insets getBorderInsets(Component c) {
-			return new Insets(5, 5, 5, 5); // Khoảng cách từ viền tới nội dung
-		}
-	}
+//	public static class DashedBorder extends AbstractBorder {
+//		@Override
+//		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+//			Graphics2D g2d = (Graphics2D) g.create();
+//			g2d.setColor(Color.BLACK); // Màu của viền
+//			float[] dashPattern = { 10, 2 }; // Độ dài nét đứt và khoảng cách giữa các nét
+//			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, dashPattern, 0));
+//
+//			// Vẽ viền
+//			g2d.drawRect(x, y, width - 1, height - 1);
+//			g2d.dispose();
+//		}
+//
+//		@Override
+//		public Insets getBorderInsets(Component c) {
+//			return new Insets(5, 5, 5, 5); // Khoảng cách từ viền tới nội dung
+//		}
+//	}
 
 	// Bo góc cho JTextField
 	public static class CustomTextField extends JTextField {
@@ -2095,11 +2095,6 @@ public class CommonPL {
 //		if (type.equals("dashboard manager")) {
 //			table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16));
 //		}
-		// - Căn giữa
-		DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader()
-				.getDefaultRenderer();
-		headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-		table.getTableHeader().setDefaultRenderer(headerRenderer);
 		// - Chiều cao của dòng tiêu đề
 		table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 50));
 		if (type.equals("dashboard manager")) {
@@ -2152,6 +2147,11 @@ public class CommonPL {
 					boolean hasFocus, int row, int column) {
 				Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
+				if (cell instanceof JLabel) {
+		            JLabel label = (JLabel) cell;
+		            label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding: top, left, bottom, right
+		        }
+				
 				if (!isSelected) { // Chỉ đổi màu khi không được chọn
 					if (type.equals("add or update unit table")) {
 						if (row % 2 == 0) {
@@ -2276,67 +2276,6 @@ public class CommonPL {
 				}
 			});
 		}
-
-		// Thiết lập các nút sự kiện cho cột "Chức năng"
-//			table.addMouseListener(new MouseAdapter() {
-//				@Override
-//				public void mouseClicked(MouseEvent e) {
-//					int column = table.columnAtPoint(e.getPoint());
-//					if (column == columns.length - 1) {
-//						if (type.equals("account manager")) {
-//							System.out.println("Chức năng ở Tài khoản");
-//						} else if (type.equals("department manager")) {
-//							System.out.println("Chức năng ở Khoa");
-//						} else if (type.equals("sick manager")) {
-//							System.out.println("Chức năng ở Bệnh");
-//						} else if (type.equals("table prices manager")) {
-//							System.out.println("Chức năng ở Bảng giá Khám - Chữa");
-//						} else if (type.equals("medicine supplier manager")) {
-//							System.out.println("Chức năng ở Nhà cung cấp thuốc");
-//						} else if (type.equals("medicine object manager")) {
-//							System.out.println("Chức năng ở Đối tượng thuốc");
-//						} else if (type.equals("medicine bill manager")) {
-//							System.out.println("Chức năng ở Đơn thuốc");
-//						} else if (type.equals("healthcare worker object manager")) {
-//							System.out.println("Chức năng ở Đối tượng Nhân viên");
-//						} else if (type.equals("healthcare worker muster manager")) {
-//							System.out.println("Chức năng ở Điểm danh");
-//						} else if (type.equals("medical record object manager")) {
-//							System.out.println("Chức năng ở Bệnh án");
-//						} else if (type.equals("patient object manager")) {
-//							System.out.println("Chức năng ở Bệnh nhân");
-//						}
-//					}
-//				}
-//			});
-
-		// - Định dạng ô dữ liệu "Chức năng" ngoại trừ các mục: "Phân công", "Điểm danh"
-//			if (!type.equals("healthcare worker assignment manager") && !type.equals("healthcare worker muster manager")
-//					&& !type.equals("pay for test manager") && !type.equals("test calender list manager")) {
-//				table.getColumnModel().getColumn(columns.length - 1).setCellRenderer(new TableCellRenderer() {
-//					@Override
-//					public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-//							boolean hasFocus, int row, int column) {
-//						// Tạo ImageIcon từ tệp hình ảnh
-//						ImageIcon originalIcon = new ImageIcon("/Users/macbook/Desktop/bars-solid.png");
-		//
-//						// Lấy ảnh từ ImageIcon và thay đổi kích thước
-//						Image image = originalIcon.getImage();
-//						Image resizedImage = image.getScaledInstance(14, 14, Image.SCALE_SMOOTH); // Đổi kích thước
-		//
-//						// Tạo ImageIcon mới với ảnh đã thay đổi kích thước
-//						ImageIcon resizedIcon = new ImageIcon(resizedImage);
-		//
-//						// Tạo JLabel và gán ImageIcon đã thay đổi kích thước
-//						JLabel label = new JLabel("", JLabel.CENTER);
-//						label.setIcon(resizedIcon);
-//						label.setBackground(Color.WHITE);
-		//
-//						label.setOpaque(true); // Đảm bảo màu nền hiển thị
-//						return label;
-//					}
-//				});
-//			}
 
 		return table;
 	}

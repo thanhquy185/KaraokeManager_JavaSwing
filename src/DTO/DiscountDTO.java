@@ -1,7 +1,5 @@
 package DTO;
 
-import java.math.BigInteger;
-
 public class DiscountDTO {
 	// Properties
 	private String id;

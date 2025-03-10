@@ -196,7 +196,7 @@ public class Admin_SupplierManagerPL extends JPanel {
 
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		// + Tạo cấu trúc bảng dữ liệu
-		tableData = CommonPL.createTableData(columns, widthColumns, datas, "supplies manager");
+		tableData = CommonPL.createTableData(columns, widthColumns, datas, "supplier manager");
 		tableScrollPane = CommonPL.createScrollPane(true, true, tableData);
 		tableScrollPane.setBounds(15, 70, 1110, 400);
 

@@ -6,26 +6,26 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import DTO.DiscountTypeDTO;
+import DTO.CustomerTypeDTO;
 
-public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
+public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 	// Methods
-	// - Hàm thêm một loại khuyến mãi
+	// - Hàm thêm một loại khách hàng
 	@Override
-	public int insert(DiscountTypeDTO discountTypeDTO) {
+	public int insert(CustomerTypeDTO customerTypeDTO) {
 		// - Biến chứa số dòng đã được thêm
 		int rowChange = 0;
 
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.LoaiKhuyenMai(maLoaiKhuyenMai, tenLoaiKhuyenMai, trangThai, ngayCapNhat)"
+			String sql = "INSERT INTO Karaoke.LoaiKhachHang(maLoaiKhachHang, tenLoaiKhachHang, trangThai, ngayCapNhat)"
 					+ "\nVALUES(?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setString(1, discountTypeDTO.getId());
-			pstmt.setString(2, discountTypeDTO.getName());
-			pstmt.setBoolean(3, discountTypeDTO.getStatus());
-			pstmt.setString(4, discountTypeDTO.getDateUpdate());
+			pstmt.setString(1, customerTypeDTO.getId());
+			pstmt.setString(2, customerTypeDTO.getName());
+			pstmt.setBoolean(3, customerTypeDTO.getStatus());
+			pstmt.setString(4, customerTypeDTO.getDateUpdate());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -35,22 +35,22 @@ public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
 		return rowChange;
 	}
 
-	// - Hàm cập nhật một loại khuyến mãi
+	// - Hàm cập nhật một loại khách hàng
 	@Override
-	public int update(DiscountTypeDTO DiscountTypeDTO) {
+	public int update(CustomerTypeDTO customerTypeDTO) {
 		// - Biến chứa số dòng đã được thêm
 		int rowChange = 0;
 
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.LoaiKhuyenMai" + "\nSET tenLoaiKhuyenMai = ?, trangThai = ?, ngayCapNhat = ?"
-					+ "\nWHERE maLoaiKhuyenMai = ?";
+			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET tenLoaiKhachHang = ?, trangThai = ?, ngayCapNhat = ?"
+					+ "\nWHERE maLoaiKhachHang = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setString(1, DiscountTypeDTO.getName());
-			pstmt.setBoolean(2, DiscountTypeDTO.getStatus());
-			pstmt.setString(3, DiscountTypeDTO.getDateUpdate());
-			pstmt.setString(4, DiscountTypeDTO.getId());
+			pstmt.setString(1, customerTypeDTO.getName());
+			pstmt.setBoolean(2, customerTypeDTO.getStatus());
+			pstmt.setString(3, customerTypeDTO.getDateUpdate());
+			pstmt.setString(4, customerTypeDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -60,21 +60,21 @@ public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
 		return rowChange;
 	}
 
-	// - Hàm khoá một loại khuyến mãi
+	// - Hàm khoá một loại khách hàng
 	@Override
-	public int lock(DiscountTypeDTO DiscountTypeDTO) {
+	public int lock(CustomerTypeDTO customerTypeDTO) {
 		// - Biến chứa số dòng đã được thêm
 		int rowChange = 0;
 
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.LoaiKhuyenMai" + "\nSET trangThai = ?, ngayCapNhat = ?"
-					+ "\nWHERE maLoaiKhuyenMai = ?";
+			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?"
+					+ "\nWHERE maLoaiKhachHang = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setBoolean(1, DiscountTypeDTO.getStatus());
-			pstmt.setString(2, DiscountTypeDTO.getDateUpdate());
-			pstmt.setString(3, DiscountTypeDTO.getId());
+			pstmt.setBoolean(1, customerTypeDTO.getStatus());
+			pstmt.setString(2, customerTypeDTO.getDateUpdate());
+			pstmt.setString(3, customerTypeDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -84,22 +84,22 @@ public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
 		return rowChange;
 	}
 
-	// - Hàm lấy ra danh sách các loại khuyến mãi
+	// - Hàm lấy ra danh sách các loại khách hàng
 	@Override
-	public ArrayList<DiscountTypeDTO> selectAll() {
+	public ArrayList<CustomerTypeDTO> selectAll() {
 		// - Khai báo biến chứa danh sách trả về
-		ArrayList<DiscountTypeDTO> list = new ArrayList<>();
+		ArrayList<CustomerTypeDTO> list = new ArrayList<>();
 
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "SELECT * FROM Karaoke.LoaiKhuyenMai;";
+			String sql = "SELECT * FROM Karaoke.LoaiKhachHang;";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				DiscountTypeDTO discountTypeDTO = new DiscountTypeDTO(rs.getString("maLoaiKhuyenMai"),
-						rs.getString("tenLoaiKhuyenMai"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
-				list.add(discountTypeDTO);
+				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
+						rs.getString("tenLoaiKhachHang"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				list.add(customerTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {
@@ -109,24 +109,24 @@ public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
 		return list;
 	}
 
-	// - Hàm lấy ra danh sách các loại khuyến mãi dựa trên 1 điều kiện
+	// - Hàm lấy ra danh sách các loại khách hàng dựa trên 1 điều kiện
 	@Override
-	public ArrayList<DiscountTypeDTO> selectAllByCondition(String[] join, String condition, String order) {
+	public ArrayList<CustomerTypeDTO> selectAllByCondition(String[] join, String condition, String order) {
 		// - Khai báo biến chứa danh sách trả về
-		ArrayList<DiscountTypeDTO> list = new ArrayList<>();
+		ArrayList<CustomerTypeDTO> list = new ArrayList<>();
 
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = String.format("SELECT * FROM Karaoke.LoaiKhuyenMai%s%s%s;",
+			String sql = String.format("SELECT * FROM Karaoke.LoaiKhachHang%s%s%s;",
 					join != null ? CommonDAL.getJoinValues(join) : "", condition != null ? "\nWHERE " + condition : "",
 					order != null ? "\nORDER BY " + order : "");
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				DiscountTypeDTO discountTypeDTO = new DiscountTypeDTO(rs.getString("maLoaiKhuyenMai"),
-						rs.getString("tenLoaiKhuyenMai"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
-				list.add(discountTypeDTO);
+				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
+						rs.getString("tenLoaiKhachHang"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				list.add(customerTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {
@@ -136,20 +136,20 @@ public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
 		return list;
 	}
 
-	// - Hàm lấy ra một loại khuyến mãi dựa trên mã loại khuyến mãi đó
+	// - Hàm lấy ra một loại khách hàng dựa trên mã loại khách hàng đó
 	@Override
-	public DiscountTypeDTO selectOneById(String id) {
+	public CustomerTypeDTO selectOneById(String id) {
 		// - Khai báo biến chứa danh sách trả về
-		DiscountTypeDTO discountTypeDTO = null;
+		CustomerTypeDTO customerTypeDTO = null;
 
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = String.format("SELECT * FROM Karaoke.LoaiKhuyenMai \nWHERE maLoaiKhuyenMai = '%s';", id);
+			String sql = String.format("SELECT * FROM Karaoke.LoaiKhachHang \nWHERE maLoaiKhachHang = '%s';", id);
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				discountTypeDTO = new DiscountTypeDTO(rs.getString("maLoaiKhuyenMai"), rs.getString("tenLoaiKhuyenMai"),
+				customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"),
 						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -157,6 +157,6 @@ public class DiscountTypeDAL implements DAL<DiscountTypeDTO> {
 			e.printStackTrace();
 		}
 
-		return discountTypeDTO;
+		return customerTypeDTO;
 	}
 }
