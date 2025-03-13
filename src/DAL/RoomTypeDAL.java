@@ -44,7 +44,7 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				RoomTypeDTO roomTypeDTO = new RoomTypeDTO(rs.getString("maLoaiPhong"), rs.getString("tenLoaiPhong"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("giaPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
 				list.add(roomTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -71,7 +71,7 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				RoomTypeDTO roomTypeDTO = new RoomTypeDTO(rs.getString("maLoaiPhong"), rs.getString("tenLoaiPhong"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("giaPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
 				list.add(roomTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -96,7 +96,7 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				roomTypeDTO = new RoomTypeDTO(rs.getString("maLoaiPhong"), rs.getString("tenLoaiPhong"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("giaPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {
@@ -105,5 +105,4 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 
 		return roomTypeDTO;
 	}
-
 }

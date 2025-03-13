@@ -5,13 +5,13 @@ public class ProductDTO {
 	private String id;
 	private String name;
 	private String productTypeId;
-	private Float price;
+	private Long price;
 	private String image;
 	private Boolean status;
 	private String dateUpdate;
 
 	// Constructors
-	public ProductDTO(String id, String name, String productTypeId, Float price, String image, Boolean status,
+	public ProductDTO(String id, String name, String productTypeId, Long price, String image, Boolean status,
 			String dateUpdate) {
 		super();
 		this.id = id;
@@ -36,7 +36,7 @@ public class ProductDTO {
 		this.productTypeId = productTypeId;
 	}
 
-	public void setPrice(Float price) {
+	public void setPrice(Long price) {
 		this.price = price;
 	}
 
@@ -64,7 +64,7 @@ public class ProductDTO {
 		return productTypeId;
 	}
 
-	public Float getPrice() {
+	public Long getPrice() {
 		return price;
 	}
 

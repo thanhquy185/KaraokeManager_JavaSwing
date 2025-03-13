@@ -2,57 +2,46 @@ package DTO;
 
 public class InputTicketDetailDTO {
 	// Properties
-	private Integer inputTicketId;
-	private String suppliesId;
+	private Integer id;
 	private String ingredientId;
-	private Float inputPrice;
+	private Long inputPrice;
 	private Integer inputQuantity;
-
+	
 	// Constructors
-	public InputTicketDetailDTO(Integer inputTicketId, String suppliesId, String ingredientId, Float inputPrice,
-			Integer inputQuantity) {
+	public InputTicketDetailDTO(Integer id, String ingredientId, Long inputPrice, Integer inputQuantity) {
 		super();
-		this.inputTicketId = inputTicketId;
-		this.suppliesId = suppliesId;
+		this.id = id;
 		this.ingredientId = ingredientId;
 		this.inputPrice = inputPrice;
 		this.inputQuantity = inputQuantity;
 	}
 
 	// Setter - Getter
-	public void setInputTicketId(Integer inputTicketId) {
-		this.inputTicketId = inputTicketId;
-	}
-
-	public void setSuppliesId(String suppliesId) {
-		this.suppliesId = suppliesId;
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 	public void setIngredientId(String ingredientId) {
 		this.ingredientId = ingredientId;
 	}
 
-	public void setInputPrice(Float inputPrice) {
+	public void setInputPrice(Long inputPrice) {
 		this.inputPrice = inputPrice;
 	}
 
 	public void setInputQuantity(Integer inputQuantity) {
 		this.inputQuantity = inputQuantity;
 	}
-
-	public Integer getInputTicketId() {
-		return inputTicketId;
-	}
-
-	public String getSuppliesId() {
-		return suppliesId;
+	
+	public Integer getId() {
+		return id;
 	}
 
 	public String getIngredientId() {
 		return ingredientId;
 	}
 
-	public Float getInputPrice() {
+	public Long getInputPrice() {
 		return inputPrice;
 	}
 

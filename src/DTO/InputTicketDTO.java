@@ -4,23 +4,19 @@ public class InputTicketDTO {
 	// Properties
 	private Integer id;
 	private String dateCreate;
-	private String suppliesId;
-	private String ingredientId;
-	private Integer sumQuantity;
-	private Integer sumCost;
+	private String supplierId;
+	private Long cost;
 	private Boolean status;
 	private String dateUpdate;
-
+	
 	// Constructors
-	public InputTicketDTO(Integer id, String dateCreate, String suppliesId, String ingredientId, Integer sumQuantity,
-			Integer sumCost, Boolean status, String dateUpdate) {
+	public InputTicketDTO(Integer id, String dateCreate, String supplierId, Long cost, Boolean status,
+			String dateUpdate) {
 		super();
 		this.id = id;
 		this.dateCreate = dateCreate;
-		this.suppliesId = suppliesId;
-		this.ingredientId = ingredientId;
-		this.sumQuantity = sumQuantity;
-		this.sumCost = sumCost;
+		this.supplierId = supplierId;
+		this.cost = cost;
 		this.status = status;
 		this.dateUpdate = dateUpdate;
 	}
@@ -34,20 +30,12 @@ public class InputTicketDTO {
 		this.dateCreate = dateCreate;
 	}
 
-	public void setSuppliesId(String suppliesId) {
-		this.suppliesId = suppliesId;
+	public void setSupplierId(String supplierId) {
+		this.supplierId = supplierId;
 	}
 
-	public void setIngredientId(String ingredientId) {
-		this.ingredientId = ingredientId;
-	}
-
-	public void setSumQuantity(Integer sumQuantity) {
-		this.sumQuantity = sumQuantity;
-	}
-
-	public void setSumCost(Integer sumCost) {
-		this.sumCost = sumCost;
+	public void setCost(Long cost) {
+		this.cost = cost;
 	}
 
 	public void setStatus(Boolean status) {
@@ -57,7 +45,6 @@ public class InputTicketDTO {
 	public void setDateUpdate(String dateUpdate) {
 		this.dateUpdate = dateUpdate;
 	}
-
 	public Integer getId() {
 		return id;
 	}
@@ -66,20 +53,12 @@ public class InputTicketDTO {
 		return dateCreate;
 	}
 
-	public String getSuppliesId() {
-		return suppliesId;
+	public String getSupplierId() {
+		return supplierId;
 	}
 
-	public String getIngredientId() {
-		return ingredientId;
-	}
-
-	public Integer getSumQuantity() {
-		return sumQuantity;
-	}
-
-	public Integer getSumCost() {
-		return sumCost;
+	public Long getCost() {
+		return cost;
 	}
 
 	public Boolean getStatus() {
@@ -89,4 +68,6 @@ public class InputTicketDTO {
 	public String getDateUpdate() {
 		return dateUpdate;
 	}
+
+
 }

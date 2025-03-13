@@ -253,6 +253,21 @@ public class CommonPL {
 		return Long.parseLong(moneyFormat.replace(".", ""));
 	}
 	
+	// Hàm chuyển định dạng ngày
+	public static String convertDateFormat(String date) {
+		boolean isSqlDate = false;
+		if(date.charAt(2) == '-') {
+			isSqlDate = true;
+		}
+		
+		String day = date.substring(0, 2);
+		String month = date.substring(3, 5);
+		String year = date.substring(6);
+		
+		return isSqlDate ? day + "/" + month + "/" + year 
+			: year + "-" + month + "-" + day;
+	}
+	
 	// Hàm trả về danh sách các tuần trong tháng
 	public static String[][] getWeeksOfMonth(int year, int month) {
         List<String[]> weeksList = new ArrayList<>();

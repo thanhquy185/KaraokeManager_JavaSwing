@@ -2,7 +2,9 @@ package PL;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -14,7 +16,36 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
+import BLL.CustomerBLL;
+import BLL.CustomerTypeBLL;
+import BLL.DiscountBLL;
+import BLL.DiscountTypeBLL;
+import BLL.InputTicketBLL;
+import BLL.InputTicketDetailBLL;
+import BLL.OrderBLL;
+import BLL.OrderDetailBLL;
+import BLL.ProductBLL;
+import BLL.RoomBLL;
+import BLL.RoomTypeBLL;
+import DTO.DiscountDTO;
+import DTO.InputTicketDTO;
+import DTO.InputTicketDetailDTO;
+import DTO.OrderDTO;
+import DTO.OrderDetailDTO;
+import DTO.ProductDTO;
+import DTO.RoomTypeDTO;
+
 public class Admin_DashboardManagerPL extends JPanel {
+	// Các đối tượng ở tầng Bussiness Logical Layer
+	private OrderBLL orderBLL;
+	private OrderDetailBLL orderDetailBLL;
+	private InputTicketBLL inputTicketBLL;
+	private InputTicketDetailBLL inputTicketDetailBLL;
+	private RoomBLL roomBLL;
+	private RoomTypeBLL roomTypeBLL;
+	private DiscountBLL discountBLL;
+	private DiscountTypeBLL discountTypeBLL;
+	private ProductBLL productBLL;
 	// Các Font
 	private Font fontComboBox = new Font("Arial", Font.PLAIN, 14);
 	private Font fontButton = new Font("Arial", Font.BOLD, 14);
@@ -43,6 +74,17 @@ public class Admin_DashboardManagerPL extends JPanel {
 	private boolean isYearFiltered = false;
 
 	public Admin_DashboardManagerPL() {
+		// <===== Các đối tượng từ tầng Bussiness Logical Layer =====>
+		orderBLL = new OrderBLL();
+		orderDetailBLL = new OrderDetailBLL();
+		inputTicketBLL = new InputTicketBLL();
+		inputTicketDetailBLL = new InputTicketDetailBLL();
+		roomBLL = new RoomBLL();
+		roomTypeBLL = new RoomTypeBLL();
+		discountBLL = new DiscountBLL();
+		productBLL = new ProductBLL();
+		// <==================== ====================>
+
 		// <===== Cấu trúc của Title Label =====>
 		// - Tuỳ chỉnh Title Label
 		titleLabel = CommonPL.getTitleLabel("Thống kê", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER,
@@ -159,7 +201,7 @@ public class Admin_DashboardManagerPL extends JPanel {
 					timeDetailsVector.add("Chọn Thời gian cụ thể");
 
 					// Nếu giá trị hiện tại không là "Chọn Mốc thời gian"
-					int yearStart = 2000, yearEnd = 2030;
+					int yearStart = 2020, yearEnd = 2030;
 					if (!subValueSelected.equals("Chọn Mốc thời gian")) {
 						// Nếu chọn "Theo năm"
 						if (subValueSelected.equals("Theo năm")) {
@@ -203,8 +245,8 @@ public class Admin_DashboardManagerPL extends JPanel {
 		// Tên, kịch thước các cột và mảng chứa dữ liệu tương ứng cho ng loại thống kê
 		// - Thống kê Thống kê Lợi nhuận
 		// + Tên các cột
-		final String[] profitColumns01 = { "Tháng", "Chi (VNĐ)", "Doanh thu (VNĐ)", "Lợi nhuận (VNĐ)" };
-		final String[] profitColumns02 = { "Tuần", "Chi (VNĐ)", "Doanh thu (VNĐ)", "Lợi nhuận (VNĐ)" };
+		final String[] profitColumns01 = { "Tháng", "Doanh thu (VNĐ)", "Chi (VNĐ)", "Lợi nhuận (VNĐ)" };
+		final String[] profitColumns02 = { "Tuần", "Doanh thu (VNĐ)", "Chi (VNĐ)", "Lợi nhuận (VNĐ)" };
 		// + Chiều rộng các cột
 		final int[] profitWidthColumns = { 280, 240, 240, 350 };
 		// - Thống kê Thống kê Doanh thu
@@ -278,26 +320,54 @@ public class Admin_DashboardManagerPL extends JPanel {
 
 				if (currentDashboardType.equals("Thống kê Lợi nhuận")) {
 					Object[][] profitDatas = new Object[times.length + 1][profitWidthColumns.length];
-					
+
 					BigInteger totalInvest = new BigInteger("0");
 					BigInteger totalRevenue = new BigInteger("0");
 					BigInteger totalProfit = new BigInteger("0");
-					
+
 					for (int i = 0; i < profitDatas.length - 1; i++) {
+						// Truy vấn dữ liệu về Hoá đơn
+						ArrayList<OrderDTO> listOrder = orderBLL.getAllOrderByCondition(null,
+								String.format("ngayLapHD BETWEEN '%s' AND '%s' AND trangThai = 1",
+										CommonPL.convertDateFormat(times[i][1]),
+										CommonPL.convertDateFormat(times[i][2])),
+								null);
+						// Truy vấn dữ liệu về Phiếu nhập
+						ArrayList<InputTicketDTO> listInputTicket = inputTicketBLL.getAllInputTicketByCondition(null,
+								String.format("ngayLapPN BETWEEN '%s' AND '%s' AND trangThai = 1",
+										CommonPL.convertDateFormat(times[i][1]),
+										CommonPL.convertDateFormat(times[i][2])),
+								null);
+						
+						// Doanh thu
+						BigInteger revenue = new BigInteger("0");
+						for (OrderDTO orderDTO : listOrder) {
+							revenue = revenue.add(new BigInteger(String.valueOf(orderDTO.getCost())));
+						}
+						// Chi
+						BigInteger invest = new BigInteger("0");
+						for (InputTicketDTO inputTicketDTO : listInputTicket) {
+							invest = invest.subtract(new BigInteger(String.valueOf(inputTicketDTO.getCost())));
+						}
+						// Lợi nhuận
+						BigInteger profit = revenue.add(invest);
+						
+						// Gán dữ liệu cho từng ô theo dòng
 						profitDatas[i][0] = String.format("%s %02d (%s - %s)", month != -1 ? "Tuần" : "Tháng",
 								Integer.parseInt(times[i][0]), times[i][1], times[i][2]);
-						profitDatas[i][1] = i + 1;
-						profitDatas[i][2] = i + 1;
-						profitDatas[i][3] = Integer.parseInt(String.valueOf(profitDatas[i][1])) - Integer.parseInt(String.valueOf(profitDatas[i][2]));
-						
-						totalInvest = totalInvest.add(new BigInteger(String.valueOf(profitDatas[i][1])));
-						totalRevenue = totalRevenue.add(new BigInteger(String.valueOf(profitDatas[i][2])));
-						totalProfit = totalProfit.add(new BigInteger(String.valueOf(profitDatas[i][3])));
+						profitDatas[i][1] = CommonPL.moneyLongToMoneyFormat(revenue);
+						profitDatas[i][2] = CommonPL.moneyLongToMoneyFormat(invest);
+						profitDatas[i][3] = CommonPL.moneyLongToMoneyFormat(profit);
+
+						// Tính lại các ô ở dòng "TỔNG"
+						totalInvest = totalInvest.add(revenue);
+						totalRevenue = totalRevenue.add(invest);
+						totalProfit = totalProfit.add(profit);
 					}
 					profitDatas[profitDatas.length - 1][0] = "TỔNG";
-					profitDatas[profitDatas.length - 1][1] = totalInvest;
-					profitDatas[profitDatas.length - 1][2] = totalRevenue;
-					profitDatas[profitDatas.length - 1][3] = totalProfit;
+					profitDatas[profitDatas.length - 1][1] = CommonPL.moneyLongToMoneyFormat(totalInvest);
+					profitDatas[profitDatas.length - 1][2] = CommonPL.moneyLongToMoneyFormat(totalRevenue);
+					profitDatas[profitDatas.length - 1][3] = CommonPL.moneyLongToMoneyFormat(totalProfit);
 
 					if (currentTimeType.equals("Theo năm")) {
 						CommonPL.updateTableData(tableData, profitColumns01, profitWidthColumns, profitDatas);
@@ -308,35 +378,90 @@ public class Admin_DashboardManagerPL extends JPanel {
 					}
 				} else if (currentDashboardType.equals("Thống kê Doanh thu")) {
 					Object[][] revenueDatas = new Object[times.length + 1][revenueWidthColumns.length];
-					
+
 					BigInteger totalBill = new BigInteger("0");
 					BigInteger totalRoomCost = new BigInteger("0");
 					BigInteger totalProductCost = new BigInteger("0");
 					BigInteger totalDiscountCost = new BigInteger("0");
 					BigInteger totalRevenue = new BigInteger("0");
-					
+
 					for (int i = 0; i < revenueDatas.length - 1; i++) {
+						// Truy vấn dữ liệu về Hoá đơn
+						ArrayList<OrderDTO> listOrder = orderBLL.getAllOrderByCondition(null,
+								String.format("ngayLapHD BETWEEN '%s' AND '%s' AND trangThai = 1",
+										CommonPL.convertDateFormat(times[i][1]),
+										CommonPL.convertDateFormat(times[i][2])),
+								null);
+
+						// Số hoá đơn
+						BigInteger bill = new BigInteger(String.valueOf(listOrder.size()));
+						// Tổng tiền phòng
+						BigInteger roomCost = new BigInteger("0");
+						for (OrderDTO orderDTO : listOrder) {
+							ArrayList<RoomTypeDTO> listRoomType = roomTypeBLL.getAllRoomTypeByCondition(
+									new String[] { "JOIN Karaoke.Phong ON LoaiPhong.maLoaiPhong = Phong.maLoaiPhong" },
+									String.format("maPhong = '%s'", orderDTO.getRoomId()), null);
+							roomCost = roomCost.add(
+									new BigInteger(String.valueOf(listRoomType.get(0).getCost() * orderDTO.getTime())));
+						}
+						// Tổng tiền sản phẩm
+						BigInteger productCost = new BigInteger("0");
+						for (OrderDTO orderDTO : listOrder) {
+							ArrayList<OrderDetailDTO> listOrderDetail = orderDetailBLL.getAllOrderDetailByCondition(
+									null, String.format("maHoaDon = '%s'", orderDTO.getId()), null);
+							for (OrderDetailDTO orderDetailDTO : listOrderDetail) {
+								ProductDTO productDTO = productBLL.getOneProductById(orderDetailDTO.getProductId());
+								productCost = productCost.add(new BigInteger(
+										String.valueOf(productDTO.getPrice() * orderDetailDTO.getQuantity())));
+							}
+						}
+						// Tổng tiền giảm giá
+						BigInteger discountCost = new BigInteger("0");
+						for (OrderDTO orderDTO : listOrder) {
+							DiscountDTO discountDTO = discountBLL.getOneDiscountById(orderDTO.getDiscountId());
+							if (discountDTO.getDiscountType().equals("PHANTRAM")) {
+								BigDecimal currentOrderBill = new BigDecimal(roomCost.add(productCost));
+								BigDecimal percent = new BigDecimal(
+										String.valueOf(-1.0 * discountDTO.getValue() / 100));
+								discountCost = currentOrderBill.multiply(percent).toBigInteger();
+
+							} else {
+								discountCost = discountCost
+										.subtract(new BigInteger(String.valueOf(discountDTO.getValue())));
+							}
+						}
+						// Doanh thu
+						BigInteger revenue = new BigInteger("0");
+//						revenue = revenue.add(roomCost);
+//						revenue = revenue.add(productCost);
+//						revenue = revenue.add(discountCost);
+						for (OrderDTO orderDTO : listOrder) {
+							revenue = revenue.add(new BigInteger(String.valueOf(orderDTO.getCost())));
+						}
+						
+						// Gán dữ liệu cho từng ô theo dòng
 						revenueDatas[i][0] = String.format("%s %02d (%s - %s)", month != -1 ? "Tuần" : "Tháng",
 								Integer.parseInt(times[i][0]), times[i][1], times[i][2]);
-						revenueDatas[i][1] = i + 1;
-						revenueDatas[i][2] = i + 1;
-						revenueDatas[i][3] = i + 1;
-						revenueDatas[i][4] = i + 1;
-						revenueDatas[i][5] = Integer.parseInt(String.valueOf(revenueDatas[i][1])) +  Integer.parseInt(String.valueOf(revenueDatas[i][2])) +  Integer.parseInt(String.valueOf(revenueDatas[i][3])) - Integer.parseInt(String.valueOf(revenueDatas[i][4]));
-						
-						totalBill = totalBill.add(new BigInteger(String.valueOf(revenueDatas[i][1])));
-						totalRoomCost = totalRoomCost.add(new BigInteger(String.valueOf(revenueDatas[i][2])));
-						totalProductCost = totalProductCost.add(new BigInteger(String.valueOf(revenueDatas[i][3])));
-						totalDiscountCost = totalDiscountCost.add(new BigInteger(String.valueOf(revenueDatas[i][4])));
-						totalRevenue = totalRevenue.add(new BigInteger(String.valueOf(revenueDatas[i][5])));
+						revenueDatas[i][1] = bill;
+						revenueDatas[i][2] = CommonPL.moneyLongToMoneyFormat(roomCost);
+						revenueDatas[i][3] = CommonPL.moneyLongToMoneyFormat(productCost);
+						revenueDatas[i][4] = CommonPL.moneyLongToMoneyFormat(discountCost);
+						revenueDatas[i][5] = CommonPL.moneyLongToMoneyFormat(revenue);
+
+						// Tính lại các ô ở dòng "TỔNG"
+						totalBill = totalBill.add(bill);
+						totalRoomCost = totalRoomCost.add(roomCost);
+						totalProductCost = totalProductCost.add(productCost);
+						totalDiscountCost = totalDiscountCost.add(discountCost);
+						totalRevenue = totalRevenue.add(revenue);
 					}
 					revenueDatas[revenueDatas.length - 1][0] = "TỔNG";
 					revenueDatas[revenueDatas.length - 1][1] = totalBill;
-					revenueDatas[revenueDatas.length - 1][2] = totalRoomCost;
-					revenueDatas[revenueDatas.length - 1][3] = totalProductCost;
-					revenueDatas[revenueDatas.length - 1][4] = totalDiscountCost;
-					revenueDatas[revenueDatas.length - 1][5] = totalRevenue;
-					
+					revenueDatas[revenueDatas.length - 1][2] = CommonPL.moneyLongToMoneyFormat(totalRoomCost);
+					revenueDatas[revenueDatas.length - 1][3] = CommonPL.moneyLongToMoneyFormat(totalProductCost);
+					revenueDatas[revenueDatas.length - 1][4] = CommonPL.moneyLongToMoneyFormat(totalDiscountCost);
+					revenueDatas[revenueDatas.length - 1][5] = CommonPL.moneyLongToMoneyFormat(totalRevenue);
+
 					if (currentTimeType.equals("Theo năm")) {
 						CommonPL.updateTableData(tableData, revenueColumns01, revenueWidthColumns, revenueDatas);
 						isYearFiltered = true;
@@ -346,27 +471,55 @@ public class Admin_DashboardManagerPL extends JPanel {
 					}
 				} else if (currentDashboardType.equals("Thống kê Phiếu nhập")) {
 					Object[][] inputTicketDatas = new Object[times.length + 1][inputTicketWidthColumns.length];
-					
+
 					BigInteger totalTicket = new BigInteger("0");
 					BigInteger totalIngredient = new BigInteger("0");
 					BigInteger totalInvest = new BigInteger("0");
-					
+
 					for (int i = 0; i < inputTicketDatas.length - 1; i++) {
+						// Truy vấn dữ liệu về Phiếu nhập
+						ArrayList<InputTicketDTO> listInputTicket = inputTicketBLL.getAllInputTicketByCondition(null,
+								String.format("ngayLapPN BETWEEN '%s' AND '%s' AND trangThai = 1",
+										CommonPL.convertDateFormat(times[i][1]),
+										CommonPL.convertDateFormat(times[i][2])),
+								null);
+						
+						// Số phiếu nhập
+						BigInteger ticket = new BigInteger(String.valueOf(listInputTicket.size()));
+						// Tổng số nguyên liệu
+						BigInteger ingredients = new BigInteger("0");
+						for (InputTicketDTO inputTicketDTO : listInputTicket) {
+							ArrayList<InputTicketDetailDTO> listInputTicketDetail = inputTicketDetailBLL.getAllInputTicketDetailByCondition(
+									null, String.format("maPhieuNhap = '%s'", inputTicketDTO.getId()), null);
+							for(InputTicketDetailDTO inputTicketDetailDTO : listInputTicketDetail) {								
+								ingredients = ingredients.add(new BigInteger(String.valueOf(inputTicketDetailDTO.getInputQuantity())));
+							}
+						}
+						// Chi
+						BigInteger invest = new BigInteger("0");
+						for (InputTicketDTO inputTicketDTO : listInputTicket) {
+							invest = invest.subtract(new BigInteger(String.valueOf(inputTicketDTO.getCost())));
+						}
+						
+						// Gán dữ liệu cho từng ô theo dòng
 						inputTicketDatas[i][0] = String.format("%s %02d (%s - %s)", month != -1 ? "Tuần" : "Tháng",
 								Integer.parseInt(times[i][0]), times[i][1], times[i][2]);
-						inputTicketDatas[i][1] = i + 1;
-						inputTicketDatas[i][2] = i + 1;
-						inputTicketDatas[i][3] = 0;
-						
-						totalTicket = totalTicket.add(new BigInteger(String.valueOf(inputTicketDatas[i][1])));
-						totalIngredient = totalIngredient.add(new BigInteger(String.valueOf(inputTicketDatas[i][2])));
-						totalInvest = totalInvest.add(new BigInteger(String.valueOf(inputTicketDatas[i][3])));
+						inputTicketDatas[i][1] = ticket;
+						inputTicketDatas[i][2] = ingredients;
+						inputTicketDatas[i][3] = CommonPL.moneyLongToMoneyFormat(invest);
+
+						// Tính lại các ô ở dòng "TỔNG"
+						totalTicket = totalTicket.add(ticket);
+						totalIngredient = totalIngredient.add(ingredients);
+						totalInvest = totalInvest.add(invest);
 					}
+					
+					// Gán dự liệu cho từng ô ở dòng cuối cùng
 					inputTicketDatas[inputTicketDatas.length - 1][0] = "TỔNG";
 					inputTicketDatas[inputTicketDatas.length - 1][1] = totalTicket;
 					inputTicketDatas[inputTicketDatas.length - 1][2] = totalIngredient;
-					inputTicketDatas[inputTicketDatas.length - 1][3] = totalInvest;
-					
+					inputTicketDatas[inputTicketDatas.length - 1][3] = CommonPL.moneyLongToMoneyFormat(totalInvest);
+
 					if (currentTimeType.equals("Theo năm")) {
 						CommonPL.updateTableData(tableData, inputTicketColumns01, inputTicketWidthColumns,
 								inputTicketDatas);

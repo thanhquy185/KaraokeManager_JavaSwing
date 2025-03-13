@@ -5,23 +5,23 @@ public class OrderDTO {
 	private Integer id;
 	private String dateOrder;
 	private String roomId;
+	private Integer employeeId;
 	private String customerId;
-	private String employeeId;
 	private String discountId;
 	private Integer time;
-	private Integer cost;
+	private Long cost;
 	private Boolean status;
 	private String dateUpdate;
 
 	// Constructors
-	public OrderDTO(Integer id, String dateOrder, String roomId, String customerId, String employeeId,
-			String discountId, Integer time, Integer cost, Boolean status, String dateUpdate) {
+	public OrderDTO(Integer id, String dateOrder, String roomId, Integer employeeId, String customerId,
+			String discountId, Integer time, Long cost, Boolean status, String dateUpdate) {
 		super();
 		this.id = id;
 		this.dateOrder = dateOrder;
 		this.roomId = roomId;
-		this.customerId = customerId;
 		this.employeeId = employeeId;
+		this.customerId = customerId;
 		this.discountId = discountId;
 		this.time = time;
 		this.cost = cost;
@@ -42,12 +42,12 @@ public class OrderDTO {
 		this.roomId = roomId;
 	}
 
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
+	public void setEmployeeId(Integer employeeId) {
+		this.employeeId = employeeId;
 	}
 
-	public void setEmployeeId(String employeeId) {
-		this.employeeId = employeeId;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 
 	public void setDiscountId(String discountId) {
@@ -58,7 +58,7 @@ public class OrderDTO {
 		this.time = time;
 	}
 
-	public void setCost(Integer cost) {
+	public void setCost(Long cost) {
 		this.cost = cost;
 	}
 
@@ -82,12 +82,12 @@ public class OrderDTO {
 		return roomId;
 	}
 
-	public String getCustomerId() {
-		return customerId;
+	public Integer getEmployeeId() {
+		return employeeId;
 	}
 
-	public String getEmployeeId() {
-		return employeeId;
+	public String getCustomerId() {
+		return customerId;
 	}
 
 	public String getDiscountId() {
@@ -98,7 +98,7 @@ public class OrderDTO {
 		return time;
 	}
 
-	public Integer getCost() {
+	public Long getCost() {
 		return cost;
 	}
 
@@ -109,4 +109,5 @@ public class OrderDTO {
 	public String getDateUpdate() {
 		return dateUpdate;
 	}
+
 }
