@@ -470,6 +470,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 
 		// - Tuỳ chỉnh Add Address Detail City Name ComboBox
 		Vector<String> citys = new Vector<>();
+		citys.add("Chọn Tỉnh / Thành phố");
 		addressDetailCityNameComboBox = CommonPL.CustomComboBox(citys, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
 				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		addressDetailCityNameComboBox.setBounds(20, 140, 460, 40);
@@ -579,7 +580,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
 		// <===== Cấu trúc của Add Or Update Block Panel =====>
 		// - Tuỳ chỉnh Add Or Update Id Card Label
-		addOrUpdateIdCardLabel = CommonPL.getParagraphLabel("CCCD", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateIdCardLabel = CommonPL.getParagraphLabel("<html>CCCD&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", 
+				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateIdCardLabel.setBounds(20, 10, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id Card Text Field
@@ -588,8 +590,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateIdCardTextField.setBounds(20, 50, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Type Label
-		addOrUpdateTypeLabel = CommonPL.getParagraphLabel("Loại khách hàng", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
+		addOrUpdateTypeLabel = CommonPL.getParagraphLabel("<html>Loại khách hàng&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", 
+				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateTypeLabel.setBounds(260, 10, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Type Text Field
@@ -599,8 +601,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateTypeComboBox.setBounds(260, 50, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Fullname Label
-		addOrUpdateFullnameLabel = CommonPL.getParagraphLabel("Họ và tên", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
+		addOrUpdateFullnameLabel = CommonPL.getParagraphLabel("<html>Họ và tên&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", 
+				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateFullnameLabel.setBounds(20, 100, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Fullname Text Field
@@ -630,8 +632,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateGenderComboBox.setBounds(260, 230, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Phone Label
-		addOrUpdatePhoneLabel = CommonPL.getParagraphLabel("Số điện thoại", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
+		addOrUpdatePhoneLabel = CommonPL.getParagraphLabel("<html>Số điện thoại&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", 
+				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdatePhoneLabel.setBounds(20, 280, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Phone Text Field
@@ -670,13 +672,13 @@ public class Admin_CustomerManagerPL extends JPanel {
 		});
 
 		// - Tuỳ chỉnh Add Or Update Address Text Field
-		addOrUpdateAddressTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Địa chỉ", Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateAddressTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Địa chỉ", 
+				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateAddressTextField.setBounds(20, 410, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status Label
-		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK,
-				CommonPL.getFontParagraphPlain());
+		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("<html>Trạng thái&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", 
+				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateStatusLabel.setBounds(20, 460, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status ComboBox
