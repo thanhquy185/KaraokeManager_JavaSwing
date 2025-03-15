@@ -18,7 +18,7 @@ public class SupplierBLL {
     }
 
     private boolean isValidId(String id) {
-        return id != null && id.matches("NCC\\d{4}");
+        return id != null && id.matches("NCC\\d{2}");
     }
 
     private boolean isValidPhone(String phone) {

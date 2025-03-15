@@ -519,10 +519,12 @@ public class Admin_SupplierManagerPL extends JPanel {
         addOrUpdateButton.setBounds(20, 500, 460, 40);
         SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 
-        // Khi "Thêm"
+     // Khi "Thêm"
         if (title.equals("Thêm Nhà cung cấp") && button.equals("Thêm") && object.isEmpty()) {
             SupplierDTO lastSupplier = supplierBLL.getLastSupplier();
-            String newId = "NCC" + String.format("%04d", Integer.parseInt(lastSupplier.getId().substring(3)) + 1);
+            // Lấy số cuối cùng từ mã (2 chữ số) và tăng lên 1
+            int lastNumber = Integer.parseInt(lastSupplier.getId().substring(3)); // Lấy phần số từ NCCxx
+            String newId = "NCC" + String.format("%02d", (lastNumber + 1) % 100); // Giới hạn 2 số (00-99)
             addOrUpdateIdTextField.setText(newId);
         }
 
