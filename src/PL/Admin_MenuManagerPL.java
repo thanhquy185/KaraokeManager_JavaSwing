@@ -6,12 +6,11 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -30,9 +29,22 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
+import BLL.IngredientBLL;
+import BLL.ProductBLL;
+import BLL.ProductDetailBLL;
+import BLL.ProductTypeBLL;
+import DTO.IngredientDTO;
+import DTO.ProductDTO;
+import DTO.ProductDetailDTO;
 import PL.CommonPL.CustomTextField;
 
-public class Admin_MenuManagerPL extends JPanel {
+public class Admin_MenuManagerPL extends JPanel 
+{
+	// Các đối tượng từ tầng Bussiness Logical Layer
+	private ProductBLL productBLL;
+	private ProductTypeBLL productTypeBLL;
+	private ProductDetailBLL productDetailBLL;
+	private IngredientBLL ingredientBLL;
 	// Các Font
 	private Font fontParagraph = new Font("Arial", Font.PLAIN, 14);
 	private Font fontButton = new Font("Arial", Font.BOLD, 14);
@@ -89,6 +101,13 @@ public class Admin_MenuManagerPL extends JPanel {
 	private Boolean[] valueSelected = { null };
 
 	public Admin_MenuManagerPL() {
+		// <===== Các đối tượng từ tầng Bussiness Logical Layer =====>
+		productBLL = new ProductBLL();
+		productTypeBLL = new ProductTypeBLL();
+		productDetailBLL = new ProductDetailBLL();
+		ingredientBLL = new IngredientBLL();
+		// <==================== ====================>
+
 		// <===== Cấu trúc của Title Label =====>
 		// - Tuỳ chỉnh Title Label
 		titleLabel = CommonPL.getTitleLabel("Thực đơn", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER,
@@ -177,16 +196,19 @@ public class Admin_MenuManagerPL extends JPanel {
 	// Hàm cập nhật lại danh sách sản phẩm
 	private void renderListPanel() {
 		// - Truy vấn dữ liệu về tất cả sản phẩm hiện có
-		Object[][] datas = { { "1", "Chai Cocacola", "Đồ uống", "10000", "Hoạt động", "cocacola-chai-image.jpg" },
-				{ "2", "Chai Pepsi", "Đồ uống", "10000", "Tạm dừng", "pepsi-chai-image.jpg" },
-				{ "3", "Mì trứng", "Món khô", "24000", "Hoạt động", "mi-trung-image.jpg" }, };
-
+		ArrayList<ProductDTO> productList = productBLL.getAllProductByCondition(null,null,null);
+		Object[][] datas = new Object[productList.size()][6];
 		// - Duyệt qua từng đối tượng
 		int x = 0, y = 0;
-		for (int i = 0; i < datas.length; i++) {
+		for (int i = 0; i < productList.size(); i++) {
+			datas[i][0] = (Object) productList.get(i).getId();
+			datas[i][1] = (Object) productList.get(i).getName();
+			datas[i][2] = (Object) productTypeBLL.getOneProductTypeById(productList.get(i).getProductTypeId()).getName();
+			datas[i][3] = (Object) productList.get(i).getPrice();
+			datas[i][4] = (Object) productList.get(i).getImage();
+			datas[i][5] = (Object) (productList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng");
 			// + Biến tạm giữ vị trí đối tượng được duyệt
 			int j = i;
-
 			// + Ảnh sản phẩm
 			JLabel imageLabel = CommonPL.getImageLabel(210, 190,
 					CommonPL.getMiddlePathToShowProductImage() + String.valueOf(datas[i][5]));
@@ -226,12 +248,47 @@ public class Admin_MenuManagerPL extends JPanel {
 				showAddOrUpdateDialog("Sửa Sản phẩm", "Sửa", object);
 				valueSelected[0] = false;
 			});
+
 			// + Nút khoá sản phẩm
 			JButton lockButton = CommonPL.getRoundedBorderButton(14, "Khoá", Color.decode("#9f4d4d"), Color.WHITE,
 					new Font("Arial", Font.BOLD, 14));
 			lockButton.setBounds(110, 270, 90, 30);
 			lockButton.addActionListener(e -> {
-
+				// Truy vấn thông tin sản phẩm hiện tại từ datas
+				Vector<Object> currentObject = new Vector<>();
+				for (int k = 0; k < 6; k++) {
+					currentObject.add(datas[j][k]);
+				}
+				System.out.println(j + " - " + datas[j][5] + " - " + currentObject.get(5));
+			
+				// Xác định hành động (Khoá hoặc Mở khoá)
+				boolean isActive = currentObject.get(5).equals("Hoạt động");
+				String action = isActive ? "khoá" : "mở khoá";
+			
+				// Hiển thị hộp thoại xác nhận
+				CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+						String.format("Có chắc chắn muốn %s sản phẩm này?", action),
+						valueSelected);
+			
+				if (valueSelected[0]) {
+					// Gọi BLL để thay đổi trạng thái sản phẩm
+					String inform = productBLL.lockProduct(String.valueOf(currentObject.get(0)), CommonPL.getCurrentDate());
+			
+					if (inform.equals("Có thể khoá một sản phẩm")) {
+						// Cập nhật lại trạng thái trong `datas`
+						datas[j][5] = isActive ? "Tạm dừng" : "Hoạt động";
+			
+						// Hiển thị thông báo thành công với trạng thái mới
+						CommonPL.createSuccessDialog("Thông báo thành công",
+								datas[j][5].equals("Hoạt động") ? "Mở khóa thành công" : "Khóa thành công");
+			
+						// Cập nhật giao diện
+						renderListPanel();
+					} else {
+						// Hiển thị thông báo lỗi nếu có vấn đề
+						CommonPL.createErrorDialog("Thông báo lỗi", inform);
+					}
+				}
 			});
 
 			// + Khối chứa sản phẩm
@@ -264,7 +321,11 @@ public class Admin_MenuManagerPL extends JPanel {
 	}
 
 	// Hàm tạo dialog cho phép thêm hoặc cập nhật một sản phẩm
-	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
+	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) 
+	{
+		// Kiểm tra là nút thêm hay nút sửa
+		boolean check = (title == "Sửa Sản phẩm") ? true : false;
+		
 		// - Tuỳ chỉnh Add Or Update Avatar Label
 		addOrUpdateAvatarLabel = CommonPL.getParagraphLabel("Hình ảnh", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateAvatarLabel.setBounds(20, 10, 82, 40);
@@ -294,7 +355,7 @@ public class Admin_MenuManagerPL extends JPanel {
 		addOrUpdateAvatarTextField.setBounds(20, 230, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id Label
-		addOrUpdateIdLabel = CommonPL.getParagraphLabel("Mã sản phẩm", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateIdLabel = CommonPL.getParagraphLabel("<html>Mã sản phẩm&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateIdLabel.setBounds(500, 10, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id TextField
@@ -303,18 +364,18 @@ public class Admin_MenuManagerPL extends JPanel {
 		addOrUpdateIdTextField.setBounds(500, 50, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Group Label
-		addOrUpdateGroupLabel = CommonPL.getParagraphLabel("Nhóm", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateGroupLabel = CommonPL.getParagraphLabel("<html>Nhóm&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateGroupLabel.setBounds(740, 10, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Group ComboBox
-		Vector<String> groups = CommonPL.getVectorHasValues(new String[] { "Chọn Nhóm", "Món khô", "Món nước",
-				"Món ăn kèm", "Món tráng miệng", "Đồ uống", "Thuốc lá" });
+		Vector<String> groups = CommonPL.getVectorHasValues(new String[] {"Chọn Nhóm", "Món khô", "Món nước",
+				"Món ăn kèm", "Món tráng miệng", "Đồ uống", "Thuốc lá"});
 		addOrUpdateGroupComboBox = CommonPL.CustomComboBox(groups, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
 				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateGroupComboBox.setBounds(740, 50, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Price Label
-		addOrUpdatePriceLabel = CommonPL.getParagraphLabel("Giá bán", Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdatePriceLabel = CommonPL.getParagraphLabel("<html>Giá bán&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdatePriceLabel.setBounds(500, 100, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Price TextField
@@ -323,7 +384,7 @@ public class Admin_MenuManagerPL extends JPanel {
 		addOrUpdatePriceTextField.setBounds(500, 140, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status Label
-		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK,
+		addOrUpdateStatusLabel = CommonPL.getParagraphLabel("<html>Trạng thái&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateStatusLabel.setBounds(740, 100, 220, 40);
 
@@ -335,7 +396,7 @@ public class Admin_MenuManagerPL extends JPanel {
 		addOrUpdateStatusComboBox.setBounds(740, 140, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Name Label
-		addOrUpdateNameLabel = CommonPL.getParagraphLabel("Tên sản phẩm", Color.BLACK,
+		addOrUpdateNameLabel = CommonPL.getParagraphLabel("<html>Tên sản phẩm&nbsp;<span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateNameLabel.setBounds(500, 190, 460, 40);
 
@@ -390,14 +451,36 @@ public class Admin_MenuManagerPL extends JPanel {
 		addOrUpdateIngredientQuantityLabel.setBounds(780, 340, 180, 40);
 
 		// - Truy vấn bảng dữ liệu nguyên liệu và chi tiết sản phẩm
-		Object[][] datas = { { "NL0001", "Mì gói Hảo Hảo", "Gói", "2", true, "1" },
-				{ "NL0002", "Trứng gà", "Quả", "10", true, "1" }, { "NL0003", "Rau xanh", "Bó", "10", true, "0" },
-				{ "NL0004", "Thuốc lá", "Hộp", "10", false, "0" }, { "NL0005", "Táo", "Quả", "10", false, "1" } };
+		ArrayList<IngredientDTO> ingredientList = ingredientBLL.getAllIngredients();
+		Object[][] datas = new Object[ingredientList.size()][6];
 		// - Tuỳ chỉnh Add Or Update Ingredient Panel
 		addOrUpdateIngredientPanel = new JPanel();
 		addOrUpdateIngredientPanel.setLayout(null);
 		addOrUpdateIngredientPanel.setPreferredSize(new Dimension(940, datas.length * 40));
 		for (int i = 0; i < datas.length; i++) {
+			datas[i][0] = (Object) ingredientList.get(i).getId();
+			datas[i][1] = (Object) ingredientList.get(i).getName();
+			datas[i][2] = (Object) ingredientList.get(i).getUnit();
+			datas[i][3] = (Object) ingredientList.get(i).getInventory();
+			
+			// Kiểm tra xem ingredientId có trong productDetail không
+			boolean isSelected;
+			if(check)
+			{
+				String s = String.format("maSanPham = '%s' AND maNguyenLieu = '%s' ", object.get(0), ingredientList.get(i).getId());
+				ArrayList<ProductDetailDTO> detail = productDetailBLL.getAllProductDetailByCondition(null,s, null);
+
+				isSelected = (detail != null && !detail.isEmpty());
+    			datas[i][4] = isSelected; 
+    			datas[i][5] = (isSelected) ? detail.get(0).getQuantity() : 0;
+			}
+			else 
+			{
+				datas[i][4] = isSelected = false; 
+    			datas[i][5] = 0;
+			}
+			
+			
 			// + Mã sản phẩm
 			JLabel id = CommonPL.getTitleLabel(String.valueOf(datas[i][0]), Color.LIGHT_GRAY, fontInIngredientPanel,
 					SwingConstants.CENTER, SwingConstants.CENTER);
@@ -447,7 +530,7 @@ public class Admin_MenuManagerPL extends JPanel {
 			rowPanel.add(quantity);
 
 			// + Nếu mục đã được chọn từ trước
-			if ((boolean) datas[i][4]) {
+			if (isSelected) {
 				id.setForeground(Color.BLACK);
 				name.setForeground(Color.BLACK);
 				unit.setForeground(Color.BLACK);
@@ -459,24 +542,14 @@ public class Admin_MenuManagerPL extends JPanel {
 
 			// + Gán sự kiện thay đổi khi chọn vào mục nguyên liệu
 			select.addActionListener(e -> {
-				if (select.isSelected() == true) {
-					id.setForeground(Color.BLACK);
-					name.setForeground(Color.BLACK);
-					unit.setForeground(Color.BLACK);
-					inventory.setForeground(Color.BLACK);
-					quantity.setEnabled(true);
-					quantity.setForeground(Color.BLACK);
-					quantity.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.BLACK));
-				} else {
-					id.setForeground(Color.LIGHT_GRAY);
-					name.setForeground(Color.LIGHT_GRAY);
-					unit.setForeground(Color.LIGHT_GRAY);
-					inventory.setForeground(Color.LIGHT_GRAY);
-					quantity.setEnabled(false);
-					quantity.setText("0");
-					quantity.setDisabledTextColor(Color.LIGHT_GRAY);
-					quantity.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
-				}
+				boolean selected = select.isSelected();
+        		id.setForeground(selected ? Color.BLACK : Color.LIGHT_GRAY);
+        		name.setForeground(selected ? Color.BLACK : Color.LIGHT_GRAY);
+        		unit.setForeground(selected ? Color.BLACK : Color.LIGHT_GRAY);
+        		inventory.setForeground(selected ? Color.BLACK : Color.LIGHT_GRAY);
+        		quantity.setEnabled(selected);
+        		quantity.setForeground(selected ? Color.BLACK : Color.LIGHT_GRAY);
+        		quantity.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, selected ? Color.BLACK : Color.LIGHT_GRAY));
 			});
 
 			// + Thêm vào addOrUpdateIngredientPanel
@@ -515,16 +588,75 @@ public class Admin_MenuManagerPL extends JPanel {
 				CommonPL.getFontParagraphBold());
 		addOrUpdateButton.setBounds(260, 700, 460, 40);
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
+		addOrUpdateButton.addActionListener(e -> {
+			// - Lấy các giá trị hiện tại
+			// + Mã sản phẩm
+			String productId = !addOrUpdateIdTextField.getText().equals("Nhập Mã sản phẩm")
+					? addOrUpdateIdTextField.getText()
+					: null;
+			// + Tên sản phẩm
+			String productName = !addOrUpdateNameTextField.getText().equals("Nhập Tên sản phẩm")
+					? addOrUpdateNameTextField.getText()
+					: null;
+			// + Giá sản phẩm
+			String productPrice = !addOrUpdatePriceTextField.getText().equals("Nhập Giá bán")
+					? addOrUpdatePriceTextField.getText()
+					: null;
+			// + Hình ảnh sản phẩm
+			String productImage = !addOrUpdateAvatarTextField.getText().equals("Nhập đường dẫn ảnh")
+					? addOrUpdateAvatarTextField.getText()
+					: null;
+			// + Nhóm sản phẩm		
+			String productGroup = !String.valueOf(addOrUpdateGroupComboBox.getSelectedItem()).equals("Chọn Nhóm")
+					? String.valueOf(addOrUpdateGroupComboBox.getSelectedItem()).split(" - ")[0]
+					: null;
+			// + Trạng thái sản phẩm
+			String productStatus = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem()).equals("Chọn Trạng thái")
+					? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+					: null;
+			// + Ngày cập nhật
+			String dateUpdate = CommonPL.getCurrentDatetime();
 
+			// - Nếu là thêm
+			if(!check)
+			{
+				String inform = productBLL.insertProduct(productId, productName, productGroup, productPrice, productImage, productStatus, dateUpdate);
+				if(inform.equals("Có thể thêm một sản phẩm"))
+				{
+					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện	
+					CommonPL.createSuccessDialog("Thông báo thành công", "Thêm thành công");
+					addOrUpdateDialog.dispose();
+					renderListPanel();
+				}
+				else {
+					CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				}
+			}
+			// - Nếu là sửa 
+			else 
+			{
+				String inform = productBLL.updateProduct(productId, productName, productGroup, productPrice, productImage, productStatus, dateUpdate);
+				if(inform.equals("Có thể thay đổi một sản phẩm"))
+				{
+					// - Hoàn thành việc thay đổi thì thông báo và cập nhật lại trên giao diện	
+					CommonPL.createSuccessDialog("Thông báo thành công", "Thay đổi thành công");
+					addOrUpdateDialog.dispose();
+					renderListPanel();
+				}
+				else {
+					CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				}
+			}
+		});
 		// - Nếu đã chọn sửa thông tin sản phẩm
-		if (object.size() != 0) {
+		if (check) {
 			// + Cập nhật lại hình ảnh
-			ImageIcon image = new ImageIcon(CommonPL.getMiddlePathToShowProductImage() + String.valueOf(object.get(5)));
+			ImageIcon image = new ImageIcon(CommonPL.getMiddlePathToShowProductImage() + String.valueOf(object.get(4)));
 			Image scaledImage = image.getImage().getScaledInstance(190, 190, Image.SCALE_SMOOTH);
 			ImageIcon scaledIcon = new ImageIcon(scaledImage);
 			addOrUpdateAvatarImage.setIcon(scaledIcon);
 			addOrUpdateAvatarTextField
-					.setText(CommonPL.getMiddlePathToShowProductImage() + String.valueOf(object.get(5)));
+					.setText(CommonPL.getMiddlePathToShowProductImage() + String.valueOf(object.get(4)));
 			addOrUpdateAvatarTextField.setForeground(Color.BLACK);
 
 			// + Cập nhật lại mã sản phẩm
@@ -540,24 +672,28 @@ public class Admin_MenuManagerPL extends JPanel {
 			addOrUpdateNameTextField.setForeground(Color.BLACK);
 
 			// + Cập nhật lại nhóm sản phẩm
-			addOrUpdateGroupComboBox.setSelectedItem(String.valueOf(object.get(2)));
+			String group = String.valueOf(object.get(2));
+			addOrUpdateGroupComboBox.setSelectedItem(group);
 			((JTextField) addOrUpdateGroupComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			addOrUpdateGroupComboBox.setForeground(Color.BLACK);
-
+			
 			// + Cập nhật lại giá sản phẩm
 			addOrUpdatePriceTextField.setText(String.valueOf(object.get(3)));
 			addOrUpdatePriceTextField.setCaretPosition(0);
 			addOrUpdatePriceTextField.setForeground(Color.BLACK);
 
 			// + Cập nhật lại trạng thái sản phẩm
-			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(4)));
+			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(5)));
 			addOrUpdateStatusComboBox.setEnabled(false);
 			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
 			addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
 
 			// + Cập nhật lại chi tiết sản phẩm (nguyên liệu cần thiết)
+			// Ở phía trên phần nguyên liệu
 		}
+
+
 
 		// - Tuỳ chỉnh Add Or Update Block Panel
 		addOrUpdateBlockPanel = new JPanel();
