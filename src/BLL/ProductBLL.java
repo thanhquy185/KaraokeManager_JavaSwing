@@ -77,7 +77,7 @@ public class ProductBLL {
 
 	// - Hàm kiểm tra mã loại sản phẩm đã hợp lệ hay chưa ?
 	public boolean isValidType(String type) {
-		String[] validType = { "KHO", "NUOC", "TRANGMIENG", "DOUONG","CHATCOHAI", "KHAC"};
+		String[] validType = { "Món khô", "Món nước", "Tráng miệng", "Đồ uống","Thuốc lá", "Món ăn kèm"};
 		if (type == null || type.isEmpty())
 			return false;
 		for (String validtype : validType) {
@@ -102,15 +102,6 @@ public class ProductBLL {
 			return false;
 		}
 
-		return true;
-	}
-	// - Hàm kiểm tra hình ảnh đã hợp lệ chưa ?
-	public boolean isValidImage(String image)
-	{
-		if(image != null && !CommonBLL.isValidStringType04(image))
-		{
-			return false;
-		}
 		return true;
 	}
 
@@ -158,7 +149,6 @@ public class ProductBLL {
 		if (!isSelectedStatus(status)) return "Chưa chọn trạng thái";
 		if (!isValidStatus(status)) return "Chọn sai định dạng trạng thái";
 		
-		if(!isValidImage(image)) return "Nhập sai định dạng hình ảnh";
 		if(isExistsId(id)) return "Mã sản phẩm đã tồn tại";
 		if (isExistsName(name)) return "Tên sản phẩm đã tồn tại";
 		// - Nếu thỏa mãn hết thì thêm vào CSDL
@@ -187,12 +177,11 @@ public class ProductBLL {
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
 		if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
-		if(isValidPrice(price)) return "Nhập sai định dạng giá";
+		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";
 		if (!isValidType(type)) return "Chọn sai định dạng mã loại sản phẩm";
 		
-		if(isValidImage(image)) return "Nhập sai định dạng hình ảnh";
-		if (isExistsName(name)) return "Tên sản phẩm đã tồn tại";
+
 		// - Nếu thỏa mãn hết thì thêm vào CSDL
 		String productId = id;
 		String productName = name;
@@ -217,7 +206,7 @@ public class ProductBLL {
 		{
 			int dinhLuong = Integer.parseInt(productList.get(i).getQuantity());
 			int ton = (ingredientBLL.getOneIngredientById(productList.get(i).getIngredientId())).getInventory();
-			if(dinhLuong > ton ) return false;
+			if(dinhLuong > ton || dinhLuong == 0) return false;
 		}
 		return true;
 	}
@@ -231,8 +220,9 @@ public class ProductBLL {
 		{
 			lockProductDTO.setDateUpdate(dateUpdate);
 			productDAL.lock(lockProductDTO);
+			return "Có thể khoá một sản phẩm";
 		}
-		return "Có thể khoá một sản phẩm";
+		return "Mặc định khóa do số lượng tồn nhỏ hơn định lượng nguyên liệu sản phẩm";
 	}
 
 	// - Hàm lấy ra danh sách các sản phẩm hiện có trong CSDL

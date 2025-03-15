@@ -65,6 +65,22 @@ public class ProductDetailDAL implements DAL<ProductDetailDTO> {
         return 0; 
     }
 
+	// - Hàm xóa một CTSP
+	public void delete(String productId, String ingredientId) {
+		// Câu lệnh SQL để xóa bản ghi trong bảng CTSP
+		String sql = "DELETE FROM Karaoke.CTSP WHERE maSanPham = ? AND maNguyenLieu = ?";
+		
+		try (Connection c = JDBCUtil.getInstance().getConnection();
+			 PreparedStatement pstmt = c.prepareStatement(sql)) 
+		{	
+			// Thiết lập giá trị cho các tham số trong câu lệnh SQL
+			pstmt.setString(1, productId);
+			pstmt.setString(2, ingredientId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
     // - Hàm lấy ra danh sách các CTSP
     @Override
     public ArrayList<ProductDetailDTO> selectAll()

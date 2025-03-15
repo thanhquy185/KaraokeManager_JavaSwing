@@ -25,7 +25,7 @@ public class ProductDetailBLL {
 	// - Hàm kiểm tra giá sản phẩm đã hợp lệ hay chưa ?
 	public boolean isValidQuantity(String quantity)
 	{
-		if(!CommonBLL.isValidStringType04(quantity)) {
+		if(!CommonBLL.isValidStringType04(quantity) || Integer.parseInt(quantity)>0) {
 			return false;
 		}
 		return true;
@@ -41,18 +41,6 @@ public class ProductDetailBLL {
 		if(result == null || !result.isEmpty()) return false;
 		return true;
 	}
-	// - Hàm thêm CTSP
-	public String insertProductDetail(String productId, String ingredientId, String quantity)
-	{
-		if(!isInputedQuantity(quantity)) return "Chưa nhập định lượng nguyên liệu sản phẩm";
-		if(!isValidQuantity(quantity)) return "Nhập sai định dạng của định lượng sản phẩm";
-		
-		// - Nếu thỏa mãn hết thì thêm vào CSDL
-		ProductDetailDTO productDetail = new ProductDetailDTO(productId, ingredientId, quantity);
-		
-		productDetailDAL.insert(productDetail);
-		return "Có thể thêm một CTSP";
-	}
 
 	// - Hàm cập nhật CTSP
 	public String updateProductDetail(String productId, String ingredientId, String quantity)
@@ -61,16 +49,25 @@ public class ProductDetailBLL {
 		if(!isValidQuantity(quantity)) return "Nhập sai định dạng của định lượng sản phẩm";
 		
 		// Kiểm tra nguyên liệu này đã tồn tại trong CTSP chưa ?
+		ProductDetailDTO productDetail = new ProductDetailDTO(productId, ingredientId, quantity);
 		if(!isExistIngredientId(productId,ingredientId)) 
 		{
-			String insertResult = insertProductDetail(productId, ingredientId, quantity);
-			return insertResult;
+			productDetailDAL.insert(productDetail);
 		}
-		// - Nếu thỏa mãn hết thì cập nhật vào CSDL
-		ProductDetailDTO productDetail = new ProductDetailDTO(productId, ingredientId, quantity);
-		
-		productDetailDAL.update(productDetail);
-		return "Có thể thay đổi một CTSP";
+		else
+		{
+			productDetailDAL.update(productDetail);
+		}
+		return "Có thể cập nhật một CTSP";
+	}
+
+	// - Hàm xóa một CTSP
+	public void deleteProductDetail(String productId, String ingredientId)
+	{
+		if(isExistIngredientId(productId,ingredientId)) 
+		{
+			productDetailDAL.delete(productId, ingredientId);
+		}
 	}
 
 	// - Hàm lấy ra danh sách các chi tiết sản phẩm hiện có trong CSDL
