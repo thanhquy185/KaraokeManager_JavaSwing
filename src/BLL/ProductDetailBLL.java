@@ -47,7 +47,6 @@ public class ProductDetailBLL {
 	{
 		if(!isInputedQuantity(quantity)) return "Chưa nhập định lượng nguyên liệu sản phẩm";
 		if(!isValidQuantity(quantity)) return "Nhập sai định dạng của định lượng sản phẩm";
-		
 		// Kiểm tra nguyên liệu này đã tồn tại trong CTSP chưa ?
 		ProductDetailDTO productDetail = new ProductDetailDTO(productId, ingredientId, quantity);
 		if(!isExistIngredientId(productId,ingredientId)) 

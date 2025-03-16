@@ -50,7 +50,6 @@ public class ProductDAL implements DAL<ProductDTO>{
                         + "\nSET tenSanPham = ?, maLoaiSanPham = ?, giaBan = ?, hinhAnh = ?, trangThai = ?, ngayCapNhat = ?"
                         + "\n WHERE maSanPham = ?"))
         {
-            
             pstmt.setString(1,productDTO.getName());
             pstmt.setString(2,productDTO.getProductTypeId());
             pstmt.setLong(3,productDTO.getPrice());
@@ -61,7 +60,7 @@ public class ProductDAL implements DAL<ProductDTO>{
             rowChange = pstmt.executeUpdate();
         } catch (SQLException e)
         {
-            e.printStackTrace();
+			e.printStackTrace();
         }
         return rowChange;
 	}

@@ -30,7 +30,7 @@ public class ProductDetailDAL implements DAL<ProductDetailDTO> {
             rowChange = pstmt.executeUpdate();
         } catch (SQLException e)
         {
-            e.printStackTrace();
+			e.printStackTrace();
         }
         return rowChange;
     }
