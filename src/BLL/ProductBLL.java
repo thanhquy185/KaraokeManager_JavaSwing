@@ -76,16 +76,16 @@ public class ProductBLL {
 	}
 
 	// - Hàm kiểm tra mã loại sản phẩm đã hợp lệ hay chưa ?
-	public boolean isValidType(String type) {
-		String[] validType = { "Món khô", "Món nước", "Tráng miệng", "Đồ uống","Thuốc lá", "Món ăn kèm"};
-		if (type == null || type.isEmpty())
-			return false;
-		for (String validtype : validType) {
-			if (type.equals(validtype)) {
-				return true;
-			}
+	public String convertType(String type) {
+		switch (type) {
+			case "Món khô": return "KHO";
+			case "Món nước": return "NUOC";
+			case "Khác": return "KHAC";
+			case "Món tráng miệng": return "TRANGMIENG";
+			case "Đồ uống": return "DOUONG";
+			case "Chất có hại": return "CHATCOHAI";
+			default: return null; // Nếu không hợp lệ, trả về null
 		}
-		return false;
 	}
 
 	// - Hàm kiểm tra trạng thái đã được chọn hay chưa ?
@@ -141,11 +141,12 @@ public class ProductBLL {
 		if(!isInputedId(id)) return "Chưa nhập mã sản phẩm";
 		if(!isValidId(id)) return "Nhập sai định dạng mã sản phẩm";
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
-		if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
+		//if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
 		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";
-		if (!isValidType(type)) return "Chọn sai định dạng mã loại sản phẩm";
+		type = convertType(type);
+		if (type == null) return "Chọn sai định dạng mã loại sản phẩm";
 		if (!isSelectedStatus(status)) return "Chưa chọn trạng thái";
 		if (!isValidStatus(status)) return "Chọn sai định dạng trạng thái";
 		
@@ -175,11 +176,12 @@ public class ProductBLL {
 			return "Chưa nhập đầy đủ thông tin sản phẩm cần thiết";
 		}
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
-		if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
+		//if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
 		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";
-		if (!isValidType(type)) return "Chọn sai định dạng mã loại sản phẩm";
+		type = convertType(type);
+		if (type == null) return "Chọn sai định dạng mã loại sản phẩm";
 		
 
 		// - Nếu thỏa mãn hết thì thêm vào CSDL
@@ -216,7 +218,7 @@ public class ProductBLL {
 		// - Khoá hoặc mở khoá tuỳ vào trạng thái hiện tại
 		ProductDTO lockProductDTO = getOneProductById(id);
 		lockProductDTO.setStatus(lockProductDTO.getStatus() ? false : true);
-		if(checkProduct(id))
+		if(checkProduct(id) || !lockProductDTO.getStatus())
 		{
 			lockProductDTO.setDateUpdate(dateUpdate);
 			productDAL.lock(lockProductDTO);
