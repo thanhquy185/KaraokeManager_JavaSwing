@@ -25,7 +25,7 @@ public class ProductDetailBLL {
 	// - Hàm kiểm tra giá sản phẩm đã hợp lệ hay chưa ?
 	public boolean isValidQuantity(String quantity)
 	{
-		if(!CommonBLL.isValidStringType04(quantity) || Integer.parseInt(quantity)>0) {
+		if(!CommonBLL.isValidStringType04(quantity)) {
 			return false;
 		}
 		return true;
@@ -38,7 +38,7 @@ public class ProductDetailBLL {
 		String condition = String.format("maSanPham = '%s' AND maNguyenLieu = '%s' ", productId, ingredientId);
 		String order = null;
 		ArrayList<ProductDetailDTO> result = productDetailDAL.selectAllByCondition(join, condition, order);
-		if(result == null || !result.isEmpty()) return false;
+		if(result == null || result.isEmpty()) return false;
 		return true;
 	}
 

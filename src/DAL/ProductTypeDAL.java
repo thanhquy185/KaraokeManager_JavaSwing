@@ -160,4 +160,27 @@ public class ProductTypeDAL implements DAL<ProductTypeDTO> {
 		}
 		return productTypeDTO;
 	}
+
+	// - Hàm lấy ra ProductTypeId thông qua ProductTypeName
+	public String selectOneId(String name)
+	{
+		// - Khai báo biến chứa danh sách trả về
+		String id = "";
+
+		// - Kết nối đến CSDL để truy vấn
+		String sql = "SELECT * FROM Karaoke.LoaiSanPham WHERE tenLoaiSanPham = ?";
+		try (Connection c = JDBCUtil.getInstance().getConnection();
+     			PreparedStatement pstmt = c.prepareStatement(sql)) 
+		{
+    		pstmt.setString(1, name);
+    		try (ResultSet rs = pstmt.executeQuery()) {
+        		if (rs.next()) {
+            		id = rs.getString("maLoaiSanPham");
+        		}
+    		}
+		} catch (SQLException e) {
+    		e.printStackTrace();
+		}
+		return id;
+	}
 }

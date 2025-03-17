@@ -6,11 +6,15 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -46,6 +50,8 @@ public class Admin_MenuManagerPL extends JPanel
 	private ProductTypeBLL productTypeBLL;
 	private ProductDetailBLL productDetailBLL;
 	private IngredientBLL ingredientBLL;
+	private Object[][] datas;
+	ArrayList<ProductDTO> productList;
 	// Các Font
 	private Font fontParagraph = new Font("Arial", Font.PLAIN, 14);
 	private Font fontButton = new Font("Arial", Font.BOLD, 14);
@@ -96,8 +102,14 @@ public class Admin_MenuManagerPL extends JPanel
 	private JPanel addOrUpdateBlockPanel;
 	private JDialog addOrUpdateDialog;
 
-	// + Số thứ tự sản phẩm được chọn
-//	private int productSelected = -1;
+	// - Các thông tin cần thiết
+	private final String[] sortsString = { "Chọn Sắp xếp", "Tên tăng dần", "Tên giảm dần", "Giá tăng dần", "Giá giảm dần" };
+	private final String[] sortsSQL = {"", "tenSanPham ASC", "tenSanPham DESC", "giaBan ASC", "giaBan DESC"};
+	private final String[] statusStringForFilter = { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
+	private final String[] statusSQL = { "", "trangThai = 1", "trangThai = 0" };
+	private final String[] typeSQL = { "", "maLoaiSanPham = 'KHO'", "maLoaiSanPham = 'NUOC'",
+			"maLoaiSanPham = 'KHAC'", "maLoaiSanPham = 'TRANGMIENG'",  "maLoaiSanPham = 'DOUONG'", "maLoaiSanPham = 'CHATCOHAI'"};
+	private final String[] typeStringForFilter = { "Chọn Nhóm", "Món khô", "Món nước", "Khác", "Món tráng miệng", "Đồ uống", "Chất có hại"};
 	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
 	private Boolean[] valueSelected = { null };
 
@@ -107,6 +119,7 @@ public class Admin_MenuManagerPL extends JPanel
 		productTypeBLL = new ProductTypeBLL();
 		productDetailBLL = new ProductDetailBLL();
 		ingredientBLL = new IngredientBLL();
+		
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Title Label =====>
@@ -122,23 +135,21 @@ public class Admin_MenuManagerPL extends JPanel
 				fontParagraph);
 		findInputTextField.setBounds(15, 15, 180, 30);
 
-		// - Tuỳ chỉnh Add Or Update Type ComboBox
-		Vector<String> types = CommonPL.getVectorHasValues(
-				new String[] { "Chọn Sắp xếp", "Tên tăng dần", "Tên giảm dần", "Giá tăng dần", "Giá giảm dần" });
+		// - Tuỳ chỉnh Filter Type ComboBox
+		Vector<String> types = CommonPL.getVectorHasValues(sortsString);
 		sortComboBox = CommonPL.CustomComboBox(types, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE,
 				Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontParagraph);
 		sortComboBox.setBounds(210, 15, 180, 30);
 
-		// - Tuỳ chỉnh Add Or Update Group ComboBox
-		Vector<String> groups = CommonPL.getVectorHasValues(new String[] { "Chọn Nhóm", "Món khô", "Món nước",
-				"Khác", "Món tráng miệng", "Đồ uống", "Chất có hại" });
+		// - Tuỳ chỉnh Filter Group ComboBox
+		Vector<String> groups = CommonPL.getVectorHasValues(typeStringForFilter);
 		groupComboBox = CommonPL.CustomComboBox(groups, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE,
 				Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontParagraph);
 		groupComboBox.setBounds(405, 15, 180, 30);
 
-		// - Tuỳ chỉnh Add Or Update Status ComboBox
+		// - Tuỳ chỉnh Filter Status ComboBox
 		Vector<String> status = CommonPL
-				.getVectorHasValues(new String[] { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" });
+				.getVectorHasValues(statusStringForFilter);
 		statusComboBox = CommonPL.CustomComboBox(status, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE,
 				Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontParagraph);
 		statusComboBox.setBounds(600, 15, 180, 30);
@@ -146,6 +157,9 @@ public class Admin_MenuManagerPL extends JPanel
 		// - Tuỳ chỉnh Filter Button
 		filterButton = CommonPL.getRoundedBorderButton(14, "Lọc", Color.decode("#007bff"), Color.WHITE, fontButton);
 		filterButton.setBounds(795, 15, 75, 30);
+		filterButton.addActionListener(e -> {
+			filterProducts();
+		});
 
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getRoundedBorderButton(14, "Thêm", Color.decode("#699f4c"), Color.WHITE, fontButton);
@@ -191,17 +205,16 @@ public class Admin_MenuManagerPL extends JPanel
 		this.add(productPanel);
 
 		// Thiết lập sự kiện cập nhật danh sách sản phẩm
-		renderListPanel();
+		refreshProductData(null,null,null);
 	}
 
-	// Hàm cập nhật lại danh sách sản phẩm
-	public void renderListPanel() 
-	{
+	// - Hàm khởi tạo lại giao diện 
+	private void refreshProductData(String[] join, String condition, String order) {
 		// - Truy vấn dữ liệu về tất cả sản phẩm hiện có
-		ArrayList<ProductDTO> productList = productBLL.getAllProductByCondition(null,null,null);
-		Object[][] datas = new Object[productList.size()][6];
-		// - Duyệt qua từng đối tượng
-		int x = 0, y = 0;
+		productList = productBLL.getAllProductByCondition(join,condition,order);
+		datas = new Object[productList.size()][6];
+		
+		listPanel.removeAll();
 		for (int i = 0; i < productList.size(); i++) {
 			datas[i][0] = (Object) productList.get(i).getId();
 			datas[i][1] = (Object) productList.get(i).getName();
@@ -209,6 +222,19 @@ public class Admin_MenuManagerPL extends JPanel
 			datas[i][3] = (Object) productList.get(i).getPrice();
 			datas[i][4] = (Object) productList.get(i).getImage();
 			datas[i][5] = (Object) (productList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng");
+		} 
+		renderListPanel();
+		listPanel.revalidate();
+		listPanel.repaint();
+	}
+	
+	// - Hàm cập nhật lại danh sách sản phẩm
+	private void renderListPanel() 
+	{
+		// - Duyệt qua từng đối tượng
+		int x = 0, y = 0;
+		for (int i = 0; i < productList.size(); i++) 
+		{
 			// + Biến tạm giữ vị trí đối tượng được duyệt
 			int j = i;
 			// + Ảnh sản phẩm
@@ -243,9 +269,12 @@ public class Admin_MenuManagerPL extends JPanel
 				for (int k = 0; k < 6; k++) {
 					object.add(datas[j][k]);
 				}
-
 				// + Hiển thị modal để sửa thông tin sản phẩm
-				showAddOrUpdateDialog("Sửa Sản phẩm", "Sửa", object);
+				boolean updated = showAddOrUpdateDialog("Sửa Sản phẩm", "Sửa", object);
+				// + Cập nhật lại giao diện nếu thêm/sửa thành công
+				if (updated) {
+					refreshProductData(null,null,null);
+				}
 				valueSelected[0] = false;
 			});
 
@@ -274,16 +303,13 @@ public class Admin_MenuManagerPL extends JPanel
 					String inform = productBLL.lockProduct(String.valueOf(currentObject.get(0)), CommonPL.getCurrentDate());
 			
 					if (inform.equals("Có thể khoá một sản phẩm")) {
-						// Cập nhật lại trạng thái trong `datas`
-						datas[j][5] = isActive ? "Tạm dừng" : "Hoạt động";
 			
 						// Hiển thị thông báo thành công với trạng thái mới
 						CommonPL.createSuccessDialog("Thông báo thành công",
-								datas[j][5].equals("Hoạt động") ? "Mở khóa thành công" : "Khóa thành công");
+								datas[j][5].equals("Hoạt động") ? "Khóa thành công" :"Mở khóa thành công");
 			
 						// Cập nhật giao diện
-						listPanel.removeAll();
-						renderListPanel();
+						refreshProductData(null,null,null);
 					} else {
 						// Hiển thị thông báo lỗi nếu có vấn đề
 						CommonPL.createErrorDialog("Thông báo lỗi", inform);
@@ -319,9 +345,49 @@ public class Admin_MenuManagerPL extends JPanel
 
 		listPanel.setPreferredSize(new Dimension(1110, (int) ((Math.ceil(1.0 * datas.length / 5) * 325))));
 	}
-	//Hàm tạo giao diện cho dialog thêm hoặc sửa
-	private void createDialog()
+
+	private void filterProducts() 
 	{
+    	// Giá trị ô tìm kiếm
+		String findValue = !findInputTextField.getText().equals("Nhập Tên sản phẩm") ? findInputTextField.getText()
+				: null;
+    	// Giá trị ô sắp xếp
+		String sortValue = sortsSQL[sortComboBox.getSelectedIndex()];
+		// Giá trị ô loại sản phẩm
+    	String typeValue = typeSQL[groupComboBox.getSelectedIndex()];
+    	// Giá trị ô trạng thái
+		String statusValue = statusSQL[statusComboBox.getSelectedIndex()];
+		
+    	// Gán lệnh SQL tương ứng để truy vấn rồi cập nhật bảng
+		String condition = (findValue != null ? String.format(
+			"(maSanPham LIKE '%%%s%%' OR tenSanPham LIKE '%%%s%%')", findValue, findValue) : "")
+			+ (typeValue != "" ? (findValue != null ? (" AND " + typeValue) : typeValue) : "")
+			+ (statusValue != ""
+					? (findValue != null || typeValue != "" ? " AND " + statusValue
+							: statusValue)
+							: "");
+		if (condition.length() == 0)
+			condition = null;
+		String order = sortValue;
+	
+    	// Cập nhật dữ liệu hiển thị
+    	refreshProductData(null,condition,order);
+	}
+
+	//Hàm tạo giao diện cho dialog thêm hoặc sửa
+	private void createDialog(String title)
+	{
+		// Định nghĩa tính chất cho Add Or Update Dialog
+		addOrUpdateDialog = new JDialog();
+		addOrUpdateDialog.setTitle(title);
+		addOrUpdateDialog.setLayout(null);
+		addOrUpdateDialog.setSize(980, 790);
+		addOrUpdateDialog.setResizable(false);
+		addOrUpdateDialog.setLocationRelativeTo(null);
+		addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		addOrUpdateDialog.setModal(true);
+		// ======================================================================//
+
 		// - Tuỳ chỉnh Add Or Update Avatar Label
 		addOrUpdateAvatarLabel = CommonPL.getParagraphLabel("Hình ảnh", Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateAvatarLabel.setBounds(20, 10, 82, 40);
@@ -448,12 +514,14 @@ public class Admin_MenuManagerPL extends JPanel
 	}
 
 	// Hàm xử lí dialog cho phép thêm hoặc cập nhật một sản phẩm
-	private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) 
+	private boolean showAddOrUpdateDialog(String title, String button, Vector<Object> object) 
 	{
+		// - Tạo biến kiểm tra kết quả thêm/sửa
+		final boolean[] kq = {false};
 		// Kiểm tra là nút thêm hay nút sửa
 		boolean check = (title == "Sửa Sản phẩm") ? true : false;
 
-		createDialog();
+		createDialog(title);
 		
 		// - Truy vấn bảng dữ liệu nguyên liệu và chi tiết sản phẩm
 		ArrayList<IngredientDTO> ingredientList = ingredientBLL.getAllIngredients();
@@ -652,9 +720,8 @@ public class Admin_MenuManagerPL extends JPanel
 								CommonPL.createSuccessDialog("Thông báo thành công", "Thêm thành công, mặc định trạng thái sản phẩm tạm dừng do không đủ định lượng");
 							}
 							updateCTSP(selectCheckbox, quantityFields, productId, datas);
+							kq[0] = true;
 							addOrUpdateDialog.dispose();
-							listPanel.removeAll();
-							renderListPanel();
 						}
 						else {
 							CommonPL.createErrorDialog("Thông báo lỗi", inform);
@@ -674,9 +741,9 @@ public class Admin_MenuManagerPL extends JPanel
 								CommonPL.createSuccessDialog("Thông báo thành công", "Thay đổi thành công, mặc định trạng thái sản phẩm tạm dừng do không đủ định lượng");
 							}
 							updateCTSP(selectCheckbox, quantityFields, productId, datas);
+							kq[0] = true;
 							addOrUpdateDialog.dispose();
-							listPanel.removeAll();
-							renderListPanel();
+							
 						}
 						else {
 							CommonPL.createErrorDialog("Thông báo lỗi", inform);
@@ -772,27 +839,11 @@ public class Admin_MenuManagerPL extends JPanel
 		addOrUpdateBlockPanel.add(addOrUpdateIngredientScrollPane);
 		// <==================== ====================>
 
-		// Định nghĩa tính chất cho Add Or Update Dialog
-		addOrUpdateDialog = new JDialog();
-		addOrUpdateDialog.setTitle(title);
-		addOrUpdateDialog.setLayout(null);
-		addOrUpdateDialog.setSize(980, 790);
-		addOrUpdateDialog.setResizable(false);
-		addOrUpdateDialog.setLocationRelativeTo(null);
-		addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-		addOrUpdateDialog.addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowDeactivated(WindowEvent e) {
-//				if (!addOrUpdateDialog.isVisible()) {
-////					addOrUpdateDialog.setVisible(true);
-//					addOrUpdateDialog.dispose(); // Đóng Dialog khi mất focus (nhấn ngoài)
-//				}
-//			}
-		});
+		
 
 		addOrUpdateDialog.add(addOrUpdateBlockPanel);
-		addOrUpdateDialog.setModal(true);
 		addOrUpdateDialog.setVisible(true);
+		return kq[0];
 	}
 
 	public int checkCTSP(ArrayList<JCheckBox> selectCheckbox, ArrayList<JTextField> quantityFields, Object[][] data) {
@@ -834,9 +885,9 @@ public class Admin_MenuManagerPL extends JPanel
 			boolean isSelected = (selectCheckbox.get(i).isSelected() ? true :false); 
 			String ingredientId = String.valueOf(data[i][0]);
 			String quantity = quantityFields.get(i).getText().trim();
-			
 			if (isSelected) {
 				productDetailBLL.updateProductDetail(productId, ingredientId, quantity);
+				
 			} else {
 				productDetailBLL.deleteProductDetail(productId, ingredientId);
 			}

@@ -28,7 +28,7 @@ public class ProductDetailDAL implements DAL<ProductDetailDTO> {
             pstmt.setString(2, productDetailDTO.getIngredientId());
             pstmt.setString(3, productDetailDTO.getQuantity());
             rowChange = pstmt.executeUpdate();
-        } catch (SQLException e)
+		} catch (SQLException e)
         {
 			e.printStackTrace();
         }
@@ -42,6 +42,7 @@ public class ProductDetailDAL implements DAL<ProductDetailDTO> {
         // - Biến chứa số dòng đã được thêm
 		int rowChange = 0;
 
+		
 		// - Kết nối đến CSDL để truy vấn
 		String sql = "UPDATE Karaoke.CTSP" + "\nSET dinhLuong = ?"
 					+ "\nWHERE maSanPham = ? AND maNguyenLieu = ?";
@@ -66,7 +67,10 @@ public class ProductDetailDAL implements DAL<ProductDetailDTO> {
     }
 
 	// - Hàm xóa một CTSP
-	public void delete(String productId, String ingredientId) {
+	public int delete(String productId, String ingredientId) {
+		// - Biến chứa số dòng đã được xóa
+		int rowChange = 0;
+
 		// Câu lệnh SQL để xóa bản ghi trong bảng CTSP
 		String sql = "DELETE FROM Karaoke.CTSP WHERE maSanPham = ? AND maNguyenLieu = ?";
 		
@@ -76,9 +80,11 @@ public class ProductDetailDAL implements DAL<ProductDetailDTO> {
 			// Thiết lập giá trị cho các tham số trong câu lệnh SQL
 			pstmt.setString(1, productId);
 			pstmt.setString(2, ingredientId);
+			rowChange = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		return rowChange;
 	}
 
     // - Hàm lấy ra danh sách các CTSP

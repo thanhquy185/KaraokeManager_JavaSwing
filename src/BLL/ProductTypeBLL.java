@@ -21,6 +21,12 @@ public class ProductTypeBLL {
     {
         return productTypeDAL.selectAll();
     }
+    
+    // - Hàm lấy ra danh sách các loại sản phẩm hiện có trong CSDL
+    public String getOneProductTypeIdByTypeName(String name)
+    {
+        return productTypeDAL.selectOneId(name);
+    }
 
     // - Hàm lấy ra danh sách các loại sản phẩm hiện có với 1 điều kiện trong CSDL
 	public ArrayList<ProductTypeDTO> getAllProductTypeByCondition(String[] join, String condition, String order) {
