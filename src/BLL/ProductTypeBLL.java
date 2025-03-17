@@ -32,9 +32,4 @@ public class ProductTypeBLL {
 	public ArrayList<ProductTypeDTO> getAllProductTypeByCondition(String[] join, String condition, String order) {
 		return productTypeDAL.selectAllByCondition(join, condition, order);
 	}
-
-	// - Hàm lấy ra một người dùng với mã sản phẩm hàng tương ứng
-	public ProductTypeDTO getOneProductTypeById(String id) {
-		return productTypeDAL.selectOneById(id);
-	}
 }
