@@ -701,8 +701,9 @@ public class Admin_MenuManagerPL extends JPanel
 				String inform="";
 				if(ingredient == 0) inform = "Sản phẩm phải có ít nhất một nguyên liệu";
 				else if(ingredient == -1) inform = "Định lượng phải là số nguyên lớn hơn 0";
-				else if(ingredient == 2)  productStatus = String.valueOf(false);
 				else inform = "Thỏa"; 
+
+				if(ingredient == 2)  productStatus = String.valueOf(false);
 
 				if(inform.equals("Thỏa"))
 				{
@@ -725,7 +726,7 @@ public class Admin_MenuManagerPL extends JPanel
 						}
 						else {
 							CommonPL.createErrorDialog("Thông báo lỗi", inform);
-							}
+						}
 					}
 					// - Nếu là sửa 
 					else 
@@ -753,7 +754,7 @@ public class Admin_MenuManagerPL extends JPanel
 					CommonPL.createErrorDialog("Thông báo lỗi", inform);
 				}
 			} catch (Exception ex) {
-        		JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Đã xảy ra lỗi: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         		ex.printStackTrace();
     		}
 		});
