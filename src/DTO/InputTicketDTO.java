@@ -1,73 +1,70 @@
 package DTO;
 
 public class InputTicketDTO {
-	// Properties
-	private Integer id;
-	private String dateCreate;
-	private String supplierId;
-	private Long cost;
-	private Boolean status;
-	private String dateUpdate;
-	
-	// Constructors
-	public InputTicketDTO(Integer id, String dateCreate, String supplierId, Long cost, Boolean status,
-			String dateUpdate) {
-		super();
-		this.id = id;
-		this.dateCreate = dateCreate;
-		this.supplierId = supplierId;
-		this.cost = cost;
-		this.status = status;
-		this.dateUpdate = dateUpdate;
-	}
+    private Integer id;
+    private String dateCreate;
+    private String supplierId;
+    private Long cost;
+    private Boolean status;
+    private String dateUpdate;
 
-	// Setter - Getter
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    // Constructor không có employeeId
+    public InputTicketDTO(Integer id, String dateCreate, String supplierId, Long cost, Boolean status, String dateUpdate) {
+        this.id = id;
+        this.dateCreate = dateCreate;
+        this.supplierId = supplierId;
+        this.cost = cost;
+        this.status = status;
+        this.dateUpdate = dateUpdate;
+    }
 
-	public void setDateCreate(String dateCreate) {
-		this.dateCreate = dateCreate;
-	}
+    // Xóa constructor có employeeId
+    // Các getter và setter giữ nguyên, không thêm employeeId
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setSupplierId(String supplierId) {
-		this.supplierId = supplierId;
-	}
+    public void setDateCreate(String dateCreate) {
+        this.dateCreate = dateCreate;
+    }
 
-	public void setCost(Long cost) {
-		this.cost = cost;
-	}
+    public void setSupplierId(String supplierId) {
+        this.supplierId = supplierId;
+    }
 
-	public void setStatus(Boolean status) {
-		this.status = status;
-	}
+    public void setCost(Long cost) {
+        this.cost = cost;
+    }
 
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
-	}
-	public Integer getId() {
-		return id;
-	}
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
 
-	public String getDateCreate() {
-		return dateCreate;
-	}
+    public void setDateUpdate(String dateUpdate) {
+        this.dateUpdate = dateUpdate;
+    }
 
-	public String getSupplierId() {
-		return supplierId;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public Long getCost() {
-		return cost;
-	}
+    public String getDateCreate() {
+        return dateCreate;
+    }
 
-	public Boolean getStatus() {
-		return status;
-	}
+    public String getSupplierId() {
+        return supplierId;
+    }
 
-	public String getDateUpdate() {
-		return dateUpdate;
-	}
+    public Long getCost() {
+        return cost;
+    }
 
+    public Boolean getStatus() {
+        return status;
+    }
 
+    public String getDateUpdate() {
+        return dateUpdate;
+    }
 }

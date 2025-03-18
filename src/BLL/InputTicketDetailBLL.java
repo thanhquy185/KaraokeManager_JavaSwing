@@ -6,27 +6,33 @@ import DAL.InputTicketDetailDAL;
 import DTO.InputTicketDetailDTO;
 
 public class InputTicketDetailBLL {
-	// Properties
-		private InputTicketDetailDAL inputTicketDetailDAL;
+    private InputTicketDetailDAL inputTicketDetailDAL;
 
-		// Constructors
-		public InputTicketDetailBLL() {
-			inputTicketDetailDAL = new InputTicketDetailDAL();
-		}
+    public InputTicketDetailBLL() {
+        inputTicketDetailDAL = new InputTicketDetailDAL();
+    }
 
-		// Methods
-		// - Hàm lấy ra danh sách các chi tiết phiếu nhập hiện có trong CSDL
-		public ArrayList<InputTicketDetailDTO> getAllInputTicketDetail() {
-			return inputTicketDetailDAL.selectAll();
-		}
+    public ArrayList<InputTicketDetailDTO> getAllInputTicketDetail() {
+        return inputTicketDetailDAL.selectAll();
+    }
 
-		// - Hàm lấy ra danh sách các chi tiết phiếu nhập hiện có với 1 điều kiện trong CSDL
-		public ArrayList<InputTicketDetailDTO> getAllInputTicketDetailByCondition(String[] join, String condition, String order) {
-			return inputTicketDetailDAL.selectAllByCondition(join, condition, order);
-		}
+    public ArrayList<InputTicketDetailDTO> getAllInputTicketDetailByCondition(String[] join, String condition, String order) {
+        return inputTicketDetailDAL.selectAllByCondition(join, condition, order);
+    }
 
-		// - Hàm lấy ra một người dùng với mã chi tiết phiếu nhập tương ứng
-		public InputTicketDetailDTO getOneInputTicketDetailById(String id) {
-			return inputTicketDetailDAL.selectOneById(id);
-		}
+    public InputTicketDetailDTO getOneInputTicketDetailById(String id) {
+        return inputTicketDetailDAL.selectOneById(id);
+    }
+
+    public String insertInputTicketDetail(Integer id, String ingredientId, Long inputPrice, Integer inputQuantity) {
+        InputTicketDetailDTO dto = new InputTicketDetailDTO(id, ingredientId, inputPrice, inputQuantity);
+        int result = inputTicketDetailDAL.insert(dto);
+        return result > 0 ? "Thêm chi tiết phiếu nhập thành công" : "Thêm chi tiết phiếu nhập thất bại";
+    }
+
+    public String updateInputTicketDetail(Integer id, String ingredientId, Long inputPrice, Integer inputQuantity) {
+        InputTicketDetailDTO dto = new InputTicketDetailDTO(id, ingredientId, inputPrice, inputQuantity);
+        int result = inputTicketDetailDAL.update(dto);
+        return result > 0 ? "Cập nhật chi tiết phiếu nhập thành công" : "Cập nhật chi tiết phiếu nhập thất bại";
+    }
 }

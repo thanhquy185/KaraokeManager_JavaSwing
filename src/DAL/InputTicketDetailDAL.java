@@ -8,83 +8,121 @@ import java.util.ArrayList;
 import DTO.InputTicketDetailDTO;
 
 public class InputTicketDetailDAL implements DAL<InputTicketDetailDTO> {
-	// Methods
-		// - Hàm thêm một chi tiết phiếu nhập
-		@Override
-		public int insert(InputTicketDetailDTO InputTicketDetailDTO) {
+    @Override
+    public int insert(InputTicketDetailDTO dto) {
+        if (dto == null) return 0;
+        int rowsAffected = 0;
+        String sql = "INSERT INTO karaoke.ctpn (maPhieuNhap, maNguyenLieu, giaNhap, soLuong) VALUES (?, ?, ?, ?);";
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql)) {
+            pstmt.setInt(1, dto.getId());
+            pstmt.setString(2, dto.getIngredientId());
+            pstmt.setLong(3, dto.getInputPrice());
+            pstmt.setInt(4, dto.getInputQuantity());
+            rowsAffected = pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rowsAffected;
+    }
 
-			return 0;
-		}
+    @Override
+    public int update(InputTicketDetailDTO dto) {
+        if (dto == null || dto.getId() == null || dto.getIngredientId() == null) return 0;
+        int rowsAffected = 0;
+        String sql = "UPDATE karaoke.ctpn SET giaNhap = ?, soLuong = ? WHERE maPhieuNhap = ? AND maNguyenLieu = ?;";
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql)) {
+            pstmt.setLong(1, dto.getInputPrice());
+            pstmt.setInt(2, dto.getInputQuantity());
+            pstmt.setInt(3, dto.getId());
+            pstmt.setString(4, dto.getIngredientId());
+            rowsAffected = pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return rowsAffected;
+    }
 
-		// - Hàm thay đổi một chi tiết phiếu nhập
-		@Override
-		public int update(InputTicketDetailDTO InputTicketDetailDTO) {
+    @Override
+    public int lock(InputTicketDetailDTO dto) {
+        return 0; // Không cần khóa chi tiết phiếu nhập riêng lẻ
+    }
 
-			return 0;
-		}
+    @Override
+    public ArrayList<InputTicketDetailDTO> selectAll() {
+        ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
+        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong " +
+                     "FROM karaoke.ctpn;";
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                InputTicketDetailDTO dto = new InputTicketDetailDTO(
+                    rs.getInt("maPhieuNhap"),
+                    rs.getString("maNguyenLieu"),
+                    rs.getLong("giaNhap"),
+                    rs.getInt("soLuong")
+                );
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
-		// - Hàm khoá một chi tiết phiếu nhập
-		@Override
-		public int lock(InputTicketDetailDTO InputTicketDetailDTO) {
+    @Override
+    public ArrayList<InputTicketDetailDTO> selectAllByCondition(String[] join, String condition, String order) {
+        ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
+        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong " +
+                     "FROM karaoke.ctpn " +
+                     (condition != null ? " WHERE " + condition : "") +
+                     (order != null ? " ORDER BY " + order : "") + ";";
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                InputTicketDetailDTO dto = new InputTicketDetailDTO(
+                    rs.getInt("maPhieuNhap"),
+                    rs.getString("maNguyenLieu"),
+                    rs.getLong("giaNhap"),
+                    rs.getInt("soLuong")
+                );
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
-			return 0;
-		}
+    @Override
+    public InputTicketDetailDTO selectOneById(String id) {
+        String[] parts = id.split("-");
+        if (parts.length != 2) return null;
 
-		// - Hàm lấy ra danh sách chi tiết các phiếu nhập
-		@Override
-		public ArrayList<InputTicketDetailDTO> selectAll() {
-			// - Khai báo biến chứa danh sách trả về
-			ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
-
-			// - Kết nối đến CSDL để truy vấn
-			Connection c = JDBCUtil.getInstance().getConnection();
-			try {
-				String sql = "SELECT * FROM Karaoke.CTPN;";
-				PreparedStatement pstmt = c.prepareStatement(sql);
-				ResultSet rs = pstmt.executeQuery();
-				while (rs.next()) {
-					InputTicketDetailDTO inputTicketDetailDTO = new InputTicketDetailDTO(rs.getInt("maPhieuNhap"),
-							rs.getString("maNguyenLieu"), rs.getLong("giaNhap"), rs.getInt("soLuong"));
-					list.add(inputTicketDetailDTO);
-				}
-				JDBCUtil.getInstance().closeConnection(c);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			return list;
-		}
-
-		// - Hàm lấy ra danh sách các chi tiết phiếu nhập dựa trên 1 điều kiện
-		@Override
-		public ArrayList<InputTicketDetailDTO> selectAllByCondition(String[] join, String condition, String order) {
-			// - Khai báo biến chứa danh sách trả về
-			ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
-
-			// - Kết nối đến CSDL để truy vấn
-			Connection c = JDBCUtil.getInstance().getConnection();
-			try {
-				String sql = String.format("SELECT * FROM Karaoke.CTPN %s %s %s;",
-						join != null ? CommonDAL.getJoinValues(join) : "", condition != null ? "\nWHERE " + condition : "",
-						order != null ? "\nORDER BY " + order : "");
-				PreparedStatement pstmt = c.prepareStatement(sql);
-				ResultSet rs = pstmt.executeQuery();
-				while (rs.next()) {
-					InputTicketDetailDTO inputTicketDetailDTO = new InputTicketDetailDTO(rs.getInt("maPhieuNhap"),
-							rs.getString("maNguyenLieu"), rs.getLong("giaNhap"), rs.getInt("soLuong"));
-					list.add(inputTicketDetailDTO);
-				}
-				JDBCUtil.getInstance().closeConnection(c);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			return list;
-		}
-
-		// - Hàm lấy ra một phiếu nhập dựa trên mã phiếu nhập đó
-		@Override
-		public InputTicketDetailDTO selectOneById(String id) {
-			return null;
-		}
+        InputTicketDetailDTO dto = null;
+        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong " +
+                     "FROM karaoke.ctpn " +
+                     "WHERE maPhieuNhap = ? AND maNguyenLieu = ?;";
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+             PreparedStatement pstmt = c.prepareStatement(sql)) {
+            pstmt.setInt(1, Integer.parseInt(parts[0]));
+            pstmt.setString(2, parts[1]);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    dto = new InputTicketDetailDTO(
+                        rs.getInt("maPhieuNhap"),
+                        rs.getString("maNguyenLieu"),
+                        rs.getLong("giaNhap"),
+                        rs.getInt("soLuong")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dto;
+    }
 }

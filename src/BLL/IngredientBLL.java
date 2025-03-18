@@ -238,4 +238,12 @@ public class IngredientBLL {
         ArrayList<IngredientDTO> ingredients = ingredientDAL.selectAllByCondition(null, null, "maNguyenLieu DESC");
         return ingredients.isEmpty() ? new IngredientDTO("NL00000", "", "", 0, true, "") : ingredients.get(0);
     }
+ // - Hàm lấy thông tin nguyên liệu dạng "id - name" theo mã
+    public String getElementById(String id) {
+        IngredientDTO ingredient = getOneIngredientById(id);
+        if (ingredient == null) {
+            return id + " - Không xác định";
+        }
+        return ingredient.getId() + " - " + ingredient.getName();
+    }
 }

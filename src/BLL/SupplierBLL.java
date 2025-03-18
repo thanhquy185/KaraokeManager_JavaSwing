@@ -51,7 +51,7 @@ public class SupplierBLL {
         if (!isInputed(status)) return "Chưa chọn trạng thái";
 
         // Kiểm tra định dạng
-        if (!isValidId(id)) return "Mã nhà cung cấp phải có định dạng NCCxxxx (x là số)";
+        if (!isValidId(id)) return "Mã nhà cung cấp phải có định dạng NCCxx (x là số)";
         if (!isValidPhone(phone)) return "Số điện thoại phải có 10 chữ số";
         if (!isValidEmail(email)) return "Email không đúng định dạng";
         if (!isValidStatus(status)) return "Trạng thái không hợp lệ";
@@ -101,7 +101,7 @@ public class SupplierBLL {
         return rowsAffected > 0 ? "Thay đổi trạng thái thành công" : "Không thể thay đổi trạng thái nhà cung cấp";
     }
 
-    // Lấy tất cả nhà cung cấp
+    // Lấy tất cả nhà cung cấp theo điều kiện
     public ArrayList<SupplierDTO> getAllSuppliersByCondition(String[] join, String condition, String order) {
         return supplierDAL.selectAllByCondition(join, condition, order);
     }
@@ -109,6 +109,17 @@ public class SupplierBLL {
     // Lấy nhà cung cấp cuối cùng
     public SupplierDTO getLastSupplier() {
         ArrayList<SupplierDTO> suppliers = supplierDAL.selectAllByCondition(null, null, "maNCC DESC");
-        return suppliers.isEmpty() ? new SupplierDTO("NCC0000", "", "", "", "", true, "") : suppliers.get(0);
+        return suppliers.isEmpty() ? new SupplierDTO("NCC00", "", "", "", "", true, "") : suppliers.get(0);
+    }
+
+    // Lấy tất cả nhà cung cấp (không điều kiện)
+    public ArrayList<SupplierDTO> getAllSuppliers() {
+        return supplierDAL.selectAll();
+    }
+
+    // Lấy tên nhà cung cấp theo mã
+    public String getSupplierNameById(String supplierId) {
+        SupplierDTO supplier = supplierDAL.selectOneById(supplierId);
+        return supplier != null ? supplier.getName() : null;
     }
 }
