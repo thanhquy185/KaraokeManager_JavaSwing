@@ -160,7 +160,7 @@ public class Admin_MenuManagerPL extends JPanel
 		filterButton.addActionListener(e -> {
 			filterProducts();
 		});
-
+	
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getRoundedBorderButton(14, "Thêm", Color.decode("#699f4c"), Color.WHITE, fontButton);
 		addButton.setBounds(1005, 15, 120, 30);
@@ -373,8 +373,7 @@ public class Admin_MenuManagerPL extends JPanel
 							: "");
 		if (condition.length() == 0)
 			condition = null;
-		String order = sortValue;
-	
+		String order = (sortValue =="") ? null : sortValue;
     	// Cập nhật dữ liệu hiển thị
     	refreshProductData(null,condition,order);
 	}
