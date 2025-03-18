@@ -165,7 +165,12 @@ public class Admin_MenuManagerPL extends JPanel
 		addButton = CommonPL.getRoundedBorderButton(14, "Thêm", Color.decode("#699f4c"), Color.WHITE, fontButton);
 		addButton.setBounds(1005, 15, 120, 30);
 		addButton.addActionListener(e -> {
-			showAddOrUpdateDialog("Thêm Sản phẩm", "Thêm", new Vector<Object>());
+			// + Hiển thị modal để sửa thông tin sản phẩm
+			boolean added = showAddOrUpdateDialog("Thêm Sản phẩm", "Thêm", new Vector<Object>());
+			// + Cập nhật lại giao diện nếu thêm/sửa thành công
+			if (added) {
+				refreshProductData(null,null,null);
+			}
 			valueSelected[0] = false;
 		});
 
