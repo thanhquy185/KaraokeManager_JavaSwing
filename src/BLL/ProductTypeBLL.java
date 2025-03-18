@@ -23,9 +23,9 @@ public class ProductTypeBLL {
     }
     
     // - Hàm lấy ra danh sách các loại sản phẩm hiện có trong CSDL
-    public String getOneProductTypeIdByTypeName(String name)
+    public ProductTypeDTO getOneProductTypeById(String id)
     {
-        return productTypeDAL.selectOneId(name);
+        return productTypeDAL.selectOneById(id);
     }
 
     // - Hàm lấy ra danh sách các loại sản phẩm hiện có với 1 điều kiện trong CSDL
