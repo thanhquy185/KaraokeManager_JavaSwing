@@ -1,52 +1,29 @@
 package DTO;
 
 public class InputTicketDetailDTO {
-	// Properties
-	private Integer id;
-	private String ingredientId;
-	private Long inputPrice;
-	private Integer inputQuantity;
-	
-	// Constructors
-	public InputTicketDetailDTO(Integer id, String ingredientId, Long inputPrice, Integer inputQuantity) {
-		super();
-		this.id = id;
-		this.ingredientId = ingredientId;
-		this.inputPrice = inputPrice;
-		this.inputQuantity = inputQuantity;
-	}
+    private Integer id;           // maPhieuNhap
+    private String ingredientId;  // maNguyenLieu
+    private Long inputPrice;      // giaNhap
+    private Integer inputQuantity;// soLuong
 
-	// Setter - Getter
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    // Constructor
+    public InputTicketDetailDTO(Integer id, String ingredientId, Long inputPrice, Integer inputQuantity) {
+        this.id = id;
+        this.ingredientId = ingredientId;
+        this.inputPrice = inputPrice;
+        this.inputQuantity = inputQuantity;
+    }
 
-	public void setIngredientId(String ingredientId) {
-		this.ingredientId = ingredientId;
-	}
+    // Getters và Setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
-	public void setInputPrice(Long inputPrice) {
-		this.inputPrice = inputPrice;
-	}
+    public String getIngredientId() { return ingredientId; }
+    public void setIngredientId(String ingredientId) { this.ingredientId = ingredientId; }
 
-	public void setInputQuantity(Integer inputQuantity) {
-		this.inputQuantity = inputQuantity;
-	}
-	
-	public Integer getId() {
-		return id;
-	}
+    public Long getInputPrice() { return inputPrice; }
+    public void setInputPrice(Long inputPrice) { this.inputPrice = inputPrice; }
 
-	public String getIngredientId() {
-		return ingredientId;
-	}
-
-	public Long getInputPrice() {
-		return inputPrice;
-	}
-
-	public Integer getInputQuantity() {
-		return inputQuantity;
-	}
-
+    public Integer getInputQuantity() { return inputQuantity; }
+    public void setInputQuantity(Integer inputQuantity) { this.inputQuantity = inputQuantity; }
 }

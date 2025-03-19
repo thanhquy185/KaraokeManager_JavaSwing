@@ -52,8 +52,7 @@ public class InputTicketDetailDAL implements DAL<InputTicketDetailDTO> {
     @Override
     public ArrayList<InputTicketDetailDTO> selectAll() {
         ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
-        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong " +
-                     "FROM karaoke.ctpn;";
+        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong FROM karaoke.ctpn;";
         try (Connection c = JDBCUtil.getInstance().getConnection();
              PreparedStatement pstmt = c.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -75,8 +74,7 @@ public class InputTicketDetailDAL implements DAL<InputTicketDetailDTO> {
     @Override
     public ArrayList<InputTicketDetailDTO> selectAllByCondition(String[] join, String condition, String order) {
         ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
-        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong " +
-                     "FROM karaoke.ctpn " +
+        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong FROM karaoke.ctpn " +
                      (condition != null ? " WHERE " + condition : "") +
                      (order != null ? " ORDER BY " + order : "") + ";";
         try (Connection c = JDBCUtil.getInstance().getConnection();
@@ -103,8 +101,7 @@ public class InputTicketDetailDAL implements DAL<InputTicketDetailDTO> {
         if (parts.length != 2) return null;
 
         InputTicketDetailDTO dto = null;
-        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong " +
-                     "FROM karaoke.ctpn " +
+        String sql = "SELECT maPhieuNhap, maNguyenLieu, giaNhap, soLuong FROM karaoke.ctpn " +
                      "WHERE maPhieuNhap = ? AND maNguyenLieu = ?;";
         try (Connection c = JDBCUtil.getInstance().getConnection();
              PreparedStatement pstmt = c.prepareStatement(sql)) {

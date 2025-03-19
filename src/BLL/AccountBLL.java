@@ -430,4 +430,9 @@ public class AccountBLL {
 	public AccountDTO getOneAccountById(String id) {
 		return accountDAL.selectOneById(id);
 	}
+	public String getFullNameById(Integer id) {
+        if (id == null) return null;
+        AccountDTO account = accountDAL.selectOneById(String.valueOf(id));
+        return account != null ? account.getFullname() : null;
+    }
 }
