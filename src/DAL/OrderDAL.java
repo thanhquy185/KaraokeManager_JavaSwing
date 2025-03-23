@@ -11,7 +11,7 @@ import DTO.OrderDTO;
 
 public class OrderDAL implements DAL<OrderDTO> {
 	// Methods
-	// - Hàm thêm một phòng
+	// - Hàm thêm một hóa đơn
 	@Override
 	public int insert(OrderDTO orderDTO) {
 		// - Biến chứa số dòng đã được thêm
@@ -42,7 +42,7 @@ public class OrderDAL implements DAL<OrderDTO> {
 		return rowChange;
 	}
 
-	// - Hàm cập nhật một phòng
+	// - Hàm cập nhật một hóa đơn
 	@Override
 	public int update(OrderDTO orderDTO) {
 		// - Biến chứa số dòng đã được thêm
@@ -74,7 +74,7 @@ public class OrderDAL implements DAL<OrderDTO> {
 		return rowChange;
 	}
 
-	// - Hàm khoá một phòng
+	// - Hàm khoá một hóa đơn
 	@Override
 	public int lock(OrderDTO orderDTO) {
 		// - Biến chứa số dòng đã được thêm
@@ -97,7 +97,7 @@ public class OrderDAL implements DAL<OrderDTO> {
 		return rowChange;
 	}
 
-	// - Hàm lấy ra danh sách các phòng
+	// - Hàm lấy ra danh sách các hóa đơn
 	@Override
 	public ArrayList<OrderDTO> selectAll() {
 		// - Khai báo biến chứa danh sách trả về
@@ -124,7 +124,7 @@ public class OrderDAL implements DAL<OrderDTO> {
 		return list;
 	}
 
-	// - Hàm lấy ra danh sách các phòng dựa trên 1 điều kiện
+	// - Hàm lấy ra danh sách các hóa đơn dựa trên 1 điều kiện
 	@Override
 	public ArrayList<OrderDTO> selectAllByCondition(String[] join, String condition, String order) {
 		// - Khai báo biến chứa danh sách trả về
@@ -153,7 +153,7 @@ public class OrderDAL implements DAL<OrderDTO> {
 		return list;
 	}
 
-	// - Hàm lấy ra một phòng dựa trên mã phòng đó
+	// - Hàm lấy ra một hóa đơn dựa trên mã hóa đơn đó
 	@Override
 	public OrderDTO selectOneById(String id) {
 		// - Khai báo biến chứa danh sách trả về

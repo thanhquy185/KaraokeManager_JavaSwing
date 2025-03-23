@@ -10,28 +10,28 @@ import DTO.OrderDetailDTO;
 
 public class OrderDetailDAL implements DAL<OrderDetailDTO> {
 	// Methods
-		// - Hàm thêm một loại phòng
+		// - Hàm thêm một loại hóa đơn
 		@Override
 		public int insert(OrderDetailDTO t) {
 			// TODO Auto-generated method stub
 			return 0;
 		}
 
-		// - Hàm thay đổi một loại phòng
+		// - Hàm thay đổi một loại hóa đơn
 		@Override
 		public int update(OrderDetailDTO t) {
 			// TODO Auto-generated method stub
 			return 0;
 		}
 
-		// - Hàm khoá một loại phòng
+		// - Hàm khoá một loại hóa đơn
 		@Override
 		public int lock(OrderDetailDTO t) {
 			// TODO Auto-generated method stub
 			return 0;
 		}
 
-		// - Hàm lấy ra danh sách các loại phòng
+		// - Hàm lấy ra danh sách các loại hóa đơn
 		@Override
 		public ArrayList<OrderDetailDTO> selectAll() {
 			// - Khai báo biến chứa danh sách trả về
@@ -55,7 +55,7 @@ public class OrderDetailDAL implements DAL<OrderDetailDTO> {
 			return list;
 		}
 
-		// - Hàm lấy ra danh sách các phòng dựa trên 1 điều kiện
+		// - Hàm lấy ra danh sách các hóa đơn dựa trên 1 điều kiện
 		@Override
 		public ArrayList<OrderDetailDTO> selectAllByCondition(String[] join, String condition, String order) {
 			// - Khai báo biến chứa danh sách trả về
@@ -81,7 +81,7 @@ public class OrderDetailDAL implements DAL<OrderDetailDTO> {
 			return list;
 		}
 
-		// // - Hàm lấy ra một chi tiết hoá đơn dựa trên mã loại phòng đó
+		// // - Hàm lấy ra một chi tiết hoá đơn dựa trên mã loại hóa đơn đó
 		@Override
 		public OrderDetailDTO selectOneById(String id) {
 			// - Khai báo biến chứa danh sách trả về
