@@ -11,6 +11,7 @@ import java.awt.event.WindowEvent;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -26,7 +27,16 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import BLL.ProductBLL;
+import BLL.ProductTypeBLL;
+import DTO.ProductDTO;
+
 public class Admin_OrderManagerPL extends JPanel {
+	// Các đối tượng từ tầng Bussiness Logical Layer
+	private ProductBLL productBLL;
+	private ProductTypeBLL productTypeBLL;
+	private Object[][] datas;
+	ArrayList<ProductDTO> productList;
 	// Các Font
 	private Font fontParagraph = new Font("Arial", Font.PLAIN, 14);
 	private Font fontButton = new Font("Arial", Font.BOLD, 14);
@@ -68,13 +78,33 @@ public class Admin_OrderManagerPL extends JPanel {
 	private JDialog quantityInputDialog;
 	// - Giỏ hàng chứa các sản phẩm hiện tại ở đơn
 	private Vector<Object[]> shoppingCart = new Vector<>();
+	// - Các thông tin cần thiết
+	private final String[] sortsString = { "Chọn Sắp xếp", "Tên tăng dần", "Tên giảm dần", "Giá tăng dần", "Giá giảm dần" };
+	private final String[] sortsSQL = {"", "tenSanPham ASC", "tenSanPham DESC", "giaBan ASC", "giaBan DESC"};
+	private final String[] typeSQL = { "", "maLoaiSanPham = 'KHO'", "maLoaiSanPham = 'NUOC'",
+			"maLoaiSanPham = 'KHAC'", "maLoaiSanPham = 'TRANGMIENG'",  "maLoaiSanPham = 'DOUONG'", "maLoaiSanPham = 'CHATCOHAI'"};
+	private final String[] typeStringForFilter = { "Chọn Nhóm", "Món khô", "Món nước", "Khác", "Món tráng miệng", "Đồ uống", "Chất có hại"};
 
 	public Admin_OrderManagerPL() {
+		// <===== Các đối tượng từ tầng Bussiness Logical Layer =====>
+		productBLL = new ProductBLL();
+		productTypeBLL = new ProductTypeBLL();
+			/*orderBLL = new OrderBLL();
+			roomBLL = new RoomBLL();
+			orderList = orderBLL.getAllOrderByCondition(null,"trangThai = 0",null);
+			roomList[0]="Chọn Phòng";
+			for(int i=0;i<orderList.size();i++)
+			{
+				RoomDTO room = roomBLL.getOneRoomById(orderList.get(i).getRoomId());
+				roomList[i+1]=room.getName();
+			}*/
+		// <==================== ====================>
+
 		// <===== Cấu trúc của Title Label =====>
 		// - Tuỳ chỉnh Title Label
 		titleLabel = CommonPL.getTitleLabel("Đặt món", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER,
 				SwingConstants.CENTER);
-		titleLabel.setBounds(30, 0, 1140, 115);
+		titleLabel.setBounds(30, 0, 1140, 70);
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Product Panel =====>
@@ -84,15 +114,13 @@ public class Admin_OrderManagerPL extends JPanel {
 		findInputTextField.setBounds(15, 15, 180, 30);
 
 		// - Tuỳ chỉnh Sort ComboBox
-		Vector<String> types = CommonPL.getVectorHasValues(
-				new String[] { "Chọn Sắp xếp", "Tên tăng dần", "Tên giảm dần", "Giá tăng dần", "Giá giảm dần" });
+		Vector<String> types = CommonPL.getVectorHasValues(sortsString);
 		sortComboBox = CommonPL.CustomComboBox(types, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE,
 				Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontParagraph);
 		sortComboBox.setBounds(210, 15, 180, 30);
 
 		// - Tuỳ chỉnh Add Or Update Group ComboBox
-		Vector<String> groups = CommonPL.getVectorHasValues(new String[] { "Chọn Nhóm", "Món khô", "Món nước",
-				"Món ăn kèm", "Món tráng miệng", "Đồ uống", "Thuốc lá" });
+		Vector<String> groups = CommonPL.getVectorHasValues(typeStringForFilter);
 		groupComboBox = CommonPL.CustomComboBox(groups, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE,
 				Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontParagraph);
 		groupComboBox.setBounds(405, 15, 180, 30);
@@ -100,6 +128,9 @@ public class Admin_OrderManagerPL extends JPanel {
 		// - Tuỳ chỉnh Filter Button
 		filterButton = CommonPL.getRoundedBorderButton(14, "Lọc", Color.decode("#007bff"), Color.WHITE, fontButton);
 		filterButton.setBounds(600, 15, 75, 30);
+		filterButton.addActionListener(e -> {
+			filterProducts();
+		});
 
 		// - Tuỳ chỉnh List Panel
 		listPanel = new JPanel();
@@ -190,10 +221,18 @@ public class Admin_OrderManagerPL extends JPanel {
 		// - Tuỳ chỉnh Reset Button
 		resetButton = CommonPL.getRoundedBorderButton(14, "Đặt lại", Color.decode("#1976D2"), Color.WHITE, fontButton);
 		resetButton.setBounds(225, 660, 195, 30);
-		resetButton.addActionListener(e -> {
+		resetButton.addActionListener(e -> 
+		{
+			// + Đặt lại text của findTextField về mặc định
+			findInputTextField.setText("Nhập tên sản phẩm");
+			// + Đặt lại các comboBox về giá trị mặc định
+			sortComboBox.setSelectedIndex(0);
+			groupComboBox.setSelectedIndex(0);
 			// + Xoá tất cả sản phẩm hiện có trong Giỏ hàng
 			shoppingCart.clear();
 
+			// + Cập nhật lại list sản phẩm
+			renderListPanel(null,null,null);
 			// + Cập nhật lại giỏ hàng trên giao diện
 			renderOrderListPanel();
 		});
@@ -224,11 +263,33 @@ public class Admin_OrderManagerPL extends JPanel {
 		this.add(billPanel);
 
 		// Thiết lập sự kiện cập nhật danh sách sản phẩm
-		renderListPanel();
+		renderListPanel(null,null,null);
 
 		// Thiết lập sự kiện cập nhật danh sách sản phẩm ở giỏ hàng
 		renderOrderListPanel();
 
+	}
+
+	// - Hàm lọc sản phẩm
+	private void filterProducts() 
+	{
+    	// Giá trị ô tìm kiếm
+		String findValue = !findInputTextField.getText().equals("Nhập Tên sản phẩm") ? findInputTextField.getText()
+				: null;
+    	// Giá trị ô sắp xếp
+		String sortValue = sortsSQL[sortComboBox.getSelectedIndex()];
+		// Giá trị ô loại sản phẩm
+    	String typeValue = typeSQL[groupComboBox.getSelectedIndex()];
+    	// Gán lệnh SQL tương ứng để truy vấn rồi cập nhật bảng
+		String condition = (findValue != null ? String.format(
+			"(maSanPham LIKE '%%%s%%' OR tenSanPham LIKE '%%%s%%')", findValue, findValue) : "")
+			+ (typeValue != "" ? (findValue != null ? (" AND " + typeValue) : typeValue) : "");
+		
+		if (condition.length() == 0)
+			condition = null;
+		String order = (sortValue =="") ? null : sortValue;
+    	// Cập nhật dữ liệu hiển thị
+    	renderListPanel(null,condition,order);
 	}
 
 	// Hàm cập nhật sản phẩm trong Giỏ hàng
@@ -325,21 +386,30 @@ public class Admin_OrderManagerPL extends JPanel {
 	}
 
 	// Hàm cập nhật lại danh sách sản phẩm
-	private void renderListPanel() {
+	private void renderListPanel(String[] join, String condition, String order) {
+		listPanel.removeAll();
 		// - Truy vấn dữ liệu về tất cả sản phẩm hiện có
-		Object[][] datas = { { "1", "Chai Cocacola", "Đồ uống", "10000", "Hoạt động", "cocacola-chai-image.jpg" },
-				{ "2", "Chai Pepsi", "Đồ uống", "10000", "Tạm dừng", "pepsi-chai-image.jpg" },
-				{ "3", "Mì trứng", "Món khô", "24000", "Hoạt động", "mi-trung-image.jpg" }, };
+		if(condition == null) condition = "trangThai = 1";
+		else condition += " AND trangThai = 1";
+		productList = productBLL.getAllProductByCondition(join,condition,order);
+		datas = new Object[productList.size()][5];
+		for (int i = 0; i < productList.size(); i++) {
+			datas[i][0] = (Object) productList.get(i).getId();
+			datas[i][1] = (Object) productList.get(i).getName();
+			datas[i][2] = (Object) productTypeBLL.getOneProductTypeById(productList.get(i).getProductTypeId()).getName();
+			datas[i][3] = (Object) productList.get(i).getPrice();
+			datas[i][4] = (Object) productList.get(i).getImage();
+		}
 
 		// - Duyệt qua từng đối tượng
 		int x = 0, y = 0;
-		for (int i = 0; i < datas.length; i++) {
+		for (int i = 0; i < productList.size(); i++) {
 			// + Biến tạm giữ vị trí đối tượng được duyệt
 			int j = i;
 
 			// + Ảnh sản phẩm
 			JLabel imageLabel = CommonPL.getImageLabel(210, 190,
-					CommonPL.getMiddlePathToShowProductImage() + String.valueOf(datas[i][5]));
+					CommonPL.getMiddlePathToShowProductImage() + String.valueOf(datas[i][4]));
 			imageLabel.setBounds(2, 2, 206, 186);
 			// + Mã sản phẩm
 			JLabel idLabel = CommonPL.getParagraphLabel(String.valueOf(datas[i][0]), Color.BLACK,
@@ -400,6 +470,8 @@ public class Admin_OrderManagerPL extends JPanel {
 
 		// - Cập nhật lại kích thước
 		listPanel.setPreferredSize(new Dimension(675, (int) ((Math.ceil(1.0 * datas.length / 3) * 325))));
+		listPanel.revalidate();
+		listPanel.repaint();
 	}
 
 	// Hàm cập nhật danh sách sản phẩm ở giỏ hàng
@@ -452,6 +524,7 @@ public class Admin_OrderManagerPL extends JPanel {
 			// + Thêm vào listPanel
 			orderListPanel.add(rowPanel);
 		}
+
 		// - Cập nhật lại Order List Panel
 		orderListPanel.setPreferredSize(new Dimension(405, shoppingCart.size() * 40));
 		orderListPanel.revalidate();
@@ -460,13 +533,14 @@ public class Admin_OrderManagerPL extends JPanel {
 		// - Tính tổng giá sản phẩm hiện có trong Giỏ hàng
 		// (sử dụng BigInteger để chứa số lớn)
 		BigInteger totalPrice = new BigInteger("0");
+		System.out.println(shoppingCart.size());
 		for (int i = 0; i < shoppingCart.size(); i++) {
-			BigInteger quantity = new BigInteger((String) shoppingCart.get(i)[2]);
-			BigInteger price = new BigInteger((String) shoppingCart.get(i)[3]);
+			BigInteger quantity = new BigInteger(shoppingCart.get(i)[2].toString());
+			BigInteger price = new BigInteger(shoppingCart.get(i)[3].toString());
 			totalPrice = totalPrice.add(quantity.multiply(price));
 		}
 		// - Cập nhật lại tổng giá trên giao diện
 		summaryCostDetailLabel
 				.setText(CommonPL.moneyLongToMoneyFormat(new BigInteger((String.valueOf(totalPrice)))) + " VNĐ");
-	}
+	}	
 }
