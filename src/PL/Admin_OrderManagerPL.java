@@ -27,16 +27,29 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 
+import BLL.CommonBLL;
+import BLL.OrderBLL;
+import BLL.OrderDetailBLL;
 import BLL.ProductBLL;
 import BLL.ProductTypeBLL;
+import BLL.RoomBLL;
+import DTO.OrderDTO;
 import DTO.ProductDTO;
+import DTO.RoomDTO;
 
 public class Admin_OrderManagerPL extends JPanel {
 	// Các đối tượng từ tầng Bussiness Logical Layer
 	private ProductBLL productBLL;
 	private ProductTypeBLL productTypeBLL;
+	private OrderBLL orderBLL;
+	private OrderDetailBLL orderDetailBLL;
+	private RoomBLL roomBLL;
 	private Object[][] datas;
+	private String[] roomNameList;
+	private String[] roomIdList;
 	ArrayList<ProductDTO> productList;
+	ArrayList<OrderDTO> orderList;
+
 	// Các Font
 	private Font fontParagraph = new Font("Arial", Font.PLAIN, 14);
 	private Font fontButton = new Font("Arial", Font.BOLD, 14);
@@ -84,20 +97,32 @@ public class Admin_OrderManagerPL extends JPanel {
 	private final String[] typeSQL = { "", "maLoaiSanPham = 'KHO'", "maLoaiSanPham = 'NUOC'",
 			"maLoaiSanPham = 'KHAC'", "maLoaiSanPham = 'TRANGMIENG'",  "maLoaiSanPham = 'DOUONG'", "maLoaiSanPham = 'CHATCOHAI'"};
 	private final String[] typeStringForFilter = { "Chọn Nhóm", "Món khô", "Món nước", "Khác", "Món tráng miệng", "Đồ uống", "Chất có hại"};
+	BigInteger totalPrice;
 
 	public Admin_OrderManagerPL() {
 		// <===== Các đối tượng từ tầng Bussiness Logical Layer =====>
 		productBLL = new ProductBLL();
 		productTypeBLL = new ProductTypeBLL();
-			/*orderBLL = new OrderBLL();
-			roomBLL = new RoomBLL();
-			orderList = orderBLL.getAllOrderByCondition(null,"trangThai = 0",null);
-			roomList[0]="Chọn Phòng";
+		orderBLL = new OrderBLL();
+		orderDetailBLL = new OrderDetailBLL();
+		roomBLL = new RoomBLL();
+		orderList = orderBLL.getAllOrderByCondition(null,"trangThai = 0",null);
+		if (orderList == null || orderList.isEmpty()) 
+		{
+			roomNameList = new String[] { "Chọn Phòng" };
+			roomIdList = new String[] {};
+		} else
+		{
+			roomNameList = new String[orderList.size() + 1];
+			roomIdList = new String[orderList.size()];
+			roomNameList[0]="Chọn Phòng";
 			for(int i=0;i<orderList.size();i++)
 			{
+				roomIdList[i] = orderList.get(i).getRoomId();
 				RoomDTO room = roomBLL.getOneRoomById(orderList.get(i).getRoomId());
-				roomList[i+1]=room.getName();
-			}*/
+				roomNameList[i+1]=room.getName();
+			}
+		}
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Title Label =====>
@@ -206,7 +231,7 @@ public class Admin_OrderManagerPL extends JPanel {
 		summaryCostDetailLabel.setBounds(120, 560, 300, 30);
 
 		// - Tuỳ chỉnh Pay Methods ComboBox
-		Vector<String> roomNames = CommonPL.getVectorHasValues(new String[] { "Chọn Phòng", "1.1", "1.2", "1.3" });
+		Vector<String> roomNames = CommonPL.getVectorHasValues(roomNameList);
 		roomNamesComboBox = CommonPL.CustomComboBox(roomNames, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK, Color.WHITE,
 				Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, fontParagraph);
 		roomNamesComboBox.setBounds(15, 620, 405, 30);
@@ -215,7 +240,40 @@ public class Admin_OrderManagerPL extends JPanel {
 		orderButton = CommonPL.getRoundedBorderButton(14, "Tạo đơn", Color.decode("#1976D2"), Color.WHITE, fontButton);
 		orderButton.setBounds(15, 660, 195, 30);
 		orderButton.addActionListener(e -> {
+			if(roomNamesComboBox.getSelectedIndex() == 0) CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn số phòng!");
+			else 
+			{
+				String roomId = roomIdList[roomNamesComboBox.getSelectedIndex()-1];
+				String s = String.format("maPhong = '%s' AND trangThai = 0",roomId);
+				orderList = orderBLL.getAllOrderByCondition(null,s,null);
+				
+				String orderId = String.valueOf(orderList.get(0).getId());
+				String date1 = String.valueOf(orderList.get(0).getDateOrder());
+				String room = String.valueOf(orderList.get(0).getRoomId());
+				String employeeid = String.valueOf(orderList.get(0).getEmployeeId());
+				String customer = String.valueOf(orderList.get(0).getCustomerId());
+				String discount = String.valueOf(orderList.get(0).getDiscountId());
+				String t = String.valueOf(orderList.get(0).getTime());
+				String gia = String.valueOf(orderList.get(0).getCost() + totalPrice.longValue());
+				String trangThai = String.valueOf(orderList.get(0).getStatus());
+				String date2 = String.valueOf(orderList.get(0).getDateUpdate());
 
+				// - Cập nhật lại tổng tiền trong hóa đơn
+				String inform = orderBLL.updateOrder(orderId, date1, room, employeeid, customer, discount, t, gia, trangThai, date2);
+				if(inform != "Có thể thay đổi một hóa đơn") CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				else
+				{
+					// - Cập nhật CTHD cho hóa đơn
+					boolean c = true;
+					for(int i=0;i<shoppingCart.size();i++)
+					{
+						inform = orderDetailBLL.updateOrderDetail(orderId, String.valueOf(shoppingCart.get(i)[0]), String.valueOf(shoppingCart.get(i)[2]));
+						if(inform != "Có thể cập nhật một CTHD") { CommonPL.createErrorDialog("Thông báo lỗi", inform); c = false;}
+					}
+					if(c) CommonPL.createSuccessDialog("Thông báo thành công", "Đặt món thành công!");
+					resetProduct();
+				}
+			}
 		});
 
 		// - Tuỳ chỉnh Reset Button
@@ -223,18 +281,7 @@ public class Admin_OrderManagerPL extends JPanel {
 		resetButton.setBounds(225, 660, 195, 30);
 		resetButton.addActionListener(e -> 
 		{
-			// + Đặt lại text của findTextField về mặc định
-			findInputTextField.setText("Nhập tên sản phẩm");
-			// + Đặt lại các comboBox về giá trị mặc định
-			sortComboBox.setSelectedIndex(0);
-			groupComboBox.setSelectedIndex(0);
-			// + Xoá tất cả sản phẩm hiện có trong Giỏ hàng
-			shoppingCart.clear();
-
-			// + Cập nhật lại list sản phẩm
-			renderListPanel(null,null,null);
-			// + Cập nhật lại giỏ hàng trên giao diện
-			renderOrderListPanel();
+			resetProduct();
 		});
 
 		// - Tuỳ chỉnh Bill Panel;
@@ -290,6 +337,24 @@ public class Admin_OrderManagerPL extends JPanel {
 		String order = (sortValue =="") ? null : sortValue;
     	// Cập nhật dữ liệu hiển thị
     	renderListPanel(null,condition,order);
+	}
+
+	// Hàm reset giao diện
+	private void resetProduct()
+	{
+		// + Đặt lại text của findTextField về mặc định
+		findInputTextField.setText("Nhập Tên sản phẩm");
+		// + Đặt lại các comboBox về giá trị mặc định
+		sortComboBox.setSelectedIndex(0);
+		groupComboBox.setSelectedIndex(0);
+		roomNamesComboBox.setSelectedIndex(0);
+		// + Xoá tất cả sản phẩm hiện có trong Giỏ hàng
+		shoppingCart.clear();
+
+		// + Cập nhật lại list sản phẩm
+		renderListPanel(null,null,null);
+		// + Cập nhật lại giỏ hàng trên giao diện
+		renderOrderListPanel();
 	}
 
 	// Hàm cập nhật sản phẩm trong Giỏ hàng
@@ -348,10 +413,18 @@ public class Admin_OrderManagerPL extends JPanel {
 		quantityInputButton = CommonPL.getButtonDefaultForm("Đồng ý", CommonPL.getFontParagraphBold());
 		quantityInputButton.setBounds(20, 130, 460, 40);
 		quantityInputButton.addActionListener(e -> {
-			Object[] product = new Object[] { productSelected.get(0), productSelected.get(1),
+			String quantity = quantityInputTextField.getText();
+			if(!CommonBLL.isValidStringType04(quantity)) 
+			{
+				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng nhập số lượng là một số tự nhiên !!!");
+			}
+			else 
+			{
+				Object[] product = new Object[] { productSelected.get(0), productSelected.get(1),
 					quantityInputTextField.getText(), productSelected.get(2) };
-			updateShoppingCart(product, true);
-			quantityInputDialog.dispose();
+				updateShoppingCart(product, true);
+				quantityInputDialog.dispose();
+			}
 		});
 		SwingUtilities.invokeLater(() -> quantityInputButton.requestFocusInWindow());
 
@@ -532,8 +605,7 @@ public class Admin_OrderManagerPL extends JPanel {
 
 		// - Tính tổng giá sản phẩm hiện có trong Giỏ hàng
 		// (sử dụng BigInteger để chứa số lớn)
-		BigInteger totalPrice = new BigInteger("0");
-		System.out.println(shoppingCart.size());
+		totalPrice = new BigInteger("0");
 		for (int i = 0; i < shoppingCart.size(); i++) {
 			BigInteger quantity = new BigInteger(shoppingCart.get(i)[2].toString());
 			BigInteger price = new BigInteger(shoppingCart.get(i)[3].toString());
