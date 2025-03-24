@@ -42,15 +42,6 @@ public class ProductBLL {
 		return true;
 	}
 
-	// - Hàm kiểm tra tên sản phẩm đã hợp lệ hay chưa ?
-	public boolean isValidName(String name)
-	{
-		if(!CommonBLL.isValidStringType01(name)) {
-			return false;
-		}
-		return true;
-	}
-
 	// - Hàm kiểm tra giá sản phẩm đã được nhập hay chưa ?
 	public boolean isInputedPrice(String price)
 	{
@@ -141,7 +132,6 @@ public class ProductBLL {
 		if(!isInputedId(id)) return "Chưa nhập mã sản phẩm";
 		if(!isValidId(id)) return "Nhập sai định dạng mã sản phẩm";
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
-		//if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
 		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";
@@ -176,7 +166,6 @@ public class ProductBLL {
 			return "Chưa nhập đầy đủ thông tin sản phẩm cần thiết";
 		}
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
-		//if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
 		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";

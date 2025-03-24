@@ -15,14 +15,14 @@ public class ProductDetailBLL {
 	}
 
 	// Methods
-	// - Hàm kiểm tra giá sản phẩm đã được nhập hay chưa ?
+	// - Hàm kiểm tra định lượng nguyên liệu sản phẩm đã được nhập hay chưa ?
 	public boolean isInputedQuantity(String quantity)
 	{
 		if(quantity == null || quantity.trim().isEmpty()) return false;
 		return true;
 	}
 
-	// - Hàm kiểm tra giá sản phẩm đã hợp lệ hay chưa ?
+	// - Hàm kiểm tra định lượng nguyên liệu sản phẩm đã hợp lệ hay chưa ?
 	public boolean isValidQuantity(String quantity)
 	{
 		if(!CommonBLL.isValidStringType04(quantity)) {
