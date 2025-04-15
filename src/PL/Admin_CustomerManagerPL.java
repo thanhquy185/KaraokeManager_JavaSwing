@@ -347,7 +347,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 							CommonPL.getCurrentDate());
 					if (inform.equals("Có thể khoá một khách hàng")) {
 						CommonPL.createSuccessDialog("Thông báo thành công",
-								currentObject.get(4).equals("Hoạt động") ? "Khóa thành công" : "Mở khóa thành công");
+								currentObject.get(currentObject.size() - 1).equals("Hoạt động") ? "Khóa thành công" : "Mở khóa thành công");
 						renderTableData(null, null, null);
 					} else {
 						CommonPL.createErrorDialog("Thông báo lỗi", inform);
