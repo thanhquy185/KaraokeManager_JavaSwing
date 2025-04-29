@@ -7,10 +7,12 @@ public class Program {
 	public static void main(String[] args) {
 //		FlatIntelliJLaf.setup();
 		FramePL mainFrame = new FramePL();
+
+		// System.out.println(CommonPL.getMiddlePathToShowIcon());
 		
-		String a = "Ha Thai Son";
-		String b = "Nguyen Truong Mai Phuong";
-		String c = "Tran Thanh Quy";
+		// String a = "Ha Thai Son";
+		// String b = "Nguyen Truong Mai Phuong";
+		// String c = "Tran Thanh Quy";
 		
 		// System.out.println(CommonPL.convertDateFormat("02/05/2025"));
 		

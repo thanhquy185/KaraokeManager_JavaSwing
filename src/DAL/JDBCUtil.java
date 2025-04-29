@@ -27,7 +27,7 @@ public class JDBCUtil {
 			DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
 			String url = "jdbc:mysql://localhost:3306/Karaoke";
 			String username = "root";
-			String password = "your_password";
+			String password = "quy1832258";
 			connection = DriverManager.getConnection(url, username, password);
 		} catch (Exception e) {
 			e.printStackTrace();
