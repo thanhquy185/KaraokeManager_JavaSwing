@@ -44,13 +44,12 @@ public class CategoryDAL implements DAL<CategoryDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.LoaiMonAn" + "\nSET tenLoaiMonAn = ?, trangThai = ?, thoiGianCapNhat = ?"
+			String sql = "UPDATE Karaoke.LoaiMonAn" + "\nSET tenLoaiMonAn = ?, thoiGianCapNhat = ?"
 					+ "\nWHERE maLoaiMonAn = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, categoryDTO.getName());
-			pstmt.setBoolean(2, categoryDTO.getStatus());
-			pstmt.setString(3, categoryDTO.getTimeUpdate());
-			pstmt.setString(4, categoryDTO.getId());
+			pstmt.setString(2, categoryDTO.getTimeUpdate());
+			pstmt.setString(3, categoryDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -69,7 +68,8 @@ public class CategoryDAL implements DAL<CategoryDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.LoaiMonAn" + "\nSET trangThai = ?, thoiGianCapNhat = ?" + "\nWHERE maLoaiMonAn = ?";
+			String sql = "UPDATE Karaoke.LoaiMonAn" + "\nSET trangThai = ?, thoiGianCapNhat = ?"
+					+ "\nWHERE maLoaiMonAn = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setBoolean(1, categoryDTO.getStatus());
 			pstmt.setString(2, categoryDTO.getTimeUpdate());

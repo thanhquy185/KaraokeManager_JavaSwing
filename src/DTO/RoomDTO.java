@@ -4,18 +4,18 @@ public class RoomDTO {
 	// Properties
 	private String id;
 	private String name;
-	private String roomTypeId;
+	private String type;
 	private Boolean status;
-	private String dateUpdate;
+	private String timeUpdate;
 
 	// Constructors
-	public RoomDTO(String id, String name, String roomTypeId, Boolean status, String dateUpdate) {
+	public RoomDTO(String id, String name, String type, Boolean status, String timeUpdate) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.roomTypeId = roomTypeId;
+		this.type = type;
 		this.status = status;
-		this.dateUpdate = dateUpdate;
+		this.timeUpdate = timeUpdate;
 	}
 
 	// Setter - Getter
@@ -27,16 +27,16 @@ public class RoomDTO {
 		this.name = name;
 	}
 
-	public void setRoomTypeId(String roomTypeId) {
-		this.roomTypeId = roomTypeId;
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public void setStatus(Boolean status) {
 		this.status = status;
 	}
 
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
+	public void setTimeUpdate(String timeUpdate) {
+		this.timeUpdate = timeUpdate;
 	}
 
 	public String getId() {
@@ -47,21 +47,21 @@ public class RoomDTO {
 		return name;
 	}
 
-	public String getRoomTypeId() {
-		return roomTypeId;
+	public String getType() {
+		return type;
 	}
 
 	public Boolean getStatus() {
 		return status;
 	}
 
-	public String getDateUpdate() {
-		return dateUpdate;
+	public String getTimeUpdate() {
+		return timeUpdate;
 	}
 
 	@Override
 	public String toString() {
-		return "RoomDTO [id=" + id + ", name=" + name + ", roomTypeId=" + roomTypeId + ", status=" + status
-				+ ", dateUpdate=" + dateUpdate + "]";
+		return "RoomDTO [id=" + id + ", name=" + name + ", type=" + type + ", status=" + status
+				+ ", timeUpdate=" + timeUpdate + "]";
 	}
 }

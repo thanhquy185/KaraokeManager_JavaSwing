@@ -270,13 +270,12 @@ public class AdminMenuPL extends JPanel {
 						// orderManagerPL.setBackground(colorBackgroundInMain);
 						// AdminCardPL.getInstance().changeAdminMain(orderManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Phòng hát")) {
-						// Admin_KaraokeRoomManagerPL roomStatusManagerPL = new
-						// Admin_KaraokeRoomManagerPL();
-						// roomStatusManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
-						// CommonPL.getMainWidth(),
-						// CommonPL.getScreenHeightByOwner());
-						// roomStatusManagerPL.setBackground(colorBackgroundInMain);
-						// AdminCardPL.getInstance().changeAdminMain(roomStatusManagerPL);
+						Admin_RoomManagerPL roomManagerPL = new Admin_RoomManagerPL();
+						roomManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+								CommonPL.getMainWidth(),
+								CommonPL.getScreenHeightByOwner());
+						roomManagerPL.setBackground(colorBackgroundInMain);
+						AdminCardPL.getInstance().changeAdminMain(roomManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Khách hàng")) {
 						Admin_CustomerManagerPL customerManagerPL = new Admin_CustomerManagerPL();
 						customerManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
@@ -290,13 +289,12 @@ public class AdminMenuPL extends JPanel {
 						supplierManagerPL.setBackground(colorBackgroundInMain);
 						AdminCardPL.getInstance().changeAdminMain(supplierManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Phiếu nhập")) {
-						// Admin_InputTicketManagerPL inputTicketManagerPL = new
-						// Admin_InputTicketManagerPL();
-						// inputTicketManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
-						// CommonPL.getMainWidth(),
-						// CommonPL.getScreenHeightByOwner());
-						// inputTicketManagerPL.setBackground(colorBackgroundInMain);
-						// AdminCardPL.getInstance().changeAdminMain(inputTicketManagerPL);
+						Admin_InputTicketManagerPL inputTicketManagerPL = new Admin_InputTicketManagerPL();
+						inputTicketManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+								CommonPL.getMainWidth(),
+								CommonPL.getScreenHeightByOwner());
+						inputTicketManagerPL.setBackground(colorBackgroundInMain);
+						AdminCardPL.getInstance().changeAdminMain(inputTicketManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Loại món ăn")) {
 						Admin_CategoryManagerPL categoryManagerPL = new Admin_CategoryManagerPL();
 						categoryManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),

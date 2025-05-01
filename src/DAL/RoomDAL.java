@@ -19,14 +19,14 @@ public class RoomDAL implements DAL<RoomDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.Phong(maPhong, tenPhong, maLoaiPhong, trangThai, ngayCapNhat)"
+			String sql = "INSERT INTO Karaoke.Phong(maPhong, tenPhong, maLoaiPhong, trangThai, thoiGianCapNhat)"
 					+ "\nVALUES(?, ?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, roomDTO.getId());
 			pstmt.setString(2, roomDTO.getName());
-			pstmt.setString(3, roomDTO.getRoomTypeId());
+			pstmt.setString(3, roomDTO.getType());
 			pstmt.setBoolean(4, roomDTO.getStatus());
-			pstmt.setString(5, roomDTO.getDateUpdate());
+			pstmt.setString(5, roomDTO.getTimeUpdate());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -45,14 +45,14 @@ public class RoomDAL implements DAL<RoomDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.Phong" + "\nSET tenPhong = ?, maLoaiPhong = ?, trangThai = ?, ngayCapNhat = ?"
+			String sql = "UPDATE Karaoke.Phong"
+					+ "\nSET tenPhong = ?, maLoaiPhong = ?, thoiGianCapNhat = ?"
 					+ "\nWHERE maPhong = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, roomDTO.getName());
-			pstmt.setString(2, roomDTO.getRoomTypeId());
-			pstmt.setBoolean(3, roomDTO.getStatus());
-			pstmt.setString(4, roomDTO.getDateUpdate());
-			pstmt.setString(5, roomDTO.getId());
+			pstmt.setString(2, roomDTO.getType());
+			pstmt.setString(3, roomDTO.getTimeUpdate());
+			pstmt.setString(4, roomDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -71,10 +71,10 @@ public class RoomDAL implements DAL<RoomDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.Phong" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE maPhong = ?";
+			String sql = "UPDATE Karaoke.Phong" + "\nSET trangThai = ?, thoiGianCapNhat = ?" + "\nWHERE maPhong = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setBoolean(1, roomDTO.getStatus());
-			pstmt.setString(2, roomDTO.getDateUpdate());
+			pstmt.setString(2, roomDTO.getTimeUpdate());
 			pstmt.setString(3, roomDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
@@ -99,7 +99,7 @@ public class RoomDAL implements DAL<RoomDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				RoomDTO roomDTO = new RoomDTO(rs.getString("maPhong"), rs.getString("tenPhong"),
-						rs.getString("maLoaiPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getString("maLoaiPhong"), rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				list.add(roomDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -126,7 +126,7 @@ public class RoomDAL implements DAL<RoomDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				RoomDTO roomDTO = new RoomDTO(rs.getString("maPhong"), rs.getString("tenPhong"),
-						rs.getString("maLoaiPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getString("maLoaiPhong"), rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				list.add(roomDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -151,7 +151,7 @@ public class RoomDAL implements DAL<RoomDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				roomDTO = new RoomDTO(rs.getString("maPhong"), rs.getString("tenPhong"), rs.getString("maLoaiPhong"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

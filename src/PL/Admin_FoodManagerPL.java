@@ -273,17 +273,16 @@ public class Admin_FoodManagerPL extends JPanel {
 		// Sự kiện nút "Thay đổi"
 		updateButton.addActionListener(e -> {
 			if (rowSelected != -1) {
+				String foodIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+				FoodDTO foodSelected = foodBLL.getOneFoodById(foodIdSelected);
 				Vector<Object> currentObject = new Vector<>();
-				FoodDTO foodSelected = foodBLL.getOneFoodById(String.valueOf(tableData.getValueAt(rowSelected, 0)));
 				currentObject.add(foodSelected.getId());
 				currentObject.add(foodSelected.getName());
 				currentObject.add(foodSelected.getCategory());
 				currentObject.add(foodSelected.getInventory());
 				currentObject.add(foodSelected.getPrice());
 				currentObject.add(foodSelected.getImage());
-				currentObject.add(foodSelected.getStatus());
-
-				System.out.println(foodSelected.getImage());
+				currentObject.add(foodSelected.getStatus() ? "Hoạt động" : "Tạm dừng");
 
 				showAddOrUpdateDialog("Thay đổi món ăn", "Thay đổi", currentObject);
 			} else {
@@ -297,27 +296,21 @@ public class Admin_FoodManagerPL extends JPanel {
 		// Sự kiện nút "Khóa"
 		lockButton.addActionListener(e -> {
 			if (rowSelected != -1) {
-				Vector<Object> currentObject = new Vector<>();
-				FoodDTO foodSelected = foodBLL.getOneFoodById(String.valueOf(tableData.getValueAt(rowSelected, 0)));
-				currentObject.add(foodSelected.getId());
-				currentObject.add(foodSelected.getName());
-				currentObject.add(foodSelected.getCategory());
-				currentObject.add(foodSelected.getInventory());
-				currentObject.add(foodSelected.getPrice());
-				currentObject.add(foodSelected.getImage());
-				currentObject.add(foodSelected.getStatus());
+				String foodIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+				FoodDTO foodSelected = foodBLL.getOneFoodById(foodIdSelected);
 
 				CommonPL.createSelectionsDialog("Thông báo lựa chọn",
 						String.format("Có chắc chắn muốn %s món ăn này?",
-								currentObject.get(6).equals("Hoạt động") ? "khóa" : "mở khóa"),
+								foodSelected.getStatus() ? "khóa" : "mở khóa"),
 						valueSelected);
 
 				if (valueSelected[0]) {
-					String result = foodBLL.lockFood((String) currentObject.get(0),
+					String result = foodBLL.lockFood(foodSelected.getId(),
 							CommonPL.getCurrentDatetime());
 					if (result.equals("Có thể thay đổi trạng thái món ăn")) {
 						CommonPL.createSuccessDialog("Thông báo thành công",
-								currentObject.get(6).equals("Hoạt động") ? "Khóa thành công" : "Mở khóa thành công");
+								foodSelected.getStatus() ? "Khóa thành công"
+										: "Mở khóa thành công");
 						resetPage();
 					} else {
 						CommonPL.createErrorDialog("Thông báo lỗi", result);
@@ -446,6 +439,7 @@ public class Admin_FoodManagerPL extends JPanel {
 		addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("id"), Color.LIGHT_GRAY,
 				Color.BLACK,
 				CommonPL.getFontParagraphPlain());
+		addOrUpdateIdTextField.setHorizontalAlignment(JTextField.CENTER);
 		addOrUpdateIdTextField.setEnabled(false);
 		((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
 		addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
@@ -578,7 +572,6 @@ public class Admin_FoodManagerPL extends JPanel {
 			if (object.get(0) != null) {
 				addOrUpdateIdTextField.setText(String.valueOf(object.get(0)));
 				((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
-				addOrUpdateIdTextField.setCaretPosition(0);
 			}
 
 			if (object.get(1) != null) {
@@ -593,7 +586,6 @@ public class Admin_FoodManagerPL extends JPanel {
 						addOrUpdateCategoryComboBox.setSelectedIndex(i);
 						addOrUpdateCategoryComboBox.setForeground(Color.BLACK);
 						((JTextField) addOrUpdateCategoryComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-
 						break;
 					}
 				}

@@ -492,7 +492,7 @@ public class Admin_DashboardManagerPL extends JPanel {
 							ArrayList<InputTicketDetailDTO> listInputTicketDetail = inputTicketDetailBLL.getAllInputTicketDetailByCondition(
 									null, String.format("maPhieuNhap = '%s'", inputTicketDTO.getId()), null);
 							for(InputTicketDetailDTO inputTicketDetailDTO : listInputTicketDetail) {								
-								ingredients = ingredients.add(new BigInteger(String.valueOf(inputTicketDetailDTO.getInputQuantity())));
+								ingredients = ingredients.add(new BigInteger(String.valueOf(inputTicketDetailDTO.getQuantity())));
 							}
 						}
 						// Chi

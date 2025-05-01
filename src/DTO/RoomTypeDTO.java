@@ -5,17 +5,13 @@ public class RoomTypeDTO {
 	private String id;
 	private String name;
 	private Long cost;
-	private Boolean status;
-	private String dateUpdate;
 	
 	// Constructors
-	public RoomTypeDTO(String id, String name, Long cost, Boolean status, String dateUpdate) {
+	public RoomTypeDTO(String id, String name, Long cost) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.cost = cost;
-		this.status = status;
-		this.dateUpdate = dateUpdate;
 	}
 	
 	// Setter - Getter
@@ -30,14 +26,6 @@ public class RoomTypeDTO {
 	public void setCost(Long cost) {
 		this.cost = cost;
 	}
-
-	public void setStatus(Boolean status) {
-		this.status = status;
-	}
-
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
-	}
 	
 	public String getId() {
 		return id;
@@ -49,13 +37,5 @@ public class RoomTypeDTO {
 
 	public Long getCost() {
 		return cost;
-	}
-
-	public Boolean getStatus() {
-		return status;
-	}
-
-	public String getDateUpdate() {
-		return dateUpdate;
 	}
 }

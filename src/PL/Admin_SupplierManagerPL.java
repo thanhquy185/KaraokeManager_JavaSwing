@@ -24,6 +24,7 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import BLL.SupplierBLL;
+import DTO.CategoryDTO;
 import DTO.SupplierDTO;
 import PL.CommonPL.CustomTextField;
 
@@ -238,10 +239,17 @@ public class Admin_SupplierManagerPL extends JPanel {
                                 addressDetailCityNameSelected = null;
                                 addressDetailDistrictNameSelected = null;
                                 addressDetailWardNameSelected = null;
+
+                                String supplierIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+                                SupplierDTO supplierSelected = supplierBLL.getOneSupplierById(supplierIdSelected);
                                 Vector<Object> currentObject = new Vector<>();
-                                for (int i = 0; i < widthColumns.length; i++) {
-                                        currentObject.add(tableData.getValueAt(rowSelected, i));
-                                }
+                                currentObject.add(supplierSelected.getId());
+                                currentObject.add(supplierSelected.getName());
+                                currentObject.add(supplierSelected.getPhone());
+                                currentObject.add(supplierSelected.getEmail());
+                                currentObject.add(supplierSelected.getAddress());
+                                currentObject.add(supplierSelected.getStatus() ? "Hoạt động" : "Tạm dừng");
+
                                 showAddOrUpdateDialog("Thay đổi Nhà cung cấp", "Thay đổi", currentObject);
                         } else {
                                 CommonPL.createErrorDialog("Thông báo lỗi",
@@ -255,22 +263,22 @@ public class Admin_SupplierManagerPL extends JPanel {
                 // Sự kiện nút "Khóa"
                 lockButton.addActionListener(e -> {
                         if (rowSelected != -1) {
-                                Vector<Object> currentObject = new Vector<>();
-                                for (int i = 0; i < widthColumns.length; i++) {
-                                        currentObject.add(tableData.getValueAt(rowSelected, i));
-                                }
+                                String supplierIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+                                SupplierDTO supplierSelected = supplierBLL.getOneSupplierById(supplierIdSelected);
+
                                 CommonPL.createSelectionsDialog("Thông báo lựa chọn",
                                                 String.format("Có chắc chắn muốn %s nhà cung cấp này?",
-                                                                currentObject.get(5).equals("Hoạt động") ? "khóa"
+                                                                supplierSelected.getStatus()
+                                                                                ? "khóa"
                                                                                 : "mở khóa"),
                                                 valueSelected);
 
                                 if (valueSelected[0]) {
-                                        String result = supplierBLL.lockSupplier((String) currentObject.get(0),
+                                        String result = supplierBLL.lockSupplier(supplierSelected.getId(),
                                                         CommonPL.getCurrentDatetime());
                                         if (result.equals("Thay đổi trạng thái thành công")) {
                                                 CommonPL.createSuccessDialog("Thông báo thành công",
-                                                                currentObject.get(5).equals("Hoạt động")
+                                                                supplierSelected.getStatus()
                                                                                 ? "Khóa thành công"
                                                                                 : "Mở khóa thành công");
                                                 resetPage();
@@ -423,7 +431,8 @@ public class Admin_SupplierManagerPL extends JPanel {
                                 addressDetailDistrictNameComboBox,
                                 addressDetailWardNameSelected, addressDetailWardNameComboBox);
 
-                addressDetailApplyButton = CommonPL.getButtonDefaultForm("Chọn địa chỉ",
+                addressDetailApplyButton = CommonPL.getRoundedBorderButton(20, "Xác nhận",
+                                Color.decode("#42A5F5"), Color.WHITE,
                                 CommonPL.getFontParagraphBold());
                 addressDetailApplyButton.setBounds(20, 390, 460, 40);
                 addressDetailApplyButton.addActionListener(e -> {
@@ -536,9 +545,10 @@ public class Admin_SupplierManagerPL extends JPanel {
                                 CommonPL.getFontParagraphPlain());
                 addOrUpdateAddressLabel.setBounds(20, 280, 220, 40);
 
-                addOrUpdateAddressButton = CommonPL.getButtonDefaultForm("Nhấn để chọn địa chỉ",
+                addOrUpdateAddressButton = CommonPL.getRoundedBorderButton(20, "Tạo địa chỉ",
+                                Color.decode("#42A5F5"), Color.WHITE,
                                 new Font("Arial", Font.BOLD, 14));
-                addOrUpdateAddressButton.setBounds(300, 286, 180, 28);
+                addOrUpdateAddressButton.setBounds(360, 286, 120, 28);
                 addOrUpdateAddressButton.addActionListener(e -> {
                         String initialAddress = addOrUpdateAddressTextField.getText();
                         showAddressDetailDialog(initialAddress);

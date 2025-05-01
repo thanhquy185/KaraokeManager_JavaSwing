@@ -23,13 +23,18 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
-import BLL.CategoryBLL;
-import DTO.CategoryDTO;
+import BLL.RoomBLL;
+import BLL.RoomTypeBLL;
+import DTO.RoomDTO;
+import DTO.RoomTypeDTO;
+import DTO.RoomDTO;
 import PL.CommonPL.CustomTextField;
 
-public class Admin_CategoryManagerPL extends JPanel {
+public class Admin_RoomManagerPL extends JPanel {
     // Các đối tượng từ tầng Bussiness Logical Layer
-    private CategoryBLL categoryBLL;
+    private RoomBLL roomBLL;
+    private RoomTypeBLL roomTypeBLL;
+
     // Các Component
     private JLabel titleLabel;
     private JLabel findLabel;
@@ -38,8 +43,11 @@ public class Admin_CategoryManagerPL extends JPanel {
     private JLabel sortLabel;
     private Map<String, Boolean> sortCheckboxs;
     private JButton sortButton;
+    private JLabel typeLabel;
+    private Map<String, Boolean> typeRadios;
+    private JButton typeButton;
     private JLabel statusLabel;
-    private Map<String, Boolean> statusCheckboxs;
+    private Map<String, Boolean> statusRadios;
     private JButton statusButton;
     private JButton filterApplyButton;
     private JButton filterResetButton;
@@ -54,6 +62,8 @@ public class Admin_CategoryManagerPL extends JPanel {
     private JTextField addOrUpdateIdTextField;
     private JLabel addOrUpdateNameLabel;
     private JTextField addOrUpdateNameTextField;
+    private JLabel addOrUpdateTypeLabel;
+    private JComboBox<String> addOrUpdateTypeComboBox;
     private JLabel addOrUpdateStatusLabel;
     private JComboBox<String> addOrUpdateStatusComboBox;
     private JButton addOrUpdateButton;
@@ -61,8 +71,8 @@ public class Admin_CategoryManagerPL extends JPanel {
     private JDialog addOrUpdateDialog;
 
     // Thông tin bảng
-    private final String[] columns = { "Mã loại món ăn", "Tên loại món ăn", "Trạng thái" };
-    private final int[] widthColumns = { 300, 510, 300 };
+    private final String[] columns = { "Mã phòng hát", "Tên phòng hát", "Loại phòng hát", "Trạng thái" };
+    private final int[] widthColumns = { 150, 510, 300, 150 };
     private Object[][] datas = {};
     private int rowSelected = -1;
     private Boolean[] valueSelected = { null };
@@ -71,28 +81,39 @@ public class Admin_CategoryManagerPL extends JPanel {
     // thêm, sửa và xoá
     private final Map<String, String> defaultValuesForCrud = new LinkedHashMap<String, String>() {
         {
-            put("id", "Nhập Mã loại món ăn");
-            put("name", "Nhập Tên loại món ăn");
+            put("id", "Nhập Mã phòng hát");
+            put("name", "Nhập Tên phòng hát");
+            put("type", "Chọn Loại phòng hát");
             put("status", "Chọn Trạng thái");
         }
     };
 
     // Thông tin lọc
     // - Sắp xếp
-    private final String[] sortsString = { "Mã loại món ăn tăng dần", "Mã loại món ăn giảm dần",
-            "Tên loại món ăn tăng dần", "Tên loại món ăn giảm dần" };
-    private final String[] sortsSQL = { "maLoaiMonAn ASC", "maLoaiMonAn DESC", "tenLoaiMonAn ASC",
-            "tenLoaiMonAn DESC" };
+    private final String[] sortsString = { "Mã phòng hát tăng dần", "Mã phòng hát giảm dần",
+            "Tên phòng hát tăng dần", "Tên phòng hát giảm dần" };
+    private final String[] sortsSQL = { "maPhong ASC", "maPhong DESC", "tenPhong ASC",
+            "tenPhong DESC" };
+    // - Loại phòng hát
+    private final String[] typesStringForFilter;
+    private final String[] typesStringForAddOrUpdate;
+    private final String[] typesSQL;
     // - Trạng thái
     private final String[] statusString = { "Tất cả", "Hoạt động", "Tạm dừng" };
     private final String[] statusSQL = { "", "trangThai = 1", "trangThai = 0" };
     private final String[] statusOptions = { defaultValuesForCrud.get("status"), "Hoạt động", "Tạm dừng" };
 
-    public Admin_CategoryManagerPL() {
-        categoryBLL = new CategoryBLL();
+    public Admin_RoomManagerPL() {
+        roomBLL = new RoomBLL();
+        roomTypeBLL = new RoomTypeBLL();
+
+        // Cập nhật dữ liệu cần thiết
+        typesStringForFilter = renderTypesString("Tìm kiếm");
+        typesStringForAddOrUpdate = renderTypesString("Thêm hoặc sửa");
+        typesSQL = renderTypesString("Truy vấn SQL");
 
         // Tiêu đề
-        titleLabel = CommonPL.getTitleLabel("Loại món ăn", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER,
+        titleLabel = CommonPL.getTitleLabel("Phòng hát", Color.BLACK, CommonPL.getFontTitle(), SwingConstants.CENTER,
                 SwingConstants.CENTER);
         titleLabel.setBounds(30, 0, 1140, 115);
 
@@ -101,7 +122,7 @@ public class Admin_CategoryManagerPL extends JPanel {
         findLabel.setBounds(15, 15, 90, 24);
 
         findInformButton = CommonPL.getQuestionIconForm("?", "Thông tin bạn có thể tìm kiếm",
-                "Bạn có thể tìm kiếm bằng các thông tin như: mã loại món ăn, tên loại món ăn", Color.BLACK,
+                "Bạn có thể tìm kiếm bằng các thông tin như: mã phòng hát, tên phòng hát", Color.BLACK,
                 CommonPL.getFontQuestionIcon());
         findInformButton.setBounds(110, 15, 24, 24);
 
@@ -117,13 +138,21 @@ public class Admin_CategoryManagerPL extends JPanel {
                 Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         sortButton.setBounds(390, 45, 360, 40);
 
-        statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
-        statusLabel.setBounds(765, 15, 360, 24);
+        typeLabel = CommonPL.getParagraphLabel("Loại phòng hát", Color.BLACK, CommonPL.getFontParagraphPlain());
+        typeLabel.setBounds(765, 15, 360, 24);
 
-        statusCheckboxs = CommonPL.getMapHasValues(statusString);
-        statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusCheckboxs, statusString[0],
+        typeRadios = CommonPL.getMapHasValues(typesStringForFilter);
+        typeButton = CommonPL.ButtonHasRadios.createButtonHasRadios(typeRadios, typesStringForFilter[0],
                 Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-        statusButton.setBounds(765, 45, 360, 40);
+        typeButton.setBounds(765, 45, 360, 40);
+
+        statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
+        statusLabel.setBounds(15, 100, 360, 24);
+
+        statusRadios = CommonPL.getMapHasValues(statusString);
+        statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusRadios, statusString[0],
+                Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        statusButton.setBounds(15, 130, 360, 40);
 
         filterApplyButton = CommonPL.getRoundedBorderButton(20, "Lọc", Color.decode("#007bff"), Color.WHITE,
                 CommonPL.getFontParagraphBold());
@@ -142,6 +171,8 @@ public class Admin_CategoryManagerPL extends JPanel {
         filterPanel.add(findInputTextField);
         filterPanel.add(sortLabel);
         filterPanel.add(sortButton);
+        filterPanel.add(typeLabel);
+        filterPanel.add(typeButton);
         filterPanel.add(statusLabel);
         filterPanel.add(statusButton);
         filterPanel.add(filterApplyButton);
@@ -163,7 +194,7 @@ public class Admin_CategoryManagerPL extends JPanel {
                 Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
         lockButton.setBounds(465, 15, 210, 40);
 
-        tableData = CommonPL.createTableData(columns, widthColumns, datas, "category manager");
+        tableData = CommonPL.createTableData(columns, widthColumns, datas, "room manager");
         tableScrollPane = CommonPL.createScrollPane(true, true, tableData);
         tableScrollPane.setBounds(15, 70, 1110, 400);
 
@@ -192,7 +223,7 @@ public class Admin_CategoryManagerPL extends JPanel {
 
         // Sự kiện nút "Thêm"
         addButton.addActionListener(e -> {
-            showAddOrUpdateDialog("Thêm loại món ăn", "Thêm", new Vector<>());
+            showAddOrUpdateDialog("Thêm phòng hát", "Thêm", new Vector<>());
             rowSelected = -1;
             valueSelected[0] = false;
             tableData.clearSelection();
@@ -201,14 +232,15 @@ public class Admin_CategoryManagerPL extends JPanel {
         // Sự kiện nút "Thay đổi"
         updateButton.addActionListener(e -> {
             if (rowSelected != -1) {
-                String categoryIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
-                CategoryDTO categorySelected = categoryBLL.getOneCategoryById(categoryIdSelected);
+                String roomIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+                RoomDTO roomSelected = roomBLL.getOneRoomById(roomIdSelected);
                 Vector<Object> currentObject = new Vector<>();
-                currentObject.add(categorySelected.getId());
-                currentObject.add(categorySelected.getName());
-                currentObject.add(categorySelected.getStatus() ? "Hoạt động" : "Tạm dừng");
+                currentObject.add(roomSelected.getId());
+                currentObject.add(roomSelected.getName());
+                currentObject.add(roomSelected.getType());
+                currentObject.add(roomSelected.getStatus() ? "Hoạt động" : "Tạm dừng");
 
-                showAddOrUpdateDialog("Thay đổi loại món ăn", "Thay đổi", currentObject);
+                showAddOrUpdateDialog("Thay đổi phòng hát", "Thay đổi", currentObject);
             } else {
                 CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần thay đổi");
             }
@@ -220,19 +252,19 @@ public class Admin_CategoryManagerPL extends JPanel {
         // Sự kiện nút "Khóa"
         lockButton.addActionListener(e -> {
             if (rowSelected != -1) {
-                String categoryIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
-                CategoryDTO categorySelected = categoryBLL.getOneCategoryById(categoryIdSelected);
+                String roomIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+                RoomDTO roomSelected = roomBLL.getOneRoomById(roomIdSelected);
 
                 CommonPL.createSelectionsDialog("Thông báo lựa chọn",
-                        String.format("Có chắc chắn muốn %s loại món ăn này?",
-                                categorySelected.getStatus() ? "khóa" : "mở khóa"),
+                        String.format("Có chắc chắn muốn %s phòng hát này?",
+                                roomSelected.getStatus() ? "khóa" : "mở khóa"),
                         valueSelected);
                 if (valueSelected[0]) {
-                    String result = categoryBLL.lockCategory(categorySelected.getId(),
+                    String result = roomBLL.lockRoom(roomSelected.getId(),
                             CommonPL.getCurrentDatetime());
                     if (result.equals("Thay đổi trạng thái thành công")) {
                         CommonPL.createSuccessDialog("Thông báo thành công",
-                                categorySelected.getStatus() ? "Khóa thành công"
+                                roomSelected.getStatus() ? "Khóa thành công"
                                         : "Mở khóa thành công");
                         resetPage();
                     } else {
@@ -254,14 +286,41 @@ public class Admin_CategoryManagerPL extends JPanel {
         renderTableData(null, null, null);
     }
 
+    // Hàm cập nhật dữ liệu loại phòng hát cho việc tìm kiếm, thêm và sửa
+    private String[] renderTypesString(String action) {
+        ArrayList<RoomTypeDTO> roomList = roomTypeBLL.getAllRoomType();
+
+        String[] result = new String[roomList.size() + 1];
+        if (action.equals("Tìm kiếm")) {
+            result[0] = "Tất cả";
+        } else if (action.equals("Thêm hoặc sửa")) {
+            result[0] = defaultValuesForCrud.get("type");
+        } else if (action.equals("Truy vấn SQL")) {
+            result[0] = "";
+        }
+        for (int i = 0; i < roomList.size(); i++) {
+            if (action.equals("Tìm kiếm")) {
+                result[i + 1] = String.format("%s", roomList.get(i).getName());
+            } else if (action.equals("Thêm hoặc sửa")) {
+                result[i + 1] = String.format("%s - %s", roomList.get(i).getId(),
+                        roomList.get(i).getName());
+            } else if (action.equals("Truy vấn SQL")) {
+                result[i + 1] = String.format("maLoaiPhong = '%s'", roomList.get(i).getId());
+            }
+        }
+
+        return result;
+    }
+
     // Làm mới bảng dữ liệu
     private void renderTableData(String[] join, String condition, String order) {
-        ArrayList<CategoryDTO> categoryList = categoryBLL.getAllCategoryByCondition(join, condition, order);
-        Object[][] newData = new Object[categoryList.size()][columns.length];
-        for (int i = 0; i < categoryList.size(); i++) {
-            newData[i][0] = categoryList.get(i).getId();
-            newData[i][1] = categoryList.get(i).getName();
-            newData[i][2] = categoryList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng";
+        ArrayList<RoomDTO> roomList = roomBLL.getAllRoomByCondition(join, condition, order);
+        Object[][] newData = new Object[roomList.size()][columns.length];
+        for (int i = 0; i < roomList.size(); i++) {
+            newData[i][0] = roomList.get(i).getId();
+            newData[i][1] = roomList.get(i).getName();
+            newData[i][2] = roomTypeBLL.getOneRoomTypeById(roomList.get(i).getType()).getName();
+            newData[i][3] = roomList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng";
         }
         datas = newData;
         CommonPL.updateRowsInTableData(tableData, datas);
@@ -274,7 +333,9 @@ public class Admin_CategoryManagerPL extends JPanel {
 
         CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
 
-        CommonPL.resetMapForFilter(statusCheckboxs, statusString, statusButton);
+        CommonPL.resetMapForFilter(statusRadios, typesStringForFilter, typeButton);
+
+        CommonPL.resetMapForFilter(statusRadios, statusString, statusButton);
 
         renderTableData(null, null, null);
     }
@@ -285,12 +346,16 @@ public class Admin_CategoryManagerPL extends JPanel {
             String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText()
                     : null;
             String sortValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
-            String statusValue = CommonPL.getSQLFromRadios(statusCheckboxs, statusSQL);
+            String typeValue = CommonPL.getSQLFromRadios(typeRadios, typesSQL);
+            String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);
 
             String condition = (findValue != null
-                    ? String.format("(maLoaiMonAn = '%s' OR tenLoaiMonAn LIKE '%%%s%%')", findValue, findValue)
+                    ? String.format("(maPhong = '%s' OR tenPhong LIKE '%%%s%%')", findValue, findValue)
                     : "")
-                    + (statusValue != null ? (findValue != null ? " AND " + statusValue : statusValue) : "");
+                    + (typeValue != null ? (findValue != null ? " AND " + typeValue : typeValue) : "")
+                    + (statusValue != null
+                            ? (findValue != null || typeValue != null ? " AND " + statusValue : statusValue)
+                            : "");
             if (condition.length() == 0)
                 condition = null;
 
@@ -306,7 +371,7 @@ public class Admin_CategoryManagerPL extends JPanel {
     // Hiển thị dialog thêm/cập nhật
     private void showAddOrUpdateDialog(String title, String button, Vector<Object> object) {
         addOrUpdateIdLabel = CommonPL.getParagraphLabel(
-                "<html>Mã Loại món ăn <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
+                "<html>Mã phòng hát <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
                 CommonPL.getFontParagraphPlain());
         addOrUpdateIdLabel.setBounds(20, 10, 460, 40);
 
@@ -318,7 +383,7 @@ public class Admin_CategoryManagerPL extends JPanel {
         addOrUpdateIdTextField.setBounds(20, 50, 460, 40);
 
         addOrUpdateNameLabel = CommonPL.getParagraphLabel(
-                "<html>Tên Loại món ăn <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
+                "<html>Tên phòng hát <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
                 CommonPL.getFontParagraphPlain());
         addOrUpdateNameLabel.setBounds(20, 100, 460, 40);
 
@@ -327,34 +392,44 @@ public class Admin_CategoryManagerPL extends JPanel {
                 CommonPL.getFontParagraphPlain());
         addOrUpdateNameTextField.setBounds(20, 140, 460, 40);
 
+        addOrUpdateTypeLabel = CommonPL.getParagraphLabel(
+                "<html>Loại phòng <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
+                CommonPL.getFontParagraphPlain());
+        addOrUpdateTypeLabel.setBounds(20, 190, 460, 40);
+
+        Vector<String> typeVector = CommonPL.getVectorHasValues(typesStringForAddOrUpdate);
+        addOrUpdateTypeComboBox = CommonPL.CustomComboBox(typeVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
+                Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
+        addOrUpdateTypeComboBox.setBounds(20, 230, 460, 40);
+
         addOrUpdateStatusLabel = CommonPL.getParagraphLabel(
                 "<html>Trạng thái <span style='color: red; font-size: 20px;'>*</span></html>", Color.BLACK,
                 CommonPL.getFontParagraphPlain());
-        addOrUpdateStatusLabel.setBounds(20, 190, 460, 40);
+        addOrUpdateStatusLabel.setBounds(20, 280, 460, 40);
 
         Vector<String> statusVector = CommonPL.getVectorHasValues(statusOptions);
         addOrUpdateStatusComboBox = CommonPL.CustomComboBox(statusVector, Color.WHITE, Color.LIGHT_GRAY, Color.BLACK,
                 Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
-        addOrUpdateStatusComboBox.setBounds(20, 230, 460, 40);
+        addOrUpdateStatusComboBox.setBounds(20, 320, 460, 40);
 
         addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button,
                 button.equals("Thêm") ? Color.decode("#699f4c") : Color.decode("#bf873e"), Color.WHITE,
                 CommonPL.getFontParagraphBold());
-        addOrUpdateButton.setBounds(20, 300, 460, 40);
+        addOrUpdateButton.setBounds(20, 390, 460, 40);
         SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 
         // Khi "Thêm"
-        if (title.equals("Thêm loại món ăn") && button.equals("Thêm") && object.isEmpty()) {
-            CategoryDTO lastcategory = categoryBLL.getLastCategory();
+        if (title.equals("Thêm phòng hát") && button.equals("Thêm") && object.isEmpty()) {
+            RoomDTO lastroom = roomBLL.getLastRoom();
             // Lấy số cuối cùng từ mã (2 chữ số) và tăng lên 1
-            int lastNumber = Integer.parseInt(lastcategory.getId().substring(3)); // Lấy phần số từ Loại món ănxx
-            String newId = "LMA" + String.format("%02d", (lastNumber + 1) % 100); // Giới hạn 2 số (00-99)
+            int lastNumber = Integer.parseInt(lastroom.getId().substring(3)); // Lấy phần số từ phòng hátxx
+            String newId = "PH" + String.format("%03d", (lastNumber + 1) % 100); // Giới hạn 2 số (00-99)
             addOrUpdateIdTextField.setText(newId);
             ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
         }
 
         // Khi "Thay đổi"
-        if (title.equals("Thay đổi loại món ăn") && button.equals("Thay đổi") && !object.isEmpty()) {
+        if (title.equals("Thay đổi phòng hát") && button.equals("Thay đổi") && !object.isEmpty()) {
             if (object.get(0) != null) {
                 addOrUpdateIdTextField.setText(String.valueOf(object.get(0)));
                 ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
@@ -366,7 +441,16 @@ public class Admin_CategoryManagerPL extends JPanel {
             }
 
             if (object.get(2) != null) {
-                addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(2)));
+                for (int i = 0; i < typesStringForAddOrUpdate.length; i++) {
+                    if (typesStringForAddOrUpdate[i].startsWith(String.valueOf(object.get(2)))) {
+                        addOrUpdateTypeComboBox.setSelectedItem(typesStringForAddOrUpdate[i]);
+                        break;
+                    }
+                }
+            }
+
+            if (object.get(3) != null) {
+                addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(3)));
                 addOrUpdateStatusComboBox.setEnabled(false);
                 UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
                 addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
@@ -379,21 +463,26 @@ public class Admin_CategoryManagerPL extends JPanel {
             String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
                     ? addOrUpdateNameTextField.getText()
                     : null;
+            String type = !addOrUpdateTypeComboBox.getSelectedItem().equals(defaultValuesForCrud.get("type"))
+                    ? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
+                    : null;
             String status = !addOrUpdateStatusComboBox.getSelectedItem().equals(defaultValuesForCrud.get("status"))
                     ? (String) addOrUpdateStatusComboBox.getSelectedItem()
                     : null;
             String timeUpdate = CommonPL.getCurrentDatetime();
 
+            System.out.println(type);
+
             // - Biến chứa thông báo trả về
             String inform = null;
             // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-            if (title.equals("Thêm loại món ăn") && button.equals("Thêm")) {
-                inform = categoryBLL.insertCategory(id, name, status, timeUpdate);
-            } else if (title.equals("Thay đổi loại món ăn") && button.equals("Thay đổi")) {
-                inform = categoryBLL.updateCategory(id, name, timeUpdate);
+            if (title.equals("Thêm phòng hát") && button.equals("Thêm")) {
+                inform = roomBLL.insertRoom(id, name, type, status, timeUpdate);
+            } else if (title.equals("Thay đổi phòng hát") && button.equals("Thay đổi")) {
+                inform = roomBLL.updateRoom(id, name, type, timeUpdate);
             }
             // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-            if (inform.equals("Thêm loại món ăn thành công") || inform.equals("Cập nhật loại món ăn thành công")) {
+            if (inform.equals("Thêm phòng hát thành công") || inform.equals("Cập nhật phòng hát thành công")) {
                 CommonPL.createSuccessDialog("Thông báo thành công", inform);
                 addOrUpdateDialog.dispose();
                 resetPage();
@@ -405,12 +494,14 @@ public class Admin_CategoryManagerPL extends JPanel {
         // Cấu hình dialog
         addOrUpdateBlockPanel = new JPanel();
         addOrUpdateBlockPanel.setLayout(null);
-        addOrUpdateBlockPanel.setBounds(0, 0, 500, 390);
+        addOrUpdateBlockPanel.setBounds(0, 0, 500, 480);
         addOrUpdateBlockPanel.setBackground(Color.WHITE);
         addOrUpdateBlockPanel.add(addOrUpdateIdLabel);
         addOrUpdateBlockPanel.add(addOrUpdateIdTextField);
         addOrUpdateBlockPanel.add(addOrUpdateNameLabel);
         addOrUpdateBlockPanel.add(addOrUpdateNameTextField);
+        addOrUpdateBlockPanel.add(addOrUpdateTypeLabel);
+        addOrUpdateBlockPanel.add(addOrUpdateTypeComboBox);
         addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
         addOrUpdateBlockPanel.add(addOrUpdateStatusComboBox);
         addOrUpdateBlockPanel.add(addOrUpdateButton);
@@ -419,7 +510,7 @@ public class Admin_CategoryManagerPL extends JPanel {
         addOrUpdateDialog = new JDialog();
         addOrUpdateDialog.setTitle(title);
         addOrUpdateDialog.setLayout(null);
-        addOrUpdateDialog.setSize(500, 390);
+        addOrUpdateDialog.setSize(500, 480);
         addOrUpdateDialog.setResizable(false);
         addOrUpdateDialog.setLocationRelativeTo(null);
         addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

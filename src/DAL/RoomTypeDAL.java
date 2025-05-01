@@ -44,7 +44,7 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				RoomTypeDTO roomTypeDTO = new RoomTypeDTO(rs.getString("maLoaiPhong"), rs.getString("tenLoaiPhong"),
-						rs.getLong("giaPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("giaPhong"));
 				list.add(roomTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -71,7 +71,7 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				RoomTypeDTO roomTypeDTO = new RoomTypeDTO(rs.getString("maLoaiPhong"), rs.getString("tenLoaiPhong"),
-						rs.getLong("giaPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("giaPhong"));
 				list.add(roomTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -91,12 +91,12 @@ public class RoomTypeDAL implements DAL<RoomTypeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = String.format("SELECT * FROM Karaoke.Phong \nWHERE maPhong = %s;", id);
+			String sql = String.format("SELECT * FROM Karaoke.LoaiPhong \nWHERE maLoaiPhong = '%s';", id);
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				roomTypeDTO = new RoomTypeDTO(rs.getString("maLoaiPhong"), rs.getString("tenLoaiPhong"),
-						rs.getLong("giaPhong"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("giaPhong"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

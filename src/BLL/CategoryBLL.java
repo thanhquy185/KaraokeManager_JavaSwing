@@ -69,13 +69,8 @@ public class CategoryBLL {
 		if (!isInputed(name))
 			return "Chưa nhập tên loại món ăn";
 
-		// Kiểm tra tồn tại
-		CategoryDTO existingCategory = categoryDAL.selectOneById(id);
-		if (existingCategory == null)
-			return "loại món ăn không tồn tại";
-
 		// Cập nhật
-		CategoryDTO updatedCategory = new CategoryDTO(id, name, existingCategory.getStatus(), timeUpdate);
+		CategoryDTO updatedCategory = new CategoryDTO(id, name, null, timeUpdate);
 		int rowsAffected = categoryDAL.update(updatedCategory);
 		return rowsAffected > 0 ? "Cập nhật loại món ăn thành công" : "Không thể cập nhật loại món ăn";
 	}

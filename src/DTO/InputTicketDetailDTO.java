@@ -1,29 +1,49 @@
 package DTO;
 
 public class InputTicketDetailDTO {
-    private Integer id;           // maPhieuNhap
-    private String ingredientId;  // maNguyenLieu
-    private Long inputPrice;      // giaNhap
-    private Integer inputQuantity;// soLuong
+    private Integer inputTicketId;
+    private String foodId;
+    private Long price;
+    private Long quantity;
 
     // Constructor
-    public InputTicketDetailDTO(Integer id, String ingredientId, Long inputPrice, Integer inputQuantity) {
-        this.id = id;
-        this.ingredientId = ingredientId;
-        this.inputPrice = inputPrice;
-        this.inputQuantity = inputQuantity;
+    public InputTicketDetailDTO(Integer inputTicketId, String foodId, Long price, Long quantity) {
+        this.inputTicketId = inputTicketId;
+        this.foodId = foodId;
+        this.price = price;
+        this.quantity = quantity;
     }
 
     // Getters và Setters
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getInputTicketId() {
+        return inputTicketId;
+    }
 
-    public String getIngredientId() { return ingredientId; }
-    public void setIngredientId(String ingredientId) { this.ingredientId = ingredientId; }
+    public void setInputTicketId(Integer inputTicketId) {
+        this.inputTicketId = inputTicketId;
+    }
 
-    public Long getInputPrice() { return inputPrice; }
-    public void setInputPrice(Long inputPrice) { this.inputPrice = inputPrice; }
+    public String getFoodId() {
+        return foodId;
+    }
 
-    public Integer getInputQuantity() { return inputQuantity; }
-    public void setInputQuantity(Integer inputQuantity) { this.inputQuantity = inputQuantity; }
+    public void setFoodId(String foodId) {
+        this.foodId = foodId;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public Long getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Long quantity) {
+        this.quantity = quantity;
+    }
 }
