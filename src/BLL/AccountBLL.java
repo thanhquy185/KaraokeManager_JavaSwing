@@ -410,7 +410,7 @@ public class AccountBLL {
 		// - Khoá hoặc mở khoá tuỳ vào trạng thái hiện tại
 		AccountDTO lockAccountDTO = getOneAccountById(id);
 		lockAccountDTO.setStatus(lockAccountDTO.getStatus() ? false : true);
-		lockAccountDTO.setDateUpdate(dateUpdate);
+		lockAccountDTO.setTimeUpdate(dateUpdate);
 		accountDAL.lock(lockAccountDTO);
 
 		return "Có thể khoá một người dùng";
@@ -430,9 +430,4 @@ public class AccountBLL {
 	public AccountDTO getOneAccountById(String id) {
 		return accountDAL.selectOneById(id);
 	}
-	public String getFullNameById(Integer id) {
-        if (id == null) return null;
-        AccountDTO account = accountDAL.selectOneById(String.valueOf(id));
-        return account != null ? account.getFullname() : null;
-    }
 }

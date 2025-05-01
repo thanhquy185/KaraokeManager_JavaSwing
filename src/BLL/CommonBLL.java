@@ -1,6 +1,12 @@
 package BLL;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.regex.Pattern;
+
+import PL.CommonPL;
 
 public class CommonBLL {
 	// Hàm kiểm tra chuỗi hợp lệ kiểu 1 (cho phép: chữ không dấu, chữ có dấu và số)
@@ -114,7 +120,7 @@ public class CommonBLL {
 			} else if (month01 == month02) {
 				if (day01 < day02) {
 					return -1;
-				} else if(day01 == day02) {
+				} else if (day01 == day02) {
 					return 0;
 				}
 			}
@@ -122,5 +128,30 @@ public class CommonBLL {
 
 		// Ngày đầu lớn hơn ngày sau
 		return 1;
+	}
+
+	// Hàm lưu ảnh 1 một món ăn
+	public static String updateFoodImage(File fileImage, String foodId) {
+		// Tạo thư mục nếu chưa có
+		File dir = new File(CommonPL.getMiddlePathToShowFoodImage());
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
+
+		// Tạo tên mới cho ảnh
+		String newFileName = System.currentTimeMillis() + "-" + foodId
+				+ fileImage.getName().substring(fileImage.getName().lastIndexOf("."));
+		File savedFile = new File(dir, newFileName);
+
+		try {
+			// Copy file ảnh
+			Files.copy(fileImage.toPath(), savedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			return newFileName;
+		} catch (IOException ex) {
+			ex.printStackTrace();
+			CommonPL.createErrorDialog("Thông báo lỗi", "Không thể lưu ảnh");
+		}
+
+		return null;
 	}
 }

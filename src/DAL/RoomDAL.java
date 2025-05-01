@@ -146,7 +146,7 @@ public class RoomDAL implements DAL<RoomDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = String.format("SELECT * FROM Karaoke.Phong \nWHERE maPhong = %s;", id);
+			String sql = String.format("SELECT * FROM Karaoke.Phong \nWHERE maPhong = '%s';", id);
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {

@@ -4,11 +4,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -22,7 +21,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.JXDatePicker;
@@ -84,8 +82,6 @@ public class Admin_CustomerManagerPL extends JPanel {
 	private JTextField addOrUpdateAddressTextField;
 	private JLabel addOrUpdateStatusLabel;
 	private JComboBox<String> addOrUpdateStatusComboBox;
-	private JLabel addOrUpdateTimeLabel;
-	private JLabel addOrUpdateTimeDetailLabel;
 	private JButton addOrUpdateButton;
 	private JPanel addOrUpdateBlockPanel;
 	private JDialog addOrUpdateDialog;
@@ -118,8 +114,21 @@ public class Admin_CustomerManagerPL extends JPanel {
 	private int rowSelected = -1;
 	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
 	private Boolean[] valueSelected = { null };
+	
+	// - Các giá trị mặc định cho text field, text area hoặc combobox để tìm kiếm, thêm, sửa và xoá 
+	private final Map<String, String> defaultValuesForCrud = new LinkedHashMap<String, String>() {{
+	    put("idCard", "Nhập CCCD");
+	    put("type", "Chọn Loại khách hàng");
+	    put("fullname", "Nhập họ và tên");
+	    put("birthday", "Chọn Ngày sinh");
+	    put("gender", "Chọn Giới tính");
+	    put("phone", "Nhập số điện thoại");
+	    put("email", "Nhập email");
+	    put("address", "Nhập địa chỉ");
+	    put("status", "Chọn Trạng thái");
+	}};
 
-	// - Các thông tin cần thiết cho người dùng
+	// - Các thông tin cần thiết cho lọc khách hàng
 	// + Sắp xếp
 	private final String[] sortsString = { "Mã CCCD tăng dần", "Mã CCCD giảm dần", "Họ và tên tăng dần",
 			"Họ và tên giảm dần", "Ngày sinh tăng dần", "Ngày sinh giảm dần" };
@@ -128,17 +137,17 @@ public class Admin_CustomerManagerPL extends JPanel {
 	// + Trạng thái
 	private final String[] statusStringForFilter = { "Tất cả", "Hoạt động", "Tạm dừng" };
 	private final String[] statusSQL = { "", "trangThai = 1", "trangThai = 0" };
-	private final String[] statusStringForAddOrUpdate = { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
+	private final String[] statusStringForAddOrUpdate = { defaultValuesForCrud.get("status"), "Hoạt động", "Tạm dừng" };
 	// + Loại khách hàng
 	private final String[] typeSQL = { "", "maLoaiKhachHang = 'THUONG'", "maLoaiKhachHang = 'BAC'",
 			"maLoaiKhachHang = 'VANG'", "maLoaiKhachHang = 'KIMCUONG'" };
 	private final String[] typeStringForFilter = { "Tất cả", "Thường", "Bạc", "Vàng", "Kim cương" };
-	private final String[] typeStringForAddOrUpdate = { "Chọn Loại khách hàng", "THUONG - Thường", "BAC - Bạc",
+	private final String[] typeStringForAddOrUpdate = { defaultValuesForCrud.get("type"), "THUONG - Thường", "BAC - Bạc",
 			"VANG - Vàng", "KIMCUONG - Kim cương" };
-	// + Loại khách hàng
+	// + Giới tính
 	private final String[] genderSQL = { "", "gioiTinh = 'Nam'", "gioiTinh = 'Nữ'" };
 	private final String[] genderStringForFilter = { "Tất cả", "Nam", "Nữ" };
-	private final String[] genderStringForAddOrUpdate = { "Chọn Giới tính", "Nam", "Nữ" };
+	private final String[] genderStringForAddOrUpdate = { defaultValuesForCrud.get("gender"), "Nam", "Nữ" };
 
 	public Admin_CustomerManagerPL() {
 		// <===== Các đối tượng từ tầng Bussiness Logical Layer =====>
@@ -344,11 +353,11 @@ public class Admin_CustomerManagerPL extends JPanel {
 
 				if (valueSelected[0]) {
 					String inform = customerBLL.lockCustomer(String.valueOf(currentObject.get(0)),
-							CommonPL.getCurrentDate());
+							CommonPL.getCurrentDatetime());
 					if (inform.equals("Có thể khoá một khách hàng")) {
 						CommonPL.createSuccessDialog("Thông báo thành công",
-								currentObject.get(4).equals("Hoạt động") ? "Khóa thành công" : "Mở khóa thành công");
-						renderTableData(null, null, null);
+								currentObject.get(currentObject.size() - 1).equals("Hoạt động") ? "Khóa thành công" : "Mở khóa thành công");
+						resetPage();
 					} else {
 						CommonPL.createErrorDialog("Thông báo lỗi", inform);
 					}
@@ -385,6 +394,28 @@ public class Admin_CustomerManagerPL extends JPanel {
 		}
 		datas = datasQuery;
 		CommonPL.updateRowsInTableData(tableData, datas);
+	}
+	
+	// Hàm reset lại trang
+	private void resetPage() {
+		// Cập nhật lại ô tìm kiếm
+		findInputTextField.setText("Nhập thông tin");
+		findInputTextField.setForeground(Color.LIGHT_GRAY);
+
+		// Cập nhật lại ô sắp xếp
+		CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
+
+		// Cập nhật lại ô loại khách hàng
+		CommonPL.resetMapForFilter(typeRadios, typeStringForFilter, typeButton);
+
+		// Cập nhật lại ô giới tính
+		CommonPL.resetMapForFilter(genderRadios, genderStringForFilter, genderButton);
+
+		// Cập nhật lại ô trạng thái
+		CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
+
+		// Cập nhật lại bảng
+		renderTableData(null, null, null);
 	}
 
 	// Hàm sự kiện lọc dữ liệu
@@ -423,24 +454,8 @@ public class Admin_CustomerManagerPL extends JPanel {
 
 		// Nếu nhấn vào nút "Đặt lại"
 		filterResetButton.addActionListener(e -> {
-			// Cập nhật lại ô tìm kiếm
-			findInputTextField.setText("Nhập thông tin");
-			findInputTextField.setForeground(Color.LIGHT_GRAY);
-
-			// Cập nhật lại ô sắp xếp
-			CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
-
-			// Cập nhật lại ô loại khách hàng
-			CommonPL.resetMapForFilter(typeRadios, typeStringForFilter, typeButton);
-
-			// Cập nhật lại ô giới tính
-			CommonPL.resetMapForFilter(genderRadios, genderStringForFilter, genderButton);
-
-			// Cập nhật lại ô trạng thái
-			CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
-
-			// Cập nhật lại bảng
-			renderTableData(null, null, null);
+			// Gọi hàm reset trang
+			resetPage();
 		});
 	}
 
@@ -585,7 +600,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateIdCardLabel.setBounds(20, 10, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id Card Text Field
-		addOrUpdateIdCardTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập CCCD", Color.LIGHT_GRAY, Color.BLACK,
+		addOrUpdateIdCardTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("idCard"), Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateIdCardTextField.setBounds(20, 50, 220, 40);
 
@@ -606,7 +621,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateFullnameLabel.setBounds(20, 100, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Fullname Text Field
-		addOrUpdateFullnameTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Họ và tên", Color.LIGHT_GRAY,
+		addOrUpdateFullnameTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("fullname"), Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateFullnameTextField.setBounds(20, 140, 460, 40);
 
@@ -617,7 +632,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 
 		// - Tuỳ chỉnh Add Or Update Birthday Date Picker
 		addOrUpdateBirthdayDatePicker = CommonPL.CustomCornerDatePicker.CustomDatePicker(0, CommonPL.getLocale(),
-				CommonPL.getDateFormat(), "Chọn Ngày sinh", Color.LIGHT_GRAY, Color.BLACK,
+				CommonPL.getDateFormat(), defaultValuesForCrud.get("birthday"), Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain(), 40, 40);
 		addOrUpdateBirthdayDatePicker.setBounds(20, 230, 220, 40);
 
@@ -637,7 +652,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdatePhoneLabel.setBounds(20, 280, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Phone Text Field
-		addOrUpdatePhoneTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập SĐT", Color.LIGHT_GRAY, Color.BLACK,
+		addOrUpdatePhoneTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("phone"), Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdatePhoneTextField.setBounds(20, 320, 220, 40);
 
@@ -646,7 +661,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateEmailLabel.setBounds(260, 280, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Email Text Field
-		addOrUpdateEmailTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Email", Color.LIGHT_GRAY, Color.BLACK,
+		addOrUpdateEmailTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("email"), Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateEmailTextField.setBounds(260, 320, 220, 40);
 
@@ -672,7 +687,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		});
 
 		// - Tuỳ chỉnh Add Or Update Address Text Field
-		addOrUpdateAddressTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Địa chỉ", 
+		addOrUpdateAddressTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("address"), 
 				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateAddressTextField.setBounds(20, 410, 460, 40);
 
@@ -687,26 +702,6 @@ public class Admin_CustomerManagerPL extends JPanel {
 				Color.WHITE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateStatusComboBox.setBounds(20, 500, 460, 40);
 
-		// - Tuỳ chỉnh UpdAdd Or Updateate Status Label
-		addOrUpdateTimeLabel = CommonPL.getParagraphLabel("Cập nhật gần đây:", Color.GRAY,
-				new Font("Arial", Font.ITALIC, 18));
-		addOrUpdateTimeLabel.setBounds(20, 550, 148, 40);
-
-		// - Tuỳ chỉnh Add Or Update Time Detail Label
-		addOrUpdateTimeDetailLabel = CommonPL.getTitleLabel("yyyy-MM-dd HH:mm:ss", Color.GRAY,
-				new Font("Arial", Font.ITALIC, 18), SwingConstants.RIGHT, SwingConstants.CENTER);
-		addOrUpdateTimeDetailLabel.setBounds(173, 550, 307, 40);
-		// -- Tạo Timer cập nhật thời gian khi "Thêm"
-		if (title.equals("Thêm Khách hàng") && button.equals("Thêm") && object.size() == 0) {
-			Timer timer = new Timer(1000, e -> {
-				LocalDateTime currentDateTime = LocalDateTime.now();
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-				String formattedDateTime = currentDateTime.format(formatter);
-				addOrUpdateTimeDetailLabel.setText(formattedDateTime);
-			});
-			timer.start();
-		}
-
 		// Khi "Thay đổi" một Khách hàng
 		if (title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi") && object.size() != 0) {
 			// - Gán dữ liệu là "Mã CCCD"
@@ -717,15 +712,17 @@ public class Admin_CustomerManagerPL extends JPanel {
 			}
 
 			// - Gán dữ liệu là "Loại khách hàng"
-			for (int i = 0; i < addOrUpdateTypeComboBox.getItemCount(); i++) {
-				String item = addOrUpdateTypeComboBox.getItemAt(i);
-				if (item.contains(String.valueOf(object.get(1)))) {
-					addOrUpdateTypeComboBox.setSelectedItem(item);
-					break;
+			if(object.get(1) != null) {				
+				for (int i = 0; i < addOrUpdateTypeComboBox.getItemCount(); i++) {
+					String item = addOrUpdateTypeComboBox.getItemAt(i);
+					if (item.contains(String.valueOf(object.get(1)))) {
+						addOrUpdateTypeComboBox.setSelectedItem(item);
+						break;
+					}
 				}
+				((JTextField) addOrUpdateTypeComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+				addOrUpdateTypeComboBox.setForeground(Color.BLACK);
 			}
-			((JTextField) addOrUpdateTypeComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-			addOrUpdateTypeComboBox.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Họ và tên"
 			if (object.get(2) != null) {
@@ -735,22 +732,26 @@ public class Admin_CustomerManagerPL extends JPanel {
 			}
 
 			// - Gán dữ liệu là "Ngày sinh"
-			try {
-				Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(3)));
-				addOrUpdateBirthdayDatePicker.setDate(date);
-				((JButton) addOrUpdateBirthdayDatePicker.getComponent(1))
-						.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
-				addOrUpdateBirthdayDatePicker.getEditor().setCaretPosition(0);
-				addOrUpdateBirthdayDatePicker.getEditor().setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
-				addOrUpdateBirthdayDatePicker.getEditor().setForeground(Color.BLACK);
-			} catch (ParseException e) {
-				e.printStackTrace();
+			if (object.get(3) != null) {				
+				try {
+					Date date = CommonPL.getDateFormat().parse(String.valueOf(object.get(3)));
+					addOrUpdateBirthdayDatePicker.setDate(date);
+					((JButton) addOrUpdateBirthdayDatePicker.getComponent(1))
+					.setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
+					addOrUpdateBirthdayDatePicker.getEditor().setCaretPosition(0);
+					addOrUpdateBirthdayDatePicker.getEditor().setBorder(new CustomRoundedBorder(Color.BLACK, 0, 0, 0, 0));
+					addOrUpdateBirthdayDatePicker.getEditor().setForeground(Color.BLACK);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			}
 
 			// - Gán dữ liệu là "Giới tính"
-			addOrUpdateGenderComboBox.setSelectedItem(String.valueOf(object.get(4)));
-			((JTextField) addOrUpdateGenderComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-			addOrUpdateGenderComboBox.setForeground(Color.BLACK);
+			if(object.get(4) != null) {				
+				addOrUpdateGenderComboBox.setSelectedItem(String.valueOf(object.get(4)));
+				((JTextField) addOrUpdateGenderComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+				addOrUpdateGenderComboBox.setForeground(Color.BLACK);
+			}
 
 			// - Gán dữ liệu là "Số điện thoại"
 			if (object.get(5) != null) {
@@ -774,14 +775,13 @@ public class Admin_CustomerManagerPL extends JPanel {
 			}
 
 			// - Gán dữ liệu là "Trạng thái"
-			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(8)));
-			addOrUpdateStatusComboBox.setEnabled(false);
-			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
-			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
-			addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
-
-			// - Gán dữ liệu là "Thời gian cập nhật gần đây"
-//			addOrUpdateTimeDetailLabel.setText((String) object.get(11));
+			if(object.get(8) != null) {
+				addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(8)));
+				addOrUpdateStatusComboBox.setEnabled(false);
+				((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
+				UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
+				addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
+			}
 		}
 
 		// - Tuỳ chỉnh Add Or Update Button
@@ -792,71 +792,62 @@ public class Admin_CustomerManagerPL extends JPanel {
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 		addOrUpdateButton.addActionListener(e -> {
 			// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
-			// + CCCD
-			String id = !addOrUpdateIdCardTextField.getText().equals("Nhập CCCD khách hàng")
+			// + CCCD (Căn cước công dân)
+			String id = !addOrUpdateIdCardTextField.getText().equals(defaultValuesForCrud.get("idCard"))
 					? addOrUpdateIdCardTextField.getText()
 					: null;
 			// + Loại khách hàng
-			String type = !String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).equals("Chọn Loại khách hàng")
+			String type = !String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).equals(defaultValuesForCrud.get("type"))
 					? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
 					: null;
 			// + Tên khách hàng
-			String fullname = !addOrUpdateFullnameTextField.getText().equals("Nhập Họ và tên")
+			String fullname = !addOrUpdateFullnameTextField.getText().equals(defaultValuesForCrud.get("fullname"))
 					? addOrUpdateFullnameTextField.getText()
 					: null;
 			// + Ngày sinh
-			String birthday = !String.valueOf(addOrUpdateBirthdayDatePicker.getDate()).equals("Chọn Ngày sinh")
+			String birthday = !String.valueOf(addOrUpdateBirthdayDatePicker.getEditor().getText()).equals(defaultValuesForCrud.get("birthday"))
 					? String.valueOf(addOrUpdateBirthdayDatePicker.getEditor().getText())
 					: null;
 			// + Giới tính
-			String gender = !String.valueOf(addOrUpdateGenderComboBox.getSelectedItem()).equals("Chọn Giới tính")
+			String gender = !String.valueOf(addOrUpdateGenderComboBox.getSelectedItem()).equals(defaultValuesForCrud.get("gender"))
 					? String.valueOf(addOrUpdateGenderComboBox.getSelectedItem())
 					: null;
 			// + Số điện thoại
-			String phone = !addOrUpdatePhoneTextField.getText().equals("Nhập Số điện thoại")
+			String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
 					? addOrUpdatePhoneTextField.getText()
 					: null;
 			// + Email
-			String email = !addOrUpdateEmailTextField.getText().equals("Nhập Email")
+			String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
 					? addOrUpdateEmailTextField.getText()
 					: null;
 			// + Địa chỉ
-			String address = !addOrUpdateAddressTextField.getText().equals("Nhập Địa chỉ")
+			String address = !addOrUpdateAddressTextField.getText().equals(defaultValuesForCrud.get("address"))
 					? addOrUpdateAddressTextField.getText()
 					: null;
 			// + Trạng thái
-			String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem()).equals("Chọn Trạng thái")
+			String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem()).equals(defaultValuesForCrud.get("status"))
 					? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
 					: null;
 			// + Ngày cập nhật
-			String dateUpdate = CommonPL.getCurrentDate();
-
-			// - Nếu là "Thêm"
-			if (title.equals("Thêm Khách hàng") && button.equals("Thêm")) {
-				String inform = customerBLL.insertCustomer(id, type, fullname, birthday, gender, phone, email, address,
-						status, dateUpdate);
-				if (inform.equals("Có thể thêm một khách hàng")) {
-					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện
-					CommonPL.createSuccessDialog("Thông báo thành công", "Thêm thành công");
-					addOrUpdateDialog.dispose();
-					renderTableData(null, null, null);
-				} else {
-					CommonPL.createErrorDialog("Thông báo lỗi", inform);
-				}
+			String timeUpdate = CommonPL.getCurrentDatetime();
+			
+			// - Biến chứa thông báo trả về
+			String inform = null;
+			// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+			if(title.equals("Thêm Khách hàng") && button.equals("Thêm")) {				
+				inform = customerBLL.insertCustomer(id, type, fullname, birthday, gender, phone, email, address, status, timeUpdate);
+			} else if(title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi")) {				
+				inform = customerBLL.updateCustomer(id, type, fullname, birthday, gender, phone, email, address, timeUpdate);
 			}
-			// - Nếu là "Sửa"
-			else if (title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi")) {
-				String inform = customerBLL.updateCustomer(id, type, fullname, birthday, gender, phone, email, address,
-						status, dateUpdate);
-				if (inform.equals("Có thể thay đổi một khách hàng")) {
-					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện
-					CommonPL.createSuccessDialog("Thông báo thành công", "Thay đổi thành công");
-					addOrUpdateDialog.dispose();
-					renderTableData(null, null, null);
-				} else {
-					CommonPL.createErrorDialog("Thông báo lỗi", inform);
-				}
+			// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+			if (inform.equals("Có thể thêm một khách hàng") || inform.equals("Có thể thay đổi một khách hàng")) {
+				CommonPL.createSuccessDialog("Thông báo thành công", String.format("%s thành công", button));
+				addOrUpdateDialog.dispose();
+				resetPage();
+			} else {
+				CommonPL.createErrorDialog("Thông báo lỗi", inform);
 			}
+			
 		});
 
 		// - Tuỳ chỉnh Add Or Update Block Panel
@@ -883,8 +874,6 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateBlockPanel.add(addOrUpdateAddressTextField);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusComboBox);
-//		addOrUpdateBlockPanel.add(addOrUpdateTimeLabel);
-//		addOrUpdateBlockPanel.add(addOrUpdateTimeDetailLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateButton);
 		// <==================== ====================>
 

@@ -121,7 +121,7 @@ public class Admin_DashboardManagerPL extends JPanel {
 		filterButton.setBounds(660, 15, 100, 30);
 
 		// - Tuỳ chỉnh Create Bill Button Button
-		createBillButton = CommonPL.getRoundedBorderButton(14, "Xuất biên lai", Color.decode("#699f4c"), Color.WHITE,
+		createBillButton = CommonPL.getRoundedBorderButton(14, "In phiếu thống kê", Color.decode("#699f4c"), Color.WHITE,
 				new Font("Arial", Font.BOLD, 14));
 		createBillButton.setBounds(925, 15, 200, 30);
 
@@ -347,7 +347,7 @@ public class Admin_DashboardManagerPL extends JPanel {
 						// Chi
 						BigInteger invest = new BigInteger("0");
 						for (InputTicketDTO inputTicketDTO : listInputTicket) {
-							invest = invest.subtract(new BigInteger(String.valueOf(inputTicketDTO.getCost())));
+							invest = invest.subtract(new BigInteger(String.valueOf(inputTicketDTO.getTotalPrice())));
 						}
 						// Lợi nhuận
 						BigInteger profit = revenue.add(invest);
@@ -498,7 +498,7 @@ public class Admin_DashboardManagerPL extends JPanel {
 						// Chi
 						BigInteger invest = new BigInteger("0");
 						for (InputTicketDTO inputTicketDTO : listInputTicket) {
-							invest = invest.subtract(new BigInteger(String.valueOf(inputTicketDTO.getCost())));
+							invest = invest.subtract(new BigInteger(String.valueOf(inputTicketDTO.getTotalPrice())));
 						}
 						
 						// Gán dữ liệu cho từng ô theo dòng

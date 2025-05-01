@@ -11,11 +11,11 @@ public class CustomerDTO {
 	private String email;
 	private String address;
 	private Boolean status;
-	private String dateUpdate;
+	private String timeUpdate;
 
 	// Constructors
 	public CustomerDTO(String idCard, String type, String fullname, String birthday, String gender, String phone,
-			String email, String address, Boolean status, String dateUpdate) {
+			String email, String address, Boolean status, String timeUpdate) {
 		this.idCard = idCard;
 		this.type = type;
 		this.fullname = fullname;
@@ -25,7 +25,7 @@ public class CustomerDTO {
 		this.email = email;
 		this.address = address;
 		this.status = status;
-		this.dateUpdate = dateUpdate;
+		this.timeUpdate = timeUpdate;
 	}
 
 	// Setter - Getter
@@ -103,11 +103,11 @@ public class CustomerDTO {
 		return status;
 	}
 
-	public String getDateUpdate() {
-		return dateUpdate;
+	public String getTimeUpdate() {
+		return timeUpdate;
 	}
 
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
+	public void setTimeUpdate(String timeUpdate) {
+		this.timeUpdate = timeUpdate;
 	}
 }

@@ -35,18 +35,14 @@ public class AdminMenuPL extends JPanel {
 	private JPanel linePanel;
 	// - Menu chính
 	private JButton dashboardManagerButton;
-	private JButton roomStatusManagerButton;
-	private JButton orderManagerButton;
-	private JButton menuManagerButton;
-	private JButton customerManagerButton;
 	private JButton accountManagerButton;
+	private JButton orderManagerButton;
+	private JButton roomManagerButton;
+	private JButton customerManagerButton;
 	private JButton supplierManagerButton;
 	private JButton inputTicketManagerButton;
-	private JButton discountManagerButton;
-	private JButton ingredientManagerButton;
-	private JButton employeeManagerButton;
-	private JButton calenderManagerButton;
-	private JButton historyManagerButton;
+	private JButton categoryManagerButton;
+	private JButton foodManagerButton;
 	private JButton logoutButton;
 	private JPanel mainMenuPanel;
 
@@ -76,115 +72,83 @@ public class AdminMenuPL extends JPanel {
 				fontSubTitle);
 		dashboardManagerButton.setBounds(0, 0, CommonPL.getLeftMenuWidth(), 60);
 
-		// - Tuỳ chỉnh Room Status Button
-		roomStatusManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "karaoke-icon.png", "Phòng hát", colorBackgroundInLeftMenu,
+		// - Tuỳ chỉnh Account Manager Button
+		accountManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
+				CommonPL.getMiddlePathToShowIcon() + "account-icon.png", "Người dùng", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		roomStatusManagerButton.setBounds(0, 60, CommonPL.getLeftMenuWidth(), 60);
+		accountManagerButton.setBounds(0, 60, CommonPL.getLeftMenuWidth(), 60);
 
 		// - Tuỳ chỉnh Order Button
 		orderManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "ring-icon.png", "Đặt món", colorBackgroundInLeftMenu,
+				CommonPL.getMiddlePathToShowIcon() + "ring-icon.png", "Đơn hàng", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
 		orderManagerButton.setBounds(0, 120, CommonPL.getLeftMenuWidth(), 60);
 
-		// - Tuỳ chỉnh Menu Manager Button
-		menuManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "menu-icon.png", "Thực đơn", colorBackgroundInLeftMenu,
+		// - Tuỳ chỉnh Room Button
+		roomManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
+				CommonPL.getMiddlePathToShowIcon() + "karaoke-icon.png", "Phòng hát", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		menuManagerButton.setBounds(0, 180, CommonPL.getLeftMenuWidth(), 60);
-
-		// - Tuỳ chỉnh Customer Manager Button
-		discountManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "discount-icon.png", "Khuyến mãi", colorBackgroundInLeftMenu,
-				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
-				fontSubTitle);
-		discountManagerButton.setBounds(0, 240, CommonPL.getLeftMenuWidth(), 60);
+		roomManagerButton.setBounds(0, 180, CommonPL.getLeftMenuWidth(), 60);
 
 		// - Tuỳ chỉnh Customer Manager Button
 		customerManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
 				CommonPL.getMiddlePathToShowIcon() + "customer-icon.png", "Khách hàng", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		customerManagerButton.setBounds(0, 300, CommonPL.getLeftMenuWidth(), 60);
-
-		// - Tuỳ chỉnh Account Manager Button
-		accountManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "account-icon.png", "Người dùng", colorBackgroundInLeftMenu,
-				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
-				fontSubTitle);
-		accountManagerButton.setBounds(0, 360, CommonPL.getLeftMenuWidth(), 60);
+		customerManagerButton.setBounds(0, 240, CommonPL.getLeftMenuWidth(), 60);
 
 		// - Tuỳ chỉnh Customer Manager Button
 		supplierManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
 				CommonPL.getMiddlePathToShowIcon() + "supplier-icon.png", "Nhà cung cấp", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		supplierManagerButton.setBounds(0, 420, CommonPL.getLeftMenuWidth(), 60);
+		supplierManagerButton.setBounds(0, 300, CommonPL.getLeftMenuWidth(), 60);
 
-		// - Tuỳ chỉnh Medical Record Manager Button
+		// - Tuỳ chỉnh Input Ticket Manager Button
 		inputTicketManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
 				CommonPL.getMiddlePathToShowIcon() + "input-ticket-icon.png", "Phiếu nhập", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		inputTicketManagerButton.setBounds(0, 480, CommonPL.getLeftMenuWidth(), 60);
+		inputTicketManagerButton.setBounds(0, 360, CommonPL.getLeftMenuWidth(), 60);
 
-		// - Tuỳ chỉnh Sick Manager Button
-		ingredientManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-				CommonPL.getMiddlePathToShowIcon() + "ingredient-icon.png", "Nguyên liệu", colorBackgroundInLeftMenu,
+		// - Tuỳ chỉnh Food Manager Button
+		categoryManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
+				CommonPL.getMiddlePathToShowIcon() + "category-icon.png", "Loại món ăn", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		ingredientManagerButton.setBounds(0, 540, CommonPL.getLeftMenuWidth(), 60);
+		categoryManagerButton.setBounds(0, 420, CommonPL.getLeftMenuWidth(), 60);
 
-//		// - Tuỳ chỉnh Employee Manager Button
-//		employeeManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-//				CommonPL.getMiddlePathToShowIcon() + "employee-icon.png", "Nhân viên", colorBackgroundInLeftMenu,
-//				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
-//				fontSubTitle);
-//		employeeManagerButton.setBounds(0, 600, CommonPL.getLeftMenuWidth(), 60);
-//
-//		// - Tuỳ chỉnh Account Manager Button
-//		calenderManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-//				CommonPL.getMiddlePathToShowIcon() + "calender-icon.png", "Lịch làm việc", colorBackgroundInLeftMenu,
-//				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
-//				fontSubTitle);
-//		calenderManagerButton.setBounds(0, 660, CommonPL.getLeftMenuWidth(), 60);
-//
-//		// - Tuỳ chỉnh Account Manager Button
-//		historyManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
-//				CommonPL.getMiddlePathToShowIcon() + "clock-icon.png", "Lịch sử ca", colorBackgroundInLeftMenu,
-//				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
-//				fontSubTitle);
-//		historyManagerButton.setBounds(0, 600, CommonPL.getLeftMenuWidth(), 60);
-//
-//		// - Tuỳ chỉnh Account Manager Button
+		// - Tuỳ chỉnh Food Manager Button
+		foodManagerButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
+				CommonPL.getMiddlePathToShowIcon() + "food-icon.png", "Món ăn", colorBackgroundInLeftMenu,
+				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
+				fontSubTitle);
+		foodManagerButton.setBounds(0, 480, CommonPL.getLeftMenuWidth(), 60);
+
+		// - Nút thoát
 		logoutButton = CommonPL.getButtonHasIcon(CommonPL.getLeftMenuWidth(), 60, 30, 30, 15, 15,
 				CommonPL.getMiddlePathToShowIcon() + "logout-icon.png", "Đăng xuất", colorBackgroundInLeftMenu,
 				colorBackgroundHoverInLeftMenu, colorForegroundInLeftMenu, colorForegroundHoverInLeftMenu,
 				fontSubTitle);
-		logoutButton.setBounds(0, 600, CommonPL.getLeftMenuWidth(), 60);
+		logoutButton.setBounds(0, CommonPL.getScreenHeightByOwner() - 150 - 60, CommonPL.getLeftMenuWidth(), 60);
 
 		// - Tuỳ chỉnh Main Menu Panel
 		mainMenuPanel = new JPanel();
 		mainMenuPanel.setLayout(null);
-		mainMenuPanel.setBounds(0, 120, CommonPL.getLeftMenuWidth(), 660);
+		mainMenuPanel.setBounds(0, 100, CommonPL.getLeftMenuWidth(), CommonPL.getScreenHeightByOwner() - 150);
 		mainMenuPanel.setBackground(Color.WHITE);
 		mainMenuPanel.add(dashboardManagerButton);
-		mainMenuPanel.add(roomStatusManagerButton);
-		mainMenuPanel.add(orderManagerButton);
-		mainMenuPanel.add(discountManagerButton);
-		mainMenuPanel.add(menuManagerButton);
-		mainMenuPanel.add(customerManagerButton);
 		mainMenuPanel.add(accountManagerButton);
+		mainMenuPanel.add(orderManagerButton);
+		mainMenuPanel.add(roomManagerButton);
+		mainMenuPanel.add(customerManagerButton);
 		mainMenuPanel.add(supplierManagerButton);
 		mainMenuPanel.add(inputTicketManagerButton);
-		mainMenuPanel.add(ingredientManagerButton);
-//		mainMenuPanel.add(employeeManagerButton);
-//		mainMenuPanel.add(calenderManagerButton);
-//		mainMenuPanel.add(historyManagerButton);
+		mainMenuPanel.add(categoryManagerButton);
+		mainMenuPanel.add(foodManagerButton);
 		mainMenuPanel.add(logoutButton);
 		// <==================== ====================>
 
@@ -198,7 +162,7 @@ public class AdminMenuPL extends JPanel {
 		this.add(mainMenuPanel);
 
 		// Thiết lập sự kiện cập nhật lại các mục theo chi tiết quyền
-//		renderButtonsInMenu();
+		// renderButtonsInMenu();
 
 		// Thiết lập sự kiện khi nhấn vào các mục
 		menuButtonEvents();
@@ -211,57 +175,62 @@ public class AdminMenuPL extends JPanel {
 
 	// Hàm cập nhật lại các mục theo chi tiết quyền của Người dùng hiện tại
 	private void renderButtonsInMenu() {
-		// - Truy vấn chi tiết quyền của Người dùng hiện tại đang sử dụng
-		String[] joinPrivilegeDetail = null;
-		String conditionPrivilegeDetail = String.format("ChiTietQuyen.maNguoiDung = '%s'",
-				CommonPL.getAccountUsingApp().getId());
-		String orderPrivilegeDetail = null;
-		ArrayList<PrivilegeDetailDTO> privilegeDetailList = privilegeDetailBLL
-				.getAllPrivilegeDetailByCondition(joinPrivilegeDetail, conditionPrivilegeDetail, orderPrivilegeDetail);
+		// // - Truy vấn chi tiết quyền của Người dùng hiện tại đang sử dụng
+		// String[] joinPrivilegeDetail = null;
+		// String conditionPrivilegeDetail = String.format("ChiTietQuyen.maNguoiDung =
+		// '%s'",
+		// CommonPL.getAccountUsingApp().getId());
+		// String orderPrivilegeDetail = null;
+		// ArrayList<PrivilegeDetailDTO> privilegeDetailList = privilegeDetailBLL
+		// .getAllPrivilegeDetailByCondition(joinPrivilegeDetail,
+		// conditionPrivilegeDetail, orderPrivilegeDetail);
 
-		String functionsStr = "";
-		for (PrivilegeDetailDTO privilegeDetailDTO : privilegeDetailList) {
-			if (privilegeDetailDTO.getStatus()) {
-				FunctionDTO functionDTO = functionBLL.getOneFunctionById(privilegeDetailDTO.getFunctionId());
-				functionsStr += "," + functionDTO.getName();
-			}
-		}
-		if (functionsStr.length() != 0)
-			functionsStr = functionsStr.substring(1);
+		// String functionsStr = "";
+		// for (PrivilegeDetailDTO privilegeDetailDTO : privilegeDetailList) {
+		// if (privilegeDetailDTO.getStatus()) {
+		// FunctionDTO functionDTO =
+		// functionBLL.getOneFunctionById(privilegeDetailDTO.getFunctionId());
+		// functionsStr += "," + functionDTO.getName();
+		// }
+		// }
+		// if (functionsStr.length() != 0)
+		// functionsStr = functionsStr.substring(1);
 
-		// -
-		String functionsPattern = "Thống kê,Phòng hát,Đặt món,Thực đơn,Khuyến mãi,Khách hàng,Người dùng,Nhà cung cấp,Phiếu nhập,Nguyên liệu,Loại Phòng hát,Loại món ăn";
-		String[] functionsSplit = functionsPattern.split(",");
+		// // -
+		// String functionsPattern = "Thống kê,Phòng hát,Đặt món,Thực đơn,Khuyến
+		// mãi,Khách hàng,Người dùng,Nhà cung cấp,Phiếu nhập,Món ăn,Loại Phòng hát,Loại
+		// món ăn";
+		// String[] functionsSplit = functionsPattern.split(",");
 
-		// - Lấy ra tất cả các JButton có ở Menu Panel và ẩn đi hết
-		ArrayList<JButton> buttonsInMainMenu = CommonPL.getAllButtons(mainMenuPanel);
-		ArrayList<JButton> buttons = new ArrayList<>();
-		buttons.addAll(buttonsInMainMenu);
-		for (JButton button : buttons) {
-			button.setVisible(false);
-		}
+		// // - Lấy ra tất cả các JButton có ở Menu Panel và ẩn đi hết
+		// ArrayList<JButton> buttonsInMainMenu = CommonPL.getAllButtons(mainMenuPanel);
+		// ArrayList<JButton> buttons = new ArrayList<>();
+		// buttons.addAll(buttonsInMainMenu);
+		// for (JButton button : buttons) {
+		// button.setVisible(false);
+		// }
 
-		// - Duyệt qua từng giá trị trong mảng rồi thêm mục tương ứng
-		int i = 0;
-		for (String function : functionsSplit) {
-			if (functionsStr.contains(function)) {
-				for (JButton button : buttons) {
-					JLabel labelInButton = (JLabel) button.getComponent(1);
-					if (function.equals(labelInButton.getText())) {
-						button.setVisible(true);
-						button.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
-						i += 60;
-					}
-				}
-			}
-		}
-		// - Mặc định là 'Đăng xuất' luôn có và ở vị trí cuối cùng
-		logoutButton.setVisible(true);
-		logoutButton.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
-		i += 60;
+		// // - Duyệt qua từng giá trị trong mảng rồi thêm mục tương ứng
+		// int i = 0;
+		// for (String function : functionsSplit) {
+		// if (functionsStr.contains(function)) {
+		// for (JButton button : buttons) {
+		// JLabel labelInButton = (JLabel) button.getComponent(1);
+		// if (function.equals(labelInButton.getText())) {
+		// button.setVisible(true);
+		// button.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
+		// i += 60;
+		// }
+		// }
+		// }
+		// }
+		// // - Mặc định là 'Đăng xuất' luôn có và ở vị trí cuối cùng
+		// logoutButton.setVisible(true);
+		// logoutButton.setBounds(0, i, CommonPL.getLeftMenuWidth(), 60);
+		// i += 60;
 
-		// - Cập nhật lại kích thước và vị trí của Menu Panel
-		mainMenuPanel.setBounds(0, 115, CommonPL.getLeftMenuWidth(), i);
+		// // - Cập nhật lại kích thước và vị trí của Menu Panel
+		// mainMenuPanel.setBounds(0, 115, CommonPL.getLeftMenuWidth(), i);
 	}
 
 	// Hàm thiết lập các sự kiện cho các nút ở menu trái
@@ -280,47 +249,40 @@ public class AdminMenuPL extends JPanel {
 					// Đối tượng chứa nút đã được nhấn
 					JLabel labelInButtonClicked = (JLabel) buttonClicked.getComponent(1);
 					if (labelInButtonClicked.getText().equals("Thống kê")) {
-						Admin_DashboardManagerPL dashboardManagerPL = new Admin_DashboardManagerPL();
-						dashboardManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-								CommonPL.getScreenHeightByOwner());
-						dashboardManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(dashboardManagerPL);
+						// Admin_DashboardManagerPL dashboardManagerPL = new Admin_DashboardManagerPL();
+						// dashboardManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+						// CommonPL.getMainWidth(),
+						// CommonPL.getScreenHeightByOwner());
+						// dashboardManagerPL.setBackground(colorBackgroundInMain);
+						// AdminCardPL.getInstance().changeAdminMain(dashboardManagerPL);
+					} else if (labelInButtonClicked.getText().equals("Người dùng")) {
+						// Admin_AccountManagerPL accountManagerPL = new Admin_AccountManagerPL();
+						// accountManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+						// CommonPL.getMainWidth(),
+						// CommonPL.getScreenHeightByOwner());
+						// accountManagerPL.setBackground(colorBackgroundInMain);
+						// AdminCardPL.getInstance().changeAdminMain(accountManagerPL);
+					} else if (labelInButtonClicked.getText().equals("Đơn hàng")) {
+						// Admin_OrderManagerPL orderManagerPL = new Admin_OrderManagerPL();
+						// orderManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+						// CommonPL.getMainWidth(),
+						// CommonPL.getScreenHeightByOwner());
+						// orderManagerPL.setBackground(colorBackgroundInMain);
+						// AdminCardPL.getInstance().changeAdminMain(orderManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Phòng hát")) {
-						Admin_KaraokeRoomManagerPL roomStatusManagerPL = new Admin_KaraokeRoomManagerPL();
-						roomStatusManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-								CommonPL.getScreenHeightByOwner());
-						roomStatusManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(roomStatusManagerPL);
-					} else if (labelInButtonClicked.getText().equals("Đặt món")) {
-						Admin_OrderManagerPL orderManagerPL = new Admin_OrderManagerPL();
-						orderManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-								CommonPL.getScreenHeightByOwner());
-						orderManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(orderManagerPL);
-					} else if (labelInButtonClicked.getText().equals("Thực đơn")) {
-						Admin_MenuManagerPL menuManagerPL = new Admin_MenuManagerPL();
-						menuManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-								CommonPL.getScreenHeightByOwner());
-						menuManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(menuManagerPL);
-					} else if (labelInButtonClicked.getText().equals("Khuyến mãi")) {
-						Admin_DiscountManagerPL discountManagerPL = new Admin_DiscountManagerPL();
-						discountManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-								CommonPL.getScreenHeightByOwner());
-						discountManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(discountManagerPL);
+						// Admin_KaraokeRoomManagerPL roomStatusManagerPL = new
+						// Admin_KaraokeRoomManagerPL();
+						// roomStatusManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+						// CommonPL.getMainWidth(),
+						// CommonPL.getScreenHeightByOwner());
+						// roomStatusManagerPL.setBackground(colorBackgroundInMain);
+						// AdminCardPL.getInstance().changeAdminMain(roomStatusManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Khách hàng")) {
 						Admin_CustomerManagerPL customerManagerPL = new Admin_CustomerManagerPL();
 						customerManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
 								CommonPL.getScreenHeightByOwner());
 						customerManagerPL.setBackground(colorBackgroundInMain);
 						AdminCardPL.getInstance().changeAdminMain(customerManagerPL);
-					} else if (labelInButtonClicked.getText().equals("Người dùng")) {
-						Admin_AccountManagerPL accountManagerPL = new Admin_AccountManagerPL();
-						accountManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-								CommonPL.getScreenHeightByOwner());
-						accountManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(accountManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Nhà cung cấp")) {
 						Admin_SupplierManagerPL supplierManagerPL = new Admin_SupplierManagerPL();
 						supplierManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
@@ -328,35 +290,30 @@ public class AdminMenuPL extends JPanel {
 						supplierManagerPL.setBackground(colorBackgroundInMain);
 						AdminCardPL.getInstance().changeAdminMain(supplierManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Phiếu nhập")) {
-						Admin_InputTicketManagerPL inputTicketManagerPL = new Admin_InputTicketManagerPL();
-						inputTicketManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
+						// Admin_InputTicketManagerPL inputTicketManagerPL = new
+						// Admin_InputTicketManagerPL();
+						// inputTicketManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0,
+						// CommonPL.getMainWidth(),
+						// CommonPL.getScreenHeightByOwner());
+						// inputTicketManagerPL.setBackground(colorBackgroundInMain);
+						// AdminCardPL.getInstance().changeAdminMain(inputTicketManagerPL);
+					} else if (labelInButtonClicked.getText().equals("Loại món ăn")) {
+						Admin_CategoryManagerPL categoryManagerPL = new Admin_CategoryManagerPL();
+						categoryManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
 								CommonPL.getScreenHeightByOwner());
-						inputTicketManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(inputTicketManagerPL);
-					} else if (labelInButtonClicked.getText().equals("Nguyên liệu")) {
-						Admin_IngredientManagerPL ingredientManagerPL = new Admin_IngredientManagerPL();
-						ingredientManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
+						categoryManagerPL.setBackground(colorBackgroundInMain);
+						AdminCardPL.getInstance().changeAdminMain(categoryManagerPL);
+					} else if (labelInButtonClicked.getText().equals("Món ăn")) {
+						Admin_FoodManagerPL foodManagerPL = new Admin_FoodManagerPL();
+						foodManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
 								CommonPL.getScreenHeightByOwner());
-						ingredientManagerPL.setBackground(colorBackgroundInMain);
-						AdminCardPL.getInstance().changeAdminMain(ingredientManagerPL);
+						foodManagerPL.setBackground(colorBackgroundInMain);
+						AdminCardPL.getInstance().changeAdminMain(foodManagerPL);
 					} else if (labelInButtonClicked.getText().equals("Đăng xuất")) {
 						CommonPL.setAccountUsingApp(null);
 						LoginRegisterPL loginRegisterPL = new LoginRegisterPL();
 						FramePL.getInstance().changeFrameContent(loginRegisterPL);
 					}
-//					else if (labelInButtonClicked.getText().equals("Nhân viên")) {
-//						Admin_EmployeeManagerPL employeeManagerPL = new Admin_EmployeeManagerPL();
-//						employeeManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-//								CommonPL.getScreenHeightByOwner());
-//						employeeManagerPL.setBackground(colorBackgroundInMain);
-//						AdminCardPL.getInstance().changeAdminMain(employeeManagerPL);
-//					} else if (labelInButtonClicked.getText().equals("Lịch làm việc")) {
-//						Admin_WorkScheduleManagerPL workScheduleManagerPL = new Admin_WorkScheduleManagerPL();
-//						workScheduleManagerPL.setBounds(CommonPL.getLeftMenuWidth(), 0, CommonPL.getMainWidth(),
-//								CommonPL.getScreenHeightByOwner());
-//						workScheduleManagerPL.setBackground(colorBackgroundInMain);
-//						AdminCardPL.getInstance().changeAdminMain(workScheduleManagerPL);
-//					}
 
 					for (int j = 0; j < buttons.size(); j++) {
 						JButton button = buttons.get(j);

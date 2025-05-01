@@ -11,11 +11,11 @@ public class AccountDTO {
 	private String password;
 	private String privilegeId;
 	private boolean status;
-	private String dateUpdate;
+	private String timeUpdate;
 
 	// Constructors
 	public AccountDTO(Integer id, String fullname, String phone, String email, String address, String username,
-			String password, String privilegeId, Boolean status, String dateUpdate) {
+			String password, String privilegeId, Boolean status, String timeUpdate) {
 		super();
 		this.id = id;
 		this.fullname = fullname;
@@ -26,7 +26,7 @@ public class AccountDTO {
 		this.password = password;
 		this.privilegeId = privilegeId;
 		this.status = status;
-		this.dateUpdate = dateUpdate;
+		this.timeUpdate = timeUpdate;
 	}
 
 	// Setter - Getter
@@ -66,8 +66,8 @@ public class AccountDTO {
 		this.status = status;
 	}
 
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
+	public void setTimeUpdate(String timeUpdate) {
+		this.timeUpdate = timeUpdate;
 	}
 
 	public Integer getId() {
@@ -106,15 +106,15 @@ public class AccountDTO {
 		return status;
 	}
 
-	public String getDateUpdate() {
-		return dateUpdate;
+	public String getTimeUpdate() {
+		return timeUpdate;
 	}
 
 	@Override
 	public String toString() {
 		return "AccountDTO [id=" + id + ", fullname=" + fullname + ", phone=" + phone + ", email=" + email
 				+ ", address=" + address + ", username=" + username + ", password=" + password + ", privilegeId="
-				+ privilegeId + ", status=" + status + ", dateUpdate=" + dateUpdate + "]";
+				+ privilegeId + ", status=" + status + ", timeUpdate=" + timeUpdate + "]";
 	}
 
 }

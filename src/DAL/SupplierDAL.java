@@ -16,7 +16,7 @@ public class SupplierDAL implements DAL<SupplierDTO> {
             return 0;
         }
         int rowsAffected = 0;
-        String sql = "INSERT INTO karaoke.nhacungcap (maNCC, tenNCC, soDienThoai, email, diaChi, trangThai, ngayCapNhat) " +
+        String sql = "INSERT INTO karaoke.nhacungcap (maNCC, tenNCC, soDienThoai, email, diaChi, trangThai, thoiGianCapNhat) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?);";
         try (Connection c = JDBCUtil.getInstance().getConnection();
              PreparedStatement pstmt = c.prepareStatement(sql)) {
@@ -26,7 +26,7 @@ public class SupplierDAL implements DAL<SupplierDTO> {
             pstmt.setString(4, supplierDTO.getEmail());
             pstmt.setString(5, supplierDTO.getAddress());
             pstmt.setBoolean(6, supplierDTO.getStatus());
-            pstmt.setString(7, supplierDTO.getDateUpdate());
+            pstmt.setString(7, supplierDTO.getTimeUpdate());
             rowsAffected = pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Lỗi khi thêm nhà cung cấp: " + e.getMessage());
@@ -43,7 +43,7 @@ public class SupplierDAL implements DAL<SupplierDTO> {
         }
         int rowsAffected = 0;
         String sql = "UPDATE karaoke.nhacungcap " +
-                     "SET tenNCC = ?, soDienThoai = ?, email = ?, diaChi = ?, trangThai = ?, ngayCapNhat = ? " +
+                     "SET tenNCC = ?, soDienThoai = ?, email = ?, diaChi = ?, thoiGianCapNhat = ? " +
                      "WHERE maNCC = ?;";
         try (Connection c = JDBCUtil.getInstance().getConnection();
              PreparedStatement pstmt = c.prepareStatement(sql)) {
@@ -51,9 +51,8 @@ public class SupplierDAL implements DAL<SupplierDTO> {
             pstmt.setString(2, supplierDTO.getPhone());
             pstmt.setString(3, supplierDTO.getEmail());
             pstmt.setString(4, supplierDTO.getAddress());
-            pstmt.setBoolean(5, supplierDTO.getStatus());
-            pstmt.setString(6, supplierDTO.getDateUpdate());
-            pstmt.setString(7, supplierDTO.getId());
+            pstmt.setString(5, supplierDTO.getTimeUpdate());
+            pstmt.setString(6, supplierDTO.getId());
             rowsAffected = pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Lỗi khi cập nhật nhà cung cấp: " + e.getMessage());
@@ -69,11 +68,11 @@ public class SupplierDAL implements DAL<SupplierDTO> {
             return 0;
         }
         int rowsAffected = 0;
-        String sql = "UPDATE karaoke.nhacungcap SET trangThai = ?, ngayCapNhat = ? WHERE maNCC = ?;";
+        String sql = "UPDATE karaoke.nhacungcap SET trangThai = ?, thoiGianCapNhat = ? WHERE maNCC = ?;";
         try (Connection c = JDBCUtil.getInstance().getConnection();
              PreparedStatement pstmt = c.prepareStatement(sql)) {
             pstmt.setBoolean(1, supplierDTO.getStatus()); // Sử dụng trạng thái từ supplierDTO
-            pstmt.setString(2, supplierDTO.getDateUpdate());
+            pstmt.setString(2, supplierDTO.getTimeUpdate());
             pstmt.setString(3, supplierDTO.getId());
             rowsAffected = pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -103,9 +102,9 @@ public class SupplierDAL implements DAL<SupplierDTO> {
     @Override
     public ArrayList<SupplierDTO> selectAllByCondition(String[] join, String condition, String order) {
         ArrayList<SupplierDTO> list = new ArrayList<>();
-        String sql = "SELECT * FROM karaoke.nhacungcap" +
-                     (condition != null ? " WHERE " + condition : "") +
-                     (order != null ? " ORDER BY " + order : "") + ";";
+        String sql = String.format("SELECT * FROM Karaoke.NhaCungCap%s%s%s;",
+				join != null ? CommonDAL.getJoinValues(join) : "", condition != null ? "\nWHERE " + condition : "",
+				order != null ? "\nORDER BY " + order : "");
         try (Connection c = JDBCUtil.getInstance().getConnection();
              PreparedStatement pstmt = c.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
@@ -147,7 +146,7 @@ public class SupplierDAL implements DAL<SupplierDTO> {
             rs.getString("email"),
             rs.getString("diaChi"),
             rs.getBoolean("trangThai"),
-            rs.getString("ngayCapNhat")
+            rs.getString("thoiGianCapNhat")
         );
     }
 }

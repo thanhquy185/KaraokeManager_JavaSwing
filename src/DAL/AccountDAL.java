@@ -19,7 +19,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.NguoiDung(maNguoiDung, hoVaTen, soDienThoai, email, diaChi, tenTaiKhoan, matKhau, maQuyen, trangThai, ngayCapNhat)"
+			String sql = "INSERT INTO Karaoke.NguoiDung(maNguoiDung, hoVaTen, soDienThoai, email, diaChi, tenTaiKhoan, matKhau, maQuyen, trangThai, thoiGianCapNhat)"
 					+ "\nVALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setInt(1, accountDTO.getId());
@@ -31,7 +31,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 			pstmt.setString(7, accountDTO.getPassword());
 			pstmt.setString(8, accountDTO.getPrivilegeId());
 			pstmt.setBoolean(9, accountDTO.getStatus());
-			pstmt.setString(10, accountDTO.getDateUpdate());
+			pstmt.setString(10, accountDTO.getTimeUpdate());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -51,7 +51,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
 			String sql = "UPDATE Karaoke.NguoiDung"
-					+ "\nSET hoVaTen = ?, soDienThoai = ?, email = ?, diaChi = ?, tenTaiKhoan = ?, matKhau = ?, maQuyen = ?, trangThai = ?, ngayCapNhat = ?"
+					+ "\nSET hoVaTen = ?, soDienThoai = ?, email = ?, diaChi = ?, tenTaiKhoan = ?, matKhau = ?, maQuyen = ?, trangThai = ?, thoiGianCapNhat = ?"
 					+ "\nWHERE maNguoiDung = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, accountDTO.getFullname());
@@ -62,7 +62,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 			pstmt.setString(6, accountDTO.getPassword());
 			pstmt.setString(7, accountDTO.getPrivilegeId());
 			pstmt.setBoolean(8, accountDTO.getStatus());
-			pstmt.setString(9, accountDTO.getDateUpdate());
+			pstmt.setString(9, accountDTO.getTimeUpdate());
 			pstmt.setInt(10, accountDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
@@ -82,11 +82,11 @@ public class AccountDAL implements DAL<AccountDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.NguoiDung" + "\nSET trangThai = ?, ngayCapNhat = ?"
+			String sql = "UPDATE Karaoke.NguoiDung" + "\nSET trangThai = ?, thoiGianCapNhat = ?"
 					+ "\nWHERE maNguoiDung = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setBoolean(1, accountDTO.getStatus());
-			pstmt.setString(2, accountDTO.getDateUpdate());
+			pstmt.setString(2, accountDTO.getTimeUpdate());
 			pstmt.setInt(3, accountDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
@@ -113,7 +113,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 				AccountDTO accountDTO = new AccountDTO(rs.getInt("maNguoiDung"), rs.getString("hoVaTen"),
 						rs.getString("soDienThoai"), rs.getString("email"), rs.getString("diaChi"),
 						rs.getString("tenTaiKhoan"), rs.getString("matKhau"), rs.getString("maQuyen"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				list.add(accountDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -142,7 +142,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 				AccountDTO accountDTO = new AccountDTO(rs.getInt("maNguoiDung"), rs.getString("hoVaTen"),
 						rs.getString("soDienThoai"), rs.getString("email"), rs.getString("diaChi"),
 						rs.getString("tenTaiKhoan"), rs.getString("matKhau"), rs.getString("maQuyen"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				list.add(accountDTO);
 			}
 
@@ -171,7 +171,7 @@ public class AccountDAL implements DAL<AccountDTO> {
 				accountDTO = new AccountDTO(rs.getInt("maNguoiDung"), rs.getString("hoVaTen"),
 						rs.getString("soDienThoai"), rs.getString("email"), rs.getString("diaChi"),
 						rs.getString("tenTaiKhoan"), rs.getString("matKhau"), rs.getString("maQuyen"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

@@ -29,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -57,6 +59,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
@@ -108,17 +111,13 @@ public class CommonPL {
 	private static AccountDTO accountUsingApp;
 	// Các Font
 	final private static Font fontTitle = new Font("Arial", Font.PLAIN, 34);
-	final private static Font fontParagraphBold = new Font("Arial", Font.BOLD, 20);
+	final private static Font fontParagraphBold = new Font("Arial", Font.BOLD, 18);
 	final private static Font fontParagraphPlain = new Font("Arial", Font.PLAIN, 20);
 	final private static Font fontQuestionIcon = new Font("Arial", Font.PLAIN, 14);
 	// Thông tin về ngày giờ hiện tại khi sử dụng phần mềm
-	final private static LocalDateTime currentDateTime = LocalDateTime.now();
-	final private static DateTimeFormatter datetimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+	final private static DateTimeFormatter datetimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	final private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-	final private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss");
-	final private static String currentDatetime = currentDateTime.format(datetimeFormatter);
-	final private static String currentDate = currentDateTime.format(dateFormatter);
-	final private static String currentTime = currentDateTime.format(timeFormatter);
+	final private static DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 	// Định dạng ngôn ngữ và nội dung cho JXDatePicker
 	final private static Locale locale = new Locale("vi", "VN");
 	final private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", locale);
@@ -129,8 +128,8 @@ public class CommonPL {
 	final private static String middlePathToShowIcon = System.getProperty("user.dir") + File.separator + "src"
 			+ File.separator + "Images" + File.separator + "Icons" + File.separator;
 	// Đường dẫn đến hình ảnh của Sản phẩm (Đoạn giữa)
-	final private static String middlePathToShowProductImage = System.getProperty("user.dir") + File.separator + "src"
-			+ File.separator + "Images" + File.separator + "Products" + File.separator;
+	final private static String middlePathToShowFoodImage = System.getProperty("user.dir") + File.separator + "src"
+			+ File.separator + "Images" + File.separator + "Foods" + File.separator;
 
 	// Hàm lấy kích thước màn hình máy khác
 	public static int getScreenWidthByOwner() {
@@ -177,17 +176,17 @@ public class CommonPL {
 
 	// Hàm lấy ra ngày giờ hiện tại
 	public static String getCurrentDatetime() {
-		return CommonPL.currentDatetime;
+		return LocalDateTime.now().format(datetimeFormatter);
 	}
 
 	// Hàm lấy ra ngày hiện tại
 	public static String getCurrentDate() {
-		return CommonPL.currentDate;
+		return LocalDateTime.now().format(dateFormatter);
 	}
 
 	// Hàm lấy ra giờ hiện tại
 	public static String getCurrentTime() {
-		return CommonPL.currentTime;
+		return LocalDateTime.now().format(timeFormatter);
 	}
 
 	// Hàm lấy ra Locale
@@ -235,9 +234,9 @@ public class CommonPL {
 		return CommonPL.middlePathToShowIcon;
 	}
 
-	// Hàm lấy ra Middle Path To Show Product Image
-	public static String getMiddlePathToShowProductImage() {
-		return CommonPL.middlePathToShowProductImage;
+	// Hàm lấy ra Middle Path To Show Food Image
+	public static String getMiddlePathToShowFoodImage() {
+		return CommonPL.middlePathToShowFoodImage;
 	}
 
 	// Hàm chuyển từ tiền dạng số nguyên sang dạng chuỗi (VNĐ)
@@ -252,71 +251,71 @@ public class CommonPL {
 	public static long moneyFormatToMoneyLong(String moneyFormat) {
 		return Long.parseLong(moneyFormat.replace(".", ""));
 	}
-	
+
 	// Hàm chuyển định dạng ngày
 	public static String convertDateFormat(String date) {
 		boolean isSqlDate = false;
-		if(date.charAt(2) == '-') {
+		if (date.charAt(2) == '-') {
 			isSqlDate = true;
 		}
-		
+
 		String day = date.substring(0, 2);
 		String month = date.substring(3, 5);
 		String year = date.substring(6);
-		
-		return isSqlDate ? day + "/" + month + "/" + year 
-			: year + "-" + month + "-" + day;
+
+		return isSqlDate ? day + "/" + month + "/" + year
+				: year + "-" + month + "-" + day;
 	}
-	
+
 	// Hàm trả về danh sách các tuần trong tháng
 	public static String[][] getWeeksOfMonth(int year, int month) {
-        List<String[]> weeksList = new ArrayList<>();
-        LocalDate firstDay = LocalDate.of(year, month, 1);
-        LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
-        
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        
-        LocalDate current = firstDay;
-        int weekNumber = 1;
-        
-        while (!current.isAfter(lastDay)) {
-            LocalDate startOfWeek = current;
-            LocalDate endOfWeek = current.plusDays(6);
-            
-            if (endOfWeek.isAfter(lastDay)) {
-                endOfWeek = lastDay;
-            }
-            
-            weeksList.add(new String[]{
-                String.valueOf(weekNumber),
-                startOfWeek.format(formatter),
-                endOfWeek.format(formatter)
-            });
-            
-            current = endOfWeek.plusDays(1);
-            weekNumber++;
-        }
-        
-        return weeksList.toArray(new String[0][3]);
-    }
-	
+		List<String[]> weeksList = new ArrayList<>();
+		LocalDate firstDay = LocalDate.of(year, month, 1);
+		LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		LocalDate current = firstDay;
+		int weekNumber = 1;
+
+		while (!current.isAfter(lastDay)) {
+			LocalDate startOfWeek = current;
+			LocalDate endOfWeek = current.plusDays(6);
+
+			if (endOfWeek.isAfter(lastDay)) {
+				endOfWeek = lastDay;
+			}
+
+			weeksList.add(new String[] {
+					String.valueOf(weekNumber),
+					startOfWeek.format(formatter),
+					endOfWeek.format(formatter)
+			});
+
+			current = endOfWeek.plusDays(1);
+			weekNumber++;
+		}
+
+		return weeksList.toArray(new String[0][3]);
+	}
+
 	// Hàm trả về danh sách các tháng trong năm
 	public static String[][] getMonthsOfYear(int year) {
-        String[][] monthsArray = new String[12][3];
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        
-        for (int month = 1; month <= 12; month++) {
-            LocalDate firstDay = LocalDate.of(year, month, 1);
-            LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
-            
-            monthsArray[month - 1][0] = String.valueOf(month);
-            monthsArray[month - 1][1] = firstDay.format(formatter);
-            monthsArray[month - 1][2] = lastDay.format(formatter);
-        }
-        
-        return monthsArray;
-    }
-	
+		String[][] monthsArray = new String[12][3];
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		for (int month = 1; month <= 12; month++) {
+			LocalDate firstDay = LocalDate.of(year, month, 1);
+			LocalDate lastDay = firstDay.withDayOfMonth(firstDay.lengthOfMonth());
+
+			monthsArray[month - 1][0] = String.valueOf(month);
+			monthsArray[month - 1][1] = firstDay.format(formatter);
+			monthsArray[month - 1][2] = lastDay.format(formatter);
+		}
+
+		return monthsArray;
+	}
+
 	// Hàm tách địa chỉ từ 1 địa chỉ hợp lệ
 
 	// Thiết lập các địa chỉ cho Address Info khi chương trình chạy
@@ -554,13 +553,14 @@ public class CommonPL {
 			}
 		}
 	}
-	
+
 	// Cập nhật lại giá trị cho JXDatePicker (tìm kiếm / lọc)
 	public static void resetDatePickerForFilter(JXDatePicker datePicker, String text, Color color, int roundLength) {
 		datePicker.getEditor().setText(text);
 		datePicker.getEditor().setForeground(color);
 		datePicker.getEditor().setBorder(new CustomRoundedBorder(color, roundLength, 0, 0, roundLength));
-		((JButton) datePicker.getComponent(1)).setBorder(new CustomRoundedBorder(color, 0, roundLength, roundLength, 0));
+		((JButton) datePicker.getComponent(1))
+				.setBorder(new CustomRoundedBorder(color, 0, roundLength, roundLength, 0));
 	}
 
 	// Gán giá trị vào Vector
@@ -775,9 +775,9 @@ public class CommonPL {
 			public void mouseEntered(MouseEvent evt) {
 				try {
 					Thread.sleep(100);
-//					imageLabel.setOpaque(false);
+					// imageLabel.setOpaque(false);
 					button.setBorder(BorderFactory.createLineBorder(backgroundColorHover, 2));
-//					button.setBackground(backgroundColorHover);
+					// button.setBackground(backgroundColorHover);
 					label.setForeground(foregroundColorHover);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -786,9 +786,9 @@ public class CommonPL {
 
 			@Override
 			public void mouseExited(MouseEvent evt) {
-//				imageLabel.setOpaque(true);
+				// imageLabel.setOpaque(true);
 				button.setBorder(BorderFactory.createLineBorder(backgroundColor, 2));
-//				button.setBackground(backgroundColor);
+				// button.setBackground(backgroundColor);
 				label.setForeground(foregroundColor);
 			}
 		});
@@ -828,37 +828,38 @@ public class CommonPL {
 	}
 
 	// Định dạng mẫu mặc định cho JButton có ý nghĩa là nút thao tác cuối cùng
-//	public static JButton getLastButtonForm(String content, Color backgroundColor, Color fontColor, Font font) {
-//		JButton button = new JButton();
-//		button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-//		button.setContentAreaFilled(true);
-//		button.setOpaque(true);
-//		button.setBorderPainted(true);
-//		button.setBorder(BorderFactory.createLineBorder(backgroundColor, 2));
-//		button.setBackground(backgroundColor);
-//		button.setText(content);
-//		button.setFont(font);
-//		button.setForeground(fontColor);
-//		button.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mouseEntered(MouseEvent e) {
-//				try {
-//					Thread.sleep(100);
-//					button.setForeground(backgroundColor);
-//					button.setBackground(fontColor);
-//				} catch (InterruptedException e1) {
-//					e1.printStackTrace();
-//				}
-//			}
-//
-//			@Override
-//			public void mouseExited(MouseEvent e) {
-//				button.setBackground(backgroundColor);
-//				button.setForeground(fontColor);
-//			}
-//		});
-//		return button;
-//	}
+	// public static JButton getLastButtonForm(String content, Color
+	// backgroundColor, Color fontColor, Font font) {
+	// JButton button = new JButton();
+	// button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+	// button.setContentAreaFilled(true);
+	// button.setOpaque(true);
+	// button.setBorderPainted(true);
+	// button.setBorder(BorderFactory.createLineBorder(backgroundColor, 2));
+	// button.setBackground(backgroundColor);
+	// button.setText(content);
+	// button.setFont(font);
+	// button.setForeground(fontColor);
+	// button.addMouseListener(new MouseAdapter() {
+	// @Override
+	// public void mouseEntered(MouseEvent e) {
+	// try {
+	// Thread.sleep(100);
+	// button.setForeground(backgroundColor);
+	// button.setBackground(fontColor);
+	// } catch (InterruptedException e1) {
+	// e1.printStackTrace();
+	// }
+	// }
+	//
+	// @Override
+	// public void mouseExited(MouseEvent e) {
+	// button.setBackground(backgroundColor);
+	// button.setForeground(fontColor);
+	// }
+	// });
+	// return button;
+	// }
 
 	// Định dạng mẫu mặc định cho icon (?)
 	public static JButton getQuestionIconForm(String icon, String inform, String informDetail, Color color, Font font) {
@@ -903,24 +904,27 @@ public class CommonPL {
 	}
 
 	// Tạo viền nét đứt cho Panel
-//	public static class DashedBorder extends AbstractBorder {
-//		@Override
-//		public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-//			Graphics2D g2d = (Graphics2D) g.create();
-//			g2d.setColor(Color.BLACK); // Màu của viền
-//			float[] dashPattern = { 10, 2 }; // Độ dài nét đứt và khoảng cách giữa các nét
-//			g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, dashPattern, 0));
-//
-//			// Vẽ viền
-//			g2d.drawRect(x, y, width - 1, height - 1);
-//			g2d.dispose();
-//		}
-//
-//		@Override
-//		public Insets getBorderInsets(Component c) {
-//			return new Insets(5, 5, 5, 5); // Khoảng cách từ viền tới nội dung
-//		}
-//	}
+	// public static class DashedBorder extends AbstractBorder {
+	// @Override
+	// public void paintBorder(Component c, Graphics g, int x, int y, int width, int
+	// height) {
+	// Graphics2D g2d = (Graphics2D) g.create();
+	// g2d.setColor(Color.BLACK); // Màu của viền
+	// float[] dashPattern = { 10, 2 }; // Độ dài nét đứt và khoảng cách giữa các
+	// nét
+	// g2d.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT,
+	// BasicStroke.JOIN_BEVEL, 0, dashPattern, 0));
+	//
+	// // Vẽ viền
+	// g2d.drawRect(x, y, width - 1, height - 1);
+	// g2d.dispose();
+	// }
+	//
+	// @Override
+	// public Insets getBorderInsets(Component c) {
+	// return new Insets(5, 5, 5, 5); // Khoảng cách từ viền tới nội dung
+	// }
+	// }
 
 	// Bo góc cho JTextField
 	public static class CustomTextField extends JTextField {
@@ -1579,11 +1583,11 @@ public class CommonPL {
 
 				if (count == 0) {
 					CommonPL.createErrorDialog("Thông báo lỗi", "Cần chọn ít nhất một tiêu chí");
-//					dialog.setVisible(false);
-//					SwingUtilities.invokeLater(() -> {
-//						JOptionPane.showMessageDialog(null, "Cần chọn ít nhất một tiêu chí");
-//						dialog.setVisible(true);
-//					});
+					// dialog.setVisible(false);
+					// SwingUtilities.invokeLater(() -> {
+					// JOptionPane.showMessageDialog(null, "Cần chọn ít nhất một tiêu chí");
+					// dialog.setVisible(true);
+					// });
 				} else if (count == 1) {
 					button.setText(checkboxItemValue);
 					dialog.dispose();
@@ -1620,11 +1624,11 @@ public class CommonPL {
 
 					if (count == 0) {
 						CommonPL.createErrorDialog("Thông báo lỗi", "Cần chọn ít nhất một tiêu chí");
-//						dialog.setVisible(false);
-//						SwingUtilities.invokeLater(() -> {
-//							JOptionPane.showMessageDialog(null, "Cần chọn ít nhất một tiêu chí");
-//							dialog.setVisible(true);
-//						});
+						// dialog.setVisible(false);
+						// SwingUtilities.invokeLater(() -> {
+						// JOptionPane.showMessageDialog(null, "Cần chọn ít nhất một tiêu chí");
+						// dialog.setVisible(true);
+						// });
 					} else if (count == 1) {
 						button.setText(checkboxItemValue);
 						dialog.dispose();
@@ -1896,31 +1900,33 @@ public class CommonPL {
 			// - Bo góc chỉ góc trái (trên và dưới) cho editor
 			datePicker.getEditor().setBorder(new CustomRoundedBorder(color, roundLength, 0, 0, roundLength));
 			// - Gán sự kiện cho ô nhập liệu
-//			datePicker.getEditor().addFocusListener(new FocusAdapter() {
-//				@Override
-//				public void focusGained(FocusEvent e) {
-//					if (datePicker.getEditor().getText().equals(content)) {
-//						datePicker.getEditor()
-//								.setBorder(new CustomRoundedBorder(colorActive, roundLength, 0, 0, roundLength));
-//						datePicker.getEditor().setText("");
-//						datePicker.getEditor().setForeground(colorActive);
-//						((JButton) datePicker.getComponent(1))
-//								.setBorder(new CustomRoundedBorder(colorActive, 0, roundLength, roundLength, 0));
-//					}
-//				}
-//
-//				@Override
-//				public void focusLost(FocusEvent e) {
-//					if (datePicker.getEditor().getText().isEmpty()) {
-//						datePicker.getEditor()
-//								.setBorder(new CustomRoundedBorder(color, roundLength, 0, 0, roundLength));
-//						datePicker.getEditor().setText(content);
-//						datePicker.getEditor().setForeground(color);
-//						((JButton) datePicker.getComponent(1))
-//								.setBorder(new CustomRoundedBorder(color, 0, roundLength, roundLength, 0));
-//					}
-//				}
-//			});
+			// datePicker.getEditor().addFocusListener(new FocusAdapter() {
+			// @Override
+			// public void focusGained(FocusEvent e) {
+			// if (datePicker.getEditor().getText().equals(content)) {
+			// datePicker.getEditor()
+			// .setBorder(new CustomRoundedBorder(colorActive, roundLength, 0, 0,
+			// roundLength));
+			// datePicker.getEditor().setText("");
+			// datePicker.getEditor().setForeground(colorActive);
+			// ((JButton) datePicker.getComponent(1))
+			// .setBorder(new CustomRoundedBorder(colorActive, 0, roundLength, roundLength,
+			// 0));
+			// }
+			// }
+			//
+			// @Override
+			// public void focusLost(FocusEvent e) {
+			// if (datePicker.getEditor().getText().isEmpty()) {
+			// datePicker.getEditor()
+			// .setBorder(new CustomRoundedBorder(color, roundLength, 0, 0, roundLength));
+			// datePicker.getEditor().setText(content);
+			// datePicker.getEditor().setForeground(color);
+			// ((JButton) datePicker.getComponent(1))
+			// .setBorder(new CustomRoundedBorder(color, 0, roundLength, roundLength, 0));
+			// }
+			// }
+			// });
 
 			// Định dạng lại nút nhấn (button)
 			JButton button = (JButton) datePicker.getComponent(1); // Lấy nút nhấn
@@ -2106,10 +2112,10 @@ public class CommonPL {
 
 		// Định dạng lại tiêu đề các cột
 		// - Kiểu, kích thước font
-//		table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
-//		if (type.equals("dashboard manager")) {
-//			table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16));
-//		}
+		// table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 18));
+		// if (type.equals("dashboard manager")) {
+		// table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 16));
+		// }
 		// - Chiều cao của dòng tiêu đề
 		table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 50));
 		if (type.equals("dashboard manager")) {
@@ -2163,10 +2169,10 @@ public class CommonPL {
 				Component cell = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
 				if (cell instanceof JLabel) {
-		            JLabel label = (JLabel) cell;
-		            label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding: top, left, bottom, right
-		        }
-				
+					JLabel label = (JLabel) cell;
+					label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding: top, left, bottom, right
+				}
+
 				if (!isSelected) { // Chỉ đổi màu khi không được chọn
 					if (type.equals("add or update unit table")) {
 						if (row % 2 == 0) {
@@ -2269,7 +2275,7 @@ public class CommonPL {
 					}
 
 					// - Cập nhật lại màu chữ theo ý nghĩa của chuỗi
-					if (status.equals("Đã hoàn thành") || status.equals("Hoạt động")) {
+					if (status.equals("Đã nhập hàng") || status.equals("Hoạt động")) {
 						statusLabel.setForeground(Color.decode("#33CC00"));
 					} else if (status.equals("Chưa thanh toán")) {
 						statusLabel.setForeground(Color.decode("#FFCC33"));

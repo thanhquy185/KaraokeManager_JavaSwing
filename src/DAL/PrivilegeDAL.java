@@ -19,13 +19,11 @@ public class PrivilegeDAL implements DAL<PrivilegeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.Quyen(maQuyen, tenQuyen, trangThai, ngayCapNhat)"
+			String sql = "INSERT INTO Karaoke.Quyen(maQuyen, tenQuyen)"
 					+ "\nVALUES(?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, privilegeDTO.getId());
 			pstmt.setString(2, privilegeDTO.getName());
-			pstmt.setBoolean(3, privilegeDTO.getStatus());
-			pstmt.setString(4, privilegeDTO.getDateUpdate());
 			rowChange = pstmt.executeUpdate();
 			System.out.println(sql);
 			JDBCUtil.getInstance().closeConnection(c);
@@ -45,13 +43,11 @@ public class PrivilegeDAL implements DAL<PrivilegeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.Quyen" + "\nSET tenQuyen = ?, trangThai = ?, ngayCapNhat = ?"
+			String sql = "UPDATE Karaoke.Quyen" + "\nSET tenQuyen = ?"
 					+ "\nWHERE maNguoiDung = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, privilegeDTO.getName());
-			pstmt.setBoolean(2, privilegeDTO.getStatus());
-			pstmt.setString(3, privilegeDTO.getDateUpdate());
-			pstmt.setString(4, privilegeDTO.getId());
+			pstmt.setString(2, privilegeDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -64,24 +60,22 @@ public class PrivilegeDAL implements DAL<PrivilegeDTO> {
 	// - Hàm khoá một quyền
 	@Override
 	public int lock(PrivilegeDTO privilegeDTO) {
-		// - Biến chứa số dòng đã được thêm
-		int rowChange = 0;
+		// // - Biến chứa số dòng đã được thêm
+		// int rowChange = 0;
 
-		// - Kết nối đến CSDL để truy vấn
-		Connection c = JDBCUtil.getInstance().getConnection();
-		try {
-			String sql = "UPDATE Karaoke.Quyen" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE maNguoiDung = ?";
-			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setBoolean(1, privilegeDTO.getStatus());
-			pstmt.setString(2, privilegeDTO.getDateUpdate());
-			pstmt.setString(3, privilegeDTO.getId());
-			rowChange = pstmt.executeUpdate();
-			JDBCUtil.getInstance().closeConnection(c);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// // - Kết nối đến CSDL để truy vấn
+		// Connection c = JDBCUtil.getInstance().getConnection();
+		// try {
+		// 	String sql = "UPDATE Karaoke.Quyen" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE maNguoiDung = ?";
+		// 	PreparedStatement pstmt = c.prepareStatement(sql);
+		// 	pstmt.setString(3, privilegeDTO.getId());
+		// 	rowChange = pstmt.executeUpdate();
+		// 	JDBCUtil.getInstance().closeConnection(c);
+		// } catch (SQLException e) {
+		// 	e.printStackTrace();
+		// }
 
-		return rowChange;
+		return 0;
 	}
 
 	// - Hàm lấy ra danh sách các quyền
@@ -97,8 +91,7 @@ public class PrivilegeDAL implements DAL<PrivilegeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				PrivilegeDTO privilegeDTO = new PrivilegeDTO(rs.getString("maQuyen"), rs.getString("tenQuyen"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				PrivilegeDTO privilegeDTO = new PrivilegeDTO(rs.getString("maQuyen"), rs.getString("tenQuyen"));
 				list.add(privilegeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -124,8 +117,7 @@ public class PrivilegeDAL implements DAL<PrivilegeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				PrivilegeDTO privilegeDTO = new PrivilegeDTO(rs.getString("maQuyen"), rs.getString("tenQuyen"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				PrivilegeDTO privilegeDTO = new PrivilegeDTO(rs.getString("maQuyen"), rs.getString("tenQuyen"));
 				list.add(privilegeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -149,8 +141,7 @@ public class PrivilegeDAL implements DAL<PrivilegeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				privilegeDTO = new PrivilegeDTO(rs.getString("maQuyen"), rs.getString("tenQuyen"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				privilegeDTO = new PrivilegeDTO(rs.getString("maQuyen"), rs.getString("tenQuyen"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

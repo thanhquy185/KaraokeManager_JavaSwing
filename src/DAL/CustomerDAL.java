@@ -1,4 +1,4 @@
-package DAL;
+	package DAL;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +18,7 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 		// - Kết nối CSDL để truy vấn
 		try (Connection c = JDBCUtil.getInstance().getConnection();
 				PreparedStatement pstmt = c.prepareStatement(
-						"INSERT INTO Karaoke.KhachHang(cccd, maLoaiKhachHang, hoVaTen, ngaySinh, gioiTinh, soDienThoai, email, diaChi, trangThai, ngayCapNhat)"
+						"INSERT INTO Karaoke.KhachHang(cccd, maLoaiKhachHang, hoVaTen, ngaySinh, gioiTinh, soDienThoai, email, diaChi, trangThai, thoiGianCapNhat)"
 								+ "\nVALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);")) {
 			pstmt.setString(1, customerDTO.getIdCard());
 			pstmt.setString(2, customerDTO.getType());
@@ -29,11 +29,12 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 			pstmt.setString(7, customerDTO.getEmail());
 			pstmt.setString(8, customerDTO.getAddress());
 			pstmt.setBoolean(9, customerDTO.getStatus());
-			pstmt.setString(10, customerDTO.getDateUpdate());
+			pstmt.setString(10, customerDTO.getTimeUpdate());
 			rowChange = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		return rowChange;
 	}
 
@@ -45,7 +46,7 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 		// - Kết nối cơ sở dữ liệu để truy vấn
 		try (Connection c = JDBCUtil.getInstance().getConnection();
 				PreparedStatement pstmt = c.prepareStatement("UPDATE Karaoke.KhachHang"
-						+ "\nSET maLoaiKhachHang = ?, hoVaTen = ?, ngaySinh = ?, gioiTinh = ?, soDienThoai = ?, email = ?, diaChi = ?, trangThai = ?, ngayCapNHat = ?"
+						+ "\nSET maLoaiKhachHang = ?, hoVaTen = ?, ngaySinh = ?, gioiTinh = ?, soDienThoai = ?, email = ?, diaChi = ?, thoiGianCapNhat = ?"
 						+ "\nWHERE cccd = ?")) {
 			pstmt.setString(1, customerDTO.getType());
 			pstmt.setString(2, customerDTO.getFullname());
@@ -54,13 +55,13 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 			pstmt.setString(5, customerDTO.getPhone());
 			pstmt.setString(6, customerDTO.getEmail());
 			pstmt.setString(7, customerDTO.getAddress());
-			pstmt.setBoolean(8, customerDTO.getStatus());
-			pstmt.setString(9, customerDTO.getDateUpdate());
-			pstmt.setString(10, customerDTO.getIdCard());
+			pstmt.setString(8, customerDTO.getTimeUpdate());
+			pstmt.setString(9, customerDTO.getIdCard());
 			rowChange = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		return rowChange;
 	}
 
@@ -72,14 +73,15 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 		// - Kết nối CSDL để truy vấn
 		try (Connection c = JDBCUtil.getInstance().getConnection();
 				PreparedStatement pstmt = c.prepareStatement(
-						"UPDATE Karaoke.KhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE cccd = ?")) {
+						"UPDATE Karaoke.KhachHang" + "\nSET trangThai = ?, thoiGianCapNhat = ?" + "\nWHERE cccd = ?")) {
 			pstmt.setBoolean(1, customerDTO.getStatus());
-			pstmt.setString(2, customerDTO.getDateUpdate());
+			pstmt.setString(2, customerDTO.getTimeUpdate());
 			pstmt.setString(3, customerDTO.getIdCard());
 			rowChange = pstmt.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		return rowChange;
 	}
 
@@ -97,12 +99,13 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 				CustomerDTO customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"),
 						rs.getString("hoVaTen"), rs.getString("ngaySinh"), rs.getString("gioiTinh"),
 						rs.getString("soDienThoai"), rs.getString("email"), rs.getString("diaChi"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				list.add(customerDTO);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		return list;
 	}
 
@@ -123,12 +126,13 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 				CustomerDTO customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"),
 						rs.getString("hoVaTen"), rs.getString("ngaySinh"), rs.getString("gioiTinh"),
 						rs.getString("soDienThoai"), rs.getString("email"), rs.getString("diaChi"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				list.add(customerDTO);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		return list;
 	}
 
@@ -148,12 +152,13 @@ public class CustomerDAL implements DAL<CustomerDTO> {
 					customerDTO = new CustomerDTO(rs.getString("cccd"), rs.getString("maLoaiKhachHang"),
 							rs.getString("hoVaTen"), rs.getString("ngaySinh"), rs.getString("gioiTinh"),
 							rs.getString("soDienThoai"), rs.getString("email"), rs.getString("diaChi"),
-							rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+							rs.getBoolean("trangThai"), rs.getString("thoiGianCapNhat"));
 				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
 		return customerDTO;
 	}
 }

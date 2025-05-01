@@ -8,18 +8,18 @@ public class SupplierDTO {
     private String email;
     private String address;
     private Boolean status;
-    private String dateUpdate;
+    private String timeUpdate;
 
     // Constructors
     public SupplierDTO(String id, String name, String phone, String email, String address, Boolean status,
-            String dateUpdate) {
+            String timeUpdate) {
         this.id = id;
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.status = status;
-        this.dateUpdate = dateUpdate;
+        this.timeUpdate = timeUpdate;
     }
 
     // Setter - Getter
@@ -47,8 +47,8 @@ public class SupplierDTO {
         this.status = status;
     }
 
-    public void setDateUpdate(String dateUpdate) {
-        this.dateUpdate = dateUpdate;
+    public void setTimeUpdate(String timeUpdate) {
+        this.timeUpdate = timeUpdate;
     }
 
     public String getId() {
@@ -75,7 +75,7 @@ public class SupplierDTO {
         return status;
     }
 
-    public String getDateUpdate() {
-        return dateUpdate;
+    public String getTimeUpdate() {
+        return timeUpdate;
     }
 }

@@ -19,13 +19,11 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.LoaiKhachHang(maLoaiKhachHang, tenLoaiKhachHang, trangThai, ngayCapNhat)"
+			String sql = "INSERT INTO Karaoke.LoaiKhachHang(maLoaiKhachHang, tenLoaiKhachHang)"
 					+ "\nVALUES(?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, customerTypeDTO.getId());
 			pstmt.setString(2, customerTypeDTO.getName());
-			pstmt.setBoolean(3, customerTypeDTO.getStatus());
-			pstmt.setString(4, customerTypeDTO.getDateUpdate());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -44,13 +42,11 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET tenLoaiKhachHang = ?, trangThai = ?, ngayCapNhat = ?"
+			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET tenLoaiKhachHang = ?"
 					+ "\nWHERE maLoaiKhachHang = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, customerTypeDTO.getName());
-			pstmt.setBoolean(2, customerTypeDTO.getStatus());
-			pstmt.setString(3, customerTypeDTO.getDateUpdate());
-			pstmt.setString(4, customerTypeDTO.getId());
+			pstmt.setString(2, customerTypeDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -63,25 +59,23 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 	// - Hàm khoá một loại khách hàng
 	@Override
 	public int lock(CustomerTypeDTO customerTypeDTO) {
-		// - Biến chứa số dòng đã được thêm
-		int rowChange = 0;
+		// // - Biến chứa số dòng đã được thêm
+		// int rowChange = 0;
 
-		// - Kết nối đến CSDL để truy vấn
-		Connection c = JDBCUtil.getInstance().getConnection();
-		try {
-			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?"
-					+ "\nWHERE maLoaiKhachHang = ?";
-			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setBoolean(1, customerTypeDTO.getStatus());
-			pstmt.setString(2, customerTypeDTO.getDateUpdate());
-			pstmt.setString(3, customerTypeDTO.getId());
-			rowChange = pstmt.executeUpdate();
-			JDBCUtil.getInstance().closeConnection(c);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// // - Kết nối đến CSDL để truy vấn
+		// Connection c = JDBCUtil.getInstance().getConnection();
+		// try {
+		// 	String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?"
+		// 			+ "\nWHERE maLoaiKhachHang = ?";
+		// 	PreparedStatement pstmt = c.prepareStatement(sql);
+		// 	pstmt.setString(1, customerTypeDTO.getId());
+		// 	rowChange = pstmt.executeUpdate();
+		// 	JDBCUtil.getInstance().closeConnection(c);
+		// } catch (SQLException e) {
+		// 	e.printStackTrace();
+		// }
 
-		return rowChange;
+		return 0;
 	}
 
 	// - Hàm lấy ra danh sách các loại khách hàng
@@ -97,8 +91,7 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
-						rs.getString("tenLoaiKhachHang"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"));
 				list.add(customerTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -124,8 +117,7 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
-						rs.getString("tenLoaiKhachHang"), rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"));
 				list.add(customerTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -149,8 +141,7 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+				customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

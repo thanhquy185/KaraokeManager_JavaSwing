@@ -10,12 +10,12 @@ public class ProductBLL {
 	// Properties
 	private ProductDAL productDAL;
 	private ProductDetailBLL productDetailBLL;
-	private IngredientBLL ingredientBLL;
+	private FoodBLL ingredientBLL;
 	// Constructors
 	public ProductBLL() {
 		productDAL = new ProductDAL();
 		productDetailBLL = new ProductDetailBLL();
-		ingredientBLL = new IngredientBLL();
+		ingredientBLL = new FoodBLL();
 	}
 
 	// Methods
@@ -39,15 +39,6 @@ public class ProductBLL {
 	public boolean isInputedName(String name)
 	{
 		if(name == null || name.isEmpty()) return false;
-		return true;
-	}
-
-	// - Hàm kiểm tra tên sản phẩm đã hợp lệ hay chưa ?
-	public boolean isValidName(String name)
-	{
-		if(!CommonBLL.isValidStringType01(name)) {
-			return false;
-		}
 		return true;
 	}
 
@@ -141,7 +132,6 @@ public class ProductBLL {
 		if(!isInputedId(id)) return "Chưa nhập mã sản phẩm";
 		if(!isValidId(id)) return "Nhập sai định dạng mã sản phẩm";
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
-		//if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
 		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";
@@ -176,7 +166,6 @@ public class ProductBLL {
 			return "Chưa nhập đầy đủ thông tin sản phẩm cần thiết";
 		}
 		if(!isInputedName(name)) return "Chưa nhập tên sản phẩm";
-		//if(!isValidName(name)) return "Nhập sai định dạng tên sản phẩm";
 		if(!isInputedPrice(price)) return "Chưa nhập giá sản phẩm";
 		if(!isValidPrice(price)) return "Nhập sai định dạng giá";
 		if (!isSelectedType(type)) return "Chưa chọn mã loại sản phẩm";
@@ -207,7 +196,7 @@ public class ProductBLL {
 		for(int i = 0; i < productList.size(); i++)
 		{
 			int dinhLuong = Integer.parseInt(productList.get(i).getQuantity());
-			int ton = (ingredientBLL.getOneIngredientById(productList.get(i).getIngredientId())).getInventory();
+			Long ton = (ingredientBLL.getOneFoodById(productList.get(i).getIngredientId())).getInventory();
 			if(dinhLuong > ton || dinhLuong == 0) return false;
 		}
 		return true;
