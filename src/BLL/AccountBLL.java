@@ -65,10 +65,10 @@ public class AccountBLL {
 
 	// - Hàm kiểm tra mã người dùng đã hợp lệ hay chưa ?
 	public boolean isValidId(String id) {
-	    if (!CommonBLL.isValidStringType04(id)) {
-	        return false;
-	    }
-	    return true;
+		if (!CommonBLL.isValidStringType04(id)) {
+			return false;
+		}
+		return true;
 	}
 
 	// - Hàm kiểm tra họ và tên đã hợp lệ hay chưa ?
@@ -255,7 +255,7 @@ public class AccountBLL {
 
 	// - Hàm tạo một người dùng
 	public String insertAccount(String id, String fullname, String phone, String email, String address, String username,
-			String password, String privilegeId, String status, String dateUpdate) {
+			String password, String privilegeId, String status, String timeUpdate) {
 		// - Kiểm tra các trường hợp
 		if (!isInputedId(id) && !isInputedUsername(username) && !isInputedPassword(password)
 				&& !isSelectedPrivilege(privilegeId) && !isSelectedStatus(status)) {
@@ -334,17 +334,17 @@ public class AccountBLL {
 		String accountPassword = password;
 		String accountPrivilegeId = privilegeId;
 		boolean accountStatus = status.equals("Hoạt động") ? true : false;
-		String accountDateUpdate = dateUpdate;
+		String accountTimeUpdate = timeUpdate;
 		AccountDTO newAccountDTO = new AccountDTO(accountId, accountFullname, accountPhone, accountEmail,
-				accountAddress, accountUsername, accountPassword, accountPrivilegeId, accountStatus, accountDateUpdate);
+				accountAddress, accountUsername, accountPassword, accountPrivilegeId, accountStatus, accountTimeUpdate);
 		accountDAL.insert(newAccountDTO);
 
 		return "Có thể thêm một người dùng";
 	}
 
 	// - Hàm cập nhật một người dùng
-	public String updateAccount(String id, String fullname, String phone, String email, String address, String username,
-			String password, String privilegeId, String status, String dateUpdate) {
+	public String updateAccount(String id, String fullname, String phone, String email, String address, String password,
+			String privilegeId, String timeUpdate) {
 		// - Kiểm tra các trường hợp
 		if (!isInputedPassword(password) && !isSelectedPrivilege(privilegeId)) {
 			return "Chưa nhập đầy đủ thông tin người dùng cần thiết";
@@ -393,24 +393,24 @@ public class AccountBLL {
 		String accountPhone = phone;
 		String accountEmail = email;
 		String accountAddress = address;
-		String accountUsername = username;
+		String accountUsername = null;
 		String accountPassword = password;
 		String accountPrivilegeId = privilegeId;
-		boolean accountStatus = status.equals("Hoạt động") ? true : false;
-		String accountDateUpdate = dateUpdate;
+		Boolean accountStatus = null;
+		String accountTimeUpdate = timeUpdate;
 		AccountDTO updateAccountDTO = new AccountDTO(accountId, accountFullname, accountPhone, accountEmail,
-				accountAddress, accountUsername, accountPassword, accountPrivilegeId, accountStatus, accountDateUpdate);
+				accountAddress, accountUsername, accountPassword, accountPrivilegeId, accountStatus, accountTimeUpdate);
 		accountDAL.update(updateAccountDTO);
 
 		return "Có thể thay đổi một người dùng";
 	}
 
 	// - Hàm khoá một người dùng
-	public String lockAccount(String id, String dateUpdate) {
+	public String lockAccount(String id, String timeUpdate) {
 		// - Khoá hoặc mở khoá tuỳ vào trạng thái hiện tại
 		AccountDTO lockAccountDTO = getOneAccountById(id);
 		lockAccountDTO.setStatus(lockAccountDTO.getStatus() ? false : true);
-		lockAccountDTO.setTimeUpdate(dateUpdate);
+		lockAccountDTO.setTimeUpdate(timeUpdate);
 		accountDAL.lock(lockAccountDTO);
 
 		return "Có thể khoá một người dùng";

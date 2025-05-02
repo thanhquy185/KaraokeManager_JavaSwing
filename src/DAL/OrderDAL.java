@@ -20,19 +20,18 @@ public class OrderDAL implements DAL<OrderDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.HoaDon(maHoaDon, ngayLapHD, maPhong, maNhanVien, maKhachHang, maKhuyenMai, tongGio, tongTien, trangThai, ngayCapNhat)"
+			String sql = "INSERT INTO Karaoke.HoaDon(maHoaDon, thoiGianTaoDon, thoiGianBatDau, thoiGianKetThuc, maPhong, maNhanVien, maKhachHang, tongTien, trangThai)"
 					+ "\nVALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setInt(1, orderDTO.getId());
-			pstmt.setString(2, orderDTO.getDateOrder());
-			pstmt.setString(3, orderDTO.getRoomId());
-			pstmt.setString(4, orderDTO.getCustomerId());
-			pstmt.setInt(5, orderDTO.getEmployeeId());
-			pstmt.setString(6, orderDTO.getDiscountId());
-			pstmt.setInt(7, orderDTO.getTime());
-			pstmt.setLong(8, orderDTO.getCost());
-			pstmt.setBoolean(9, orderDTO.getStatus());
-			pstmt.setString(10, orderDTO.getDateUpdate());
+			pstmt.setString(2, orderDTO.getTimeCreate());
+			pstmt.setString(3, orderDTO.getTimeStart());
+			pstmt.setString(4, orderDTO.getTimeEnd());
+			pstmt.setString(5, orderDTO.getRoomId());
+			pstmt.setInt(6, orderDTO.getEmployeeId());
+			pstmt.setString(7, orderDTO.getCustomerId());
+			pstmt.setLong(8, orderDTO.getTotalPrice());
+			pstmt.setInt(9, orderDTO.getStatus());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -52,19 +51,13 @@ public class OrderDAL implements DAL<OrderDTO> {
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
 			String sql = "UPDATE Karaoke.HoaDon"
-					+ "\nSET ngayLapHD = ?, maPhong = ?, maNhanVien = ?, maKhachHang = ?, maKhuyenMai = ?, tongGio = ?, tongTien = ?, trangThai = ?, ngayCapNhat = ?"
+					+ "\nSET thoiGianKetThuc = ?, tongTien = ?, trangThai = ?"
 					+ "\nWHERE maHoaDon = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setString(1, orderDTO.getDateOrder());
-			pstmt.setString(2, orderDTO.getRoomId());
-			pstmt.setInt(3, orderDTO.getEmployeeId());
-			pstmt.setString(4, orderDTO.getCustomerId());
-			pstmt.setString(5, orderDTO.getDiscountId());
-			pstmt.setInt(6, orderDTO.getTime());
-			pstmt.setLong(7, orderDTO.getCost());
-			pstmt.setBoolean(8, orderDTO.getStatus());
-			pstmt.setString(9, orderDTO.getDateUpdate());
-			pstmt.setInt(10, orderDTO.getId());
+			pstmt.setString(1, orderDTO.getTimeEnd());
+			pstmt.setLong(2, orderDTO.getTotalPrice());
+			pstmt.setInt(3, orderDTO.getStatus());
+			pstmt.setInt(4, orderDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -83,11 +76,10 @@ public class OrderDAL implements DAL<OrderDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.HoaDon" + "\nSET trangThai = ?, ngayCapNhat = ?" + "\nWHERE maHoaDon = ?";
+			String sql = "UPDATE Karaoke.HoaDon" + "\nSET trangThai = ?" + "\nWHERE maHoaDon = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setBoolean(1, orderDTO.getStatus());
-			pstmt.setString(2, orderDTO.getDateUpdate());
-			pstmt.setInt(3, orderDTO.getId());
+			pstmt.setInt(1, orderDTO.getStatus());
+			pstmt.setInt(2, orderDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -110,10 +102,11 @@ public class OrderDAL implements DAL<OrderDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				OrderDTO orderDTO = new OrderDTO(rs.getInt("maHoaDon"), rs.getString("ngayLapHD"),
+				OrderDTO orderDTO = new OrderDTO(rs.getInt("maHoaDon"), rs.getString("thoiGianTaoDon"),
+						rs.getString("thoiGianBatDau"), rs.getString("thoiGianKetThuc"),
 						rs.getString("maPhong"), rs.getInt("maNhanVien"), rs.getString("maKhachHang"),
-						rs.getString("maKhuyenMai"), rs.getInt("tongGio"), rs.getLong("tongTien"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("tongTien"),
+						rs.getInt("trangThai"));
 				list.add(orderDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -139,10 +132,11 @@ public class OrderDAL implements DAL<OrderDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				OrderDTO orderDTO =  new OrderDTO(rs.getInt("maHoaDon"), rs.getString("ngayLapHD"),
+				OrderDTO orderDTO = new OrderDTO(rs.getInt("maHoaDon"), rs.getString("thoiGianTaoDon"),
+						rs.getString("thoiGianBatDau"), rs.getString("thoiGianKetThuc"),
 						rs.getString("maPhong"), rs.getInt("maNhanVien"), rs.getString("maKhachHang"),
-						rs.getString("maKhuyenMai"), rs.getInt("tongGio"), rs.getLong("tongTien"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("tongTien"),
+						rs.getInt("trangThai"));
 				list.add(orderDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -162,14 +156,15 @@ public class OrderDAL implements DAL<OrderDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = String.format("SELECT * FROM Karaoke.HoaDon \nWHERE maPhong = %s;", id);
+			String sql = String.format("SELECT * FROM Karaoke.HoaDon \nWHERE maHoaDon = %s;", id);
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				orderDTO =  new OrderDTO(rs.getInt("maHoaDon"), rs.getString("ngayLapHD"),
+				orderDTO = new OrderDTO(rs.getInt("maHoaDon"), rs.getString("thoiGianTaoDon"),
+						rs.getString("thoiGianBatDau"), rs.getString("thoiGianKetThuc"),
 						rs.getString("maPhong"), rs.getInt("maNhanVien"), rs.getString("maKhachHang"),
-						rs.getString("maKhuyenMai"), rs.getInt("tongGio"), rs.getLong("tongTien"),
-						rs.getBoolean("trangThai"), rs.getString("ngayCapNhat"));
+						rs.getLong("tongTien"),
+						rs.getInt("trangThai"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import DTO.PrivilegeDetailDTO;
+import DTO.PrivilegeDetailDTO;
 
 public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 	// Methods
@@ -19,13 +20,11 @@ public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.ChiTietQuyen(maNguoiDung, maQuyen, maChucNang, trangThai)"
-					+ "\nVALUES(?, ?, ?, ?);";
+			String sql = "INSERT INTO Karaoke.ChiTietQuyen(maNguoiDung, maChucNang)"
+					+ "\nVALUES(?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setInt(1, privilegeDetailDTO.getAccountId());
-			pstmt.setString(2, privilegeDetailDTO.getPrivilegeId());
-			pstmt.setString(3, privilegeDetailDTO.getFunctionId());
-			pstmt.setBoolean(4, privilegeDetailDTO.getStatus());
+			pstmt.setString(2, privilegeDetailDTO.getFunctionId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -38,26 +37,27 @@ public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 	// - Hàm thay đổi một chi tiết quyền
 	@Override
 	public int update(PrivilegeDetailDTO privilegeDetailDTO) {
-		// - Biến chứa số dòng đã được thêm
-		int rowChange = 0;
+		// // - Biến chứa số dòng đã được thêm
+		// int rowChange = 0;
 
-		// - Kết nối đến CSDL để truy vấn
-		Connection c = JDBCUtil.getInstance().getConnection();
-		try {
-			String sql = "UPDATE Karaoke.ChiTietQuyen" + "\nSET maQuyen = ?, trangThai = ?"
-					+ "\nWHERE maNguoiDung = ? AND maChucNang = ?";
-			PreparedStatement pstmt = c.prepareStatement(sql);
-			pstmt.setString(1, privilegeDetailDTO.getPrivilegeId());
-			pstmt.setBoolean(2, privilegeDetailDTO.getStatus());
-			pstmt.setInt(3, privilegeDetailDTO.getAccountId());
-			pstmt.setString(4, privilegeDetailDTO.getFunctionId());
-			rowChange = pstmt.executeUpdate();
-			JDBCUtil.getInstance().closeConnection(c);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		// // - Kết nối đến CSDL để truy vấn
+		// Connection c = JDBCUtil.getInstance().getConnection();
+		// try {
+		// String sql = "UPDATE Karaoke.ChiTietQuyen" + "\nSET maQuyen = ?, trangThai =
+		// ?"
+		// + "\nWHERE maNguoiDung = ? AND maChucNang = ?";
+		// PreparedStatement pstmt = c.prepareStatement(sql);
+		// pstmt.setString(1, privilegeDetailDTO.getPrivilegeId());
+		// pstmt.setBoolean(2, privilegeDetailDTO.getStatus());
+		// pstmt.setInt(3, privilegeDetailDTO.getAccountId());
+		// pstmt.setString(4, privilegeDetailDTO.getFunctionId());
+		// rowChange = pstmt.executeUpdate();
+		// JDBCUtil.getInstance().closeConnection(c);
+		// } catch (SQLException e) {
+		// e.printStackTrace();
+		// }
 
-		return rowChange;
+		return 0;
 	}
 
 	// - Hàm khoá một chi tiết quyền
@@ -65,6 +65,27 @@ public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 	public int lock(PrivilegeDetailDTO privilegeDetailDTO) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	// - Hàm xoá tất cả chi tiết quyền theo mã người dùng
+	public int deleteAllByAccountId(String accountId) {
+		// - Biến chứa số dòng đã được thêm
+		int rowChange = 0;
+
+		// - Kết nối đến CSDL để truy vấn
+		Connection c = JDBCUtil.getInstance().getConnection();
+		try {
+			String sql = "DELETE FROM Karaoke.ChiTietQuyen"
+					+ "\nWHERE maNguoiDung = ?";
+			PreparedStatement pstmt = c.prepareStatement(sql);
+			pstmt.setString(1, accountId);
+			rowChange = pstmt.executeUpdate();
+			JDBCUtil.getInstance().closeConnection(c);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return rowChange;
 	}
 
 	// - Hàm lấy ra danh sách các chi tiết quyền
@@ -81,7 +102,7 @@ public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				PrivilegeDetailDTO privilegeDetailDTO = new PrivilegeDetailDTO(rs.getInt("maNguoiDung"),
-						rs.getString("maQuyen"), rs.getString("maChucNang"), rs.getBoolean("trangThai"));
+						rs.getString("maChucNang"));
 				list.add(privilegeDetailDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -108,7 +129,7 @@ public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				PrivilegeDetailDTO privilegeDetailDTO = new PrivilegeDetailDTO(rs.getInt("maNguoiDung"),
-						rs.getString("maQuyen"), rs.getString("maChucNang"), rs.getBoolean("trangThai"));
+						rs.getString("maChucNang"));
 				list.add(privilegeDetailDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -119,28 +140,50 @@ public class PrivilegeDetailDAL implements DAL<PrivilegeDetailDTO> {
 		return list;
 	}
 
-	// - Hàm lấy ra danh sách các chi tiết quyền dựa trên mã người dùng
-	@Override
-	public PrivilegeDetailDTO selectOneById(String id) {
-		// - Khai báo biến chứa danh sách trả về
-		PrivilegeDetailDTO privilegeDetailDTO = null;
-
-		// - Kết nối đến CSDL để truy vấn
-		Connection c = JDBCUtil.getInstance().getConnection();
-		try {
-			String sql = String.format("SELECT * FROM Karaoke.ChiTietQuyen \nWHERE maNguoiDung = '%s';", id);
-			PreparedStatement pstmt = c.prepareStatement(sql);
-			ResultSet rs = pstmt.executeQuery();
+	// - Hàm lấy ra danh sách các chi tiết quyền theo mã người dùng
+	public ArrayList<PrivilegeDetailDTO> selectAllByAccountId(String accountId) {
+		ArrayList<PrivilegeDetailDTO> list = new ArrayList<>();
+		String sql = "SELECT * FROM Karaoke.ChiTietQuyen"
+				+ (accountId != null ? " WHERE maNguoiDung = " + accountId + ";" : ";");
+		try (Connection c = JDBCUtil.getInstance().getConnection();
+				PreparedStatement pstmt = c.prepareStatement(sql);
+				ResultSet rs = pstmt.executeQuery()) {
 			while (rs.next()) {
-				privilegeDetailDTO = new PrivilegeDetailDTO(rs.getInt("maNguoiDung"), rs.getString("maQuyen"),
-						rs.getString("maChucNang"), rs.getBoolean("trangThai"));
+				PrivilegeDetailDTO privilegeDetailDTO = new PrivilegeDetailDTO(rs.getInt("maNguoiDung"),
+						rs.getString("maChucNang"));
+				list.add(privilegeDetailDTO);
+
 			}
-			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return list;
+	}
 
-		return privilegeDetailDTO;
+	// - Hàm lấy ra danh sách các chi tiết quyền dựa trên mã người dùng
+	@Override
+	public PrivilegeDetailDTO selectOneById(String id) {
+		// // - Khai báo biến chứa danh sách trả về
+		// PrivilegeDetailDTO privilegeDetailDTO = null;
+
+		// // - Kết nối đến CSDL để truy vấn
+		// Connection c = JDBCUtil.getInstance().getConnection();
+		// try {
+		// String sql = String.format("SELECT * FROM Karaoke.ChiTietQuyen \nWHERE
+		// maNguoiDung = '%s';", id);
+		// PreparedStatement pstmt = c.prepareStatement(sql);
+		// ResultSet rs = pstmt.executeQuery();
+		// while (rs.next()) {
+		// privilegeDetailDTO = new PrivilegeDetailDTO(rs.getInt("maNguoiDung"),
+		// rs.getString("maChucNang"));
+		// }
+		// JDBCUtil.getInstance().closeConnection(c);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+
+		// return privilegeDetailDTO;
+		return null;
 	}
 
 }

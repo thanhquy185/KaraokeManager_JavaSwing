@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice</title>
+  <style>
+      * {
+        font-family: Arial, sans-serif;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: inherit;
+      }
+      .ticket {
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      .ticket h1 {
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 12px;
+      }
+      .ticket p {
+        margin-top: 8px;
+        font-size: 14px;
+      }
+      .ticket table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 4px;
+      }
+      .ticket table th,
+      .ticket table td {
+        border: 1px solid #ddd;
+        font-size: 12px;
+        text-align: center;
+      }
+      .ticket th,
+      .ticket td {
+        padding: 8px;
+      }
+    </style>
+ </head>
+ <body>
+  <div class="ticket">
+   <h1 id="title">Thống kê Lợi nhuận</h1>
+   <div id="infos"></div>
+   <div style="margin-top: 8px">
+    <p id="desc-table"><strong>Dữ liệu thống kê:</strong></p>
+    <table>
+     <thead id="head-table">
+      <tr>
+       <th width="36%">Tuần</th>
+       <th width="18%">Doanh thu (VNĐ)</th>
+       <th width="18%">Chi tiêu (VNĐ)</th>
+       <th width="28%">Lợi nhuận (VNĐ)</th>
+      </tr>
+     </thead>
+     <tbody id="body-table">
+      <tr>
+       <td>Tuần 01 (01/03/2025 - 07/03/2025)</td>
+       <td>0</td>
+       <td>0</td>
+       <td>0</td>
+      </tr>
+      <tr>
+       <td>Tuần 02 (08/03/2025 - 14/03/2025)</td>
+       <td>0</td>
+       <td>0</td>
+       <td>0</td>
+      </tr>
+      <tr>
+       <td>Tuần 03 (15/03/2025 - 21/03/2025)</td>
+       <td>0</td>
+       <td>0</td>
+       <td>0</td>
+      </tr>
+      <tr>
+       <td>Tuần 04 (22/03/2025 - 28/03/2025)</td>
+       <td>0</td>
+       <td>0</td>
+       <td>0</td>
+      </tr>
+      <tr>
+       <td>Tuần 05 (29/03/2025 - 31/03/2025)</td>
+       <td>0</td>
+       <td>0</td>
+       <td>0</td>
+      </tr>
+      <tr>
+       <td>TỔNG</td>
+       <td>0</td>
+       <td>0</td>
+       <td>0</td>
+      </tr>
+     </tbody>
+    </table>
+   </div>
+  </div>
+ </body>
+</html>

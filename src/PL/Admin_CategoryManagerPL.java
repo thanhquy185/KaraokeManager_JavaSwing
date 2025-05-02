@@ -1,9 +1,6 @@
 package PL;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -20,7 +17,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.UIManager;
 
 import BLL.CategoryBLL;
@@ -192,7 +188,7 @@ public class Admin_CategoryManagerPL extends JPanel {
 
         // Sự kiện nút "Thêm"
         addButton.addActionListener(e -> {
-            showAddOrUpdateDialog("Thêm loại món ăn", "Thêm", new Vector<>());
+            showAddOrUpdateDialog("Thêm Loại món ăn", "Thêm", new Vector<>());
             rowSelected = -1;
             valueSelected[0] = false;
             tableData.clearSelection();
@@ -208,7 +204,7 @@ public class Admin_CategoryManagerPL extends JPanel {
                 currentObject.add(categorySelected.getName());
                 currentObject.add(categorySelected.getStatus() ? "Hoạt động" : "Tạm dừng");
 
-                showAddOrUpdateDialog("Thay đổi loại món ăn", "Thay đổi", currentObject);
+                showAddOrUpdateDialog("Thay đổi Loại món ăn", "Thay đổi", currentObject);
             } else {
                 CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần thay đổi");
             }
@@ -344,7 +340,7 @@ public class Admin_CategoryManagerPL extends JPanel {
         SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 
         // Khi "Thêm"
-        if (title.equals("Thêm loại món ăn") && button.equals("Thêm") && object.isEmpty()) {
+        if (title.equals("Thêm Loại món ăn") && button.equals("Thêm") && object.isEmpty()) {
             CategoryDTO lastcategory = categoryBLL.getLastCategory();
             // Lấy số cuối cùng từ mã (2 chữ số) và tăng lên 1
             int lastNumber = Integer.parseInt(lastcategory.getId().substring(3)); // Lấy phần số từ Loại món ănxx
@@ -354,7 +350,7 @@ public class Admin_CategoryManagerPL extends JPanel {
         }
 
         // Khi "Thay đổi"
-        if (title.equals("Thay đổi loại món ăn") && button.equals("Thay đổi") && !object.isEmpty()) {
+        if (title.equals("Thay đổi Loại món ăn") && button.equals("Thay đổi") && !object.isEmpty()) {
             if (object.get(0) != null) {
                 addOrUpdateIdTextField.setText(String.valueOf(object.get(0)));
                 ((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
@@ -375,31 +371,37 @@ public class Admin_CategoryManagerPL extends JPanel {
 
         // Sự kiện nút "Thêm" hoặc "Thay đổi"
         addOrUpdateButton.addActionListener(e -> {
-            String id = addOrUpdateIdTextField.getText();
-            String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
-                    ? addOrUpdateNameTextField.getText()
-                    : null;
-            String status = !addOrUpdateStatusComboBox.getSelectedItem().equals(defaultValuesForCrud.get("status"))
-                    ? (String) addOrUpdateStatusComboBox.getSelectedItem()
-                    : null;
-            String timeUpdate = CommonPL.getCurrentDatetime();
+            CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+                    String.format("Có chắc chắn %s loại món ăn này?", button.toLowerCase()),
+                    valueSelected);
+            if (valueSelected[0]) {
+                String id = addOrUpdateIdTextField.getText();
+                String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
+                        ? addOrUpdateNameTextField.getText()
+                        : null;
+                String status = !addOrUpdateStatusComboBox.getSelectedItem().equals(defaultValuesForCrud.get("status"))
+                        ? (String) addOrUpdateStatusComboBox.getSelectedItem()
+                        : null;
+                String timeUpdate = CommonPL.getCurrentDatetime();
 
-            // - Biến chứa thông báo trả về
-            String inform = null;
-            // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-            if (title.equals("Thêm loại món ăn") && button.equals("Thêm")) {
-                inform = categoryBLL.insertCategory(id, name, status, timeUpdate);
-            } else if (title.equals("Thay đổi loại món ăn") && button.equals("Thay đổi")) {
-                inform = categoryBLL.updateCategory(id, name, timeUpdate);
+                // - Biến chứa thông báo trả về
+                String inform = null;
+                // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+                if (title.equals("Thêm Loại món ăn") && button.equals("Thêm")) {
+                    inform = categoryBLL.insertCategory(id, name, status, timeUpdate);
+                } else if (title.equals("Thay đổi Loại món ăn") && button.equals("Thay đổi")) {
+                    inform = categoryBLL.updateCategory(id, name, timeUpdate);
+                }
+                // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+                if (inform.equals("Thêm Loại món ăn thành công") || inform.equals("Cập nhật loại món ăn thành công")) {
+                    CommonPL.createSuccessDialog("Thông báo thành công", inform);
+                    addOrUpdateDialog.dispose();
+                    resetPage();
+                } else {
+                    CommonPL.createErrorDialog("Thông báo lỗi", inform);
+                }
             }
-            // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-            if (inform.equals("Thêm loại món ăn thành công") || inform.equals("Cập nhật loại món ăn thành công")) {
-                CommonPL.createSuccessDialog("Thông báo thành công", inform);
-                addOrUpdateDialog.dispose();
-                resetPage();
-            } else {
-                CommonPL.createErrorDialog("Thông báo lỗi", inform);
-            }
+            valueSelected[0] = false;
         });
 
         // Cấu hình dialog

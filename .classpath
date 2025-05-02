@@ -5,6 +5,10 @@
 	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/guava-33.4.0-jre.jar"/>
 	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/swingx-all-1.6.4.jar"/>
 	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/protobuf-java-3.19.4.jar"/>
+	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/flying-saucer-pdf-itext5-9.1.22.jar"/>
+	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/flying-saucer-core-9.1.20.jar"/>
+	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/itextpdf-5.5.13.jar"/>
+	<classpathentry kind="lib" path="/Users/macbook/Desktop/jar_files/jsoup-1.15.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>

@@ -3,111 +3,100 @@ package DTO;
 public class OrderDTO {
 	// Properties
 	private Integer id;
-	private String dateOrder;
+	private String timeCreate;
+	private String timeStart;
+	private String timeEnd;
 	private String roomId;
 	private Integer employeeId;
 	private String customerId;
-	private String discountId;
-	private Integer time;
-	private Long cost;
-	private Boolean status;
-	private String dateUpdate;
+	private Long totalPrice;
+	private Integer status;
 
 	// Constructors
-	public OrderDTO(Integer id, String dateOrder, String roomId, Integer employeeId, String customerId,
-			String discountId, Integer time, Long cost, Boolean status, String dateUpdate) {
-		super();
+	public OrderDTO(Integer id, String timeCreate, String timeStart, String timeEnd, String roomId, Integer employeeId,
+			String customerId, Long totalPrice, Integer status) {
 		this.id = id;
-		this.dateOrder = dateOrder;
+		this.timeCreate = timeCreate;
+		this.timeStart = timeStart;
+		this.timeEnd = timeEnd;
 		this.roomId = roomId;
 		this.employeeId = employeeId;
 		this.customerId = customerId;
-		this.discountId = discountId;
-		this.time = time;
-		this.cost = cost;
-		this.status = status;
-		this.dateUpdate = dateUpdate;
-	}
-
-	// Setter - Getter
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	public void setDateOrder(String dateOrder) {
-		this.dateOrder = dateOrder;
-	}
-
-	public void setRoomId(String roomId) {
-		this.roomId = roomId;
-	}
-
-	public void setEmployeeId(Integer employeeId) {
-		this.employeeId = employeeId;
-	}
-
-	public void setCustomerId(String customerId) {
-		this.customerId = customerId;
-	}
-
-	public void setDiscountId(String discountId) {
-		this.discountId = discountId;
-	}
-
-	public void setTime(Integer time) {
-		this.time = time;
-	}
-
-	public void setCost(Long cost) {
-		this.cost = cost;
-	}
-
-	public void setStatus(Boolean status) {
+		this.totalPrice = totalPrice;
 		this.status = status;
 	}
 
-	public void setDateUpdate(String dateUpdate) {
-		this.dateUpdate = dateUpdate;
-	}
-
+	// Getter - Setter
 	public Integer getId() {
 		return id;
 	}
 
-	public String getDateOrder() {
-		return dateOrder;
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getTimeCreate() {
+		return timeCreate;
+	}
+
+	public void setTimeCreate(String timeCreate) {
+		this.timeCreate = timeCreate;
+	}
+
+	public String getTimeStart() {
+		return timeStart;
+	}
+
+	public void setTimeStart(String timeStart) {
+		this.timeStart = timeStart;
+	}
+
+	public String getTimeEnd() {
+		return timeEnd;
+	}
+
+	public void setTimeEnd(String timeEnd) {
+		this.timeEnd = timeEnd;
 	}
 
 	public String getRoomId() {
 		return roomId;
 	}
 
+	public void setRoomId(String roomId) {
+		this.roomId = roomId;
+	}
+
 	public Integer getEmployeeId() {
 		return employeeId;
+	}
+
+	public void setEmployeeId(Integer employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public String getCustomerId() {
 		return customerId;
 	}
 
-	public String getDiscountId() {
-		return discountId;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 
-	public Integer getTime() {
-		return time;
+	public Long getTotalPrice() {
+		return totalPrice;
 	}
 
-	public Long getCost() {
-		return cost;
+	public void setTotalPrice(Long totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 
-	public Boolean getStatus() {
+	public Integer getStatus() {
 		return status;
 	}
 
-	public String getDateUpdate() {
-		return dateUpdate;
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 }

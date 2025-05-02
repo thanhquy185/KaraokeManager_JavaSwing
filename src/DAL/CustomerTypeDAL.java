@@ -19,11 +19,12 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "INSERT INTO Karaoke.LoaiKhachHang(maLoaiKhachHang, tenLoaiKhachHang)"
+			String sql = "INSERT INTO Karaoke.LoaiKhachHang(maLoaiKhachHang, tenLoaiKhachHang, uuDai)"
 					+ "\nVALUES(?, ?, ?, ?);";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, customerTypeDTO.getId());
 			pstmt.setString(2, customerTypeDTO.getName());
+			pstmt.setInt(3, customerTypeDTO.getDiscount());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -42,11 +43,12 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 		// - Kết nối đến CSDL để truy vấn
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
-			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET tenLoaiKhachHang = ?"
+			String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET tenLoaiKhachHang = ?, uuDai = ?"
 					+ "\nWHERE maLoaiKhachHang = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, customerTypeDTO.getName());
-			pstmt.setString(2, customerTypeDTO.getId());
+			pstmt.setInt(2, customerTypeDTO.getDiscount());
+			pstmt.setString(3, customerTypeDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -65,14 +67,15 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 		// // - Kết nối đến CSDL để truy vấn
 		// Connection c = JDBCUtil.getInstance().getConnection();
 		// try {
-		// 	String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET trangThai = ?, ngayCapNhat = ?"
-		// 			+ "\nWHERE maLoaiKhachHang = ?";
-		// 	PreparedStatement pstmt = c.prepareStatement(sql);
-		// 	pstmt.setString(1, customerTypeDTO.getId());
-		// 	rowChange = pstmt.executeUpdate();
-		// 	JDBCUtil.getInstance().closeConnection(c);
+		// String sql = "UPDATE Karaoke.LoaiKhachHang" + "\nSET trangThai = ?,
+		// ngayCapNhat = ?"
+		// + "\nWHERE maLoaiKhachHang = ?";
+		// PreparedStatement pstmt = c.prepareStatement(sql);
+		// pstmt.setString(1, customerTypeDTO.getId());
+		// rowChange = pstmt.executeUpdate();
+		// JDBCUtil.getInstance().closeConnection(c);
 		// } catch (SQLException e) {
-		// 	e.printStackTrace();
+		// e.printStackTrace();
 		// }
 
 		return 0;
@@ -91,7 +94,8 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"));
+				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
+						rs.getString("tenLoaiKhachHang"), rs.getInt("uuDai"));
 				list.add(customerTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -117,7 +121,8 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"));
+				CustomerTypeDTO customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
+						rs.getString("tenLoaiKhachHang"), rs.getInt("uuDai"));
 				list.add(customerTypeDTO);
 			}
 			JDBCUtil.getInstance().closeConnection(c);
@@ -141,7 +146,8 @@ public class CustomerTypeDAL implements DAL<CustomerTypeDTO> {
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"), rs.getString("tenLoaiKhachHang"));
+				customerTypeDTO = new CustomerTypeDTO(rs.getString("maLoaiKhachHang"),
+						rs.getString("tenLoaiKhachHang"), rs.getInt("uuDai"));
 			}
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (Exception e) {

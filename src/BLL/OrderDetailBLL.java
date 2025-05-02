@@ -3,6 +3,8 @@ package BLL;
 import java.util.ArrayList;
 
 import DAL.OrderDetailDAL;
+import DTO.InputTicketDetailDTO;
+import DTO.OrderDetailDTO;
 import DTO.OrderDetailDTO;
 
 public class OrderDetailBLL {
@@ -16,48 +18,30 @@ public class OrderDetailBLL {
 
 	// Methods
 	// - Hàm kiểm tra giá sản phẩm đã được nhập hay chưa ?
-	public boolean isInputedQuantity(String quantity)
-	{
-		if(quantity == null || quantity.trim().isEmpty()) return false;
+	public boolean isInputedQuantity(String quantity) {
+		if (quantity == null || quantity.trim().isEmpty())
+			return false;
 		return true;
 	}
 
 	// - Hàm kiểm tra giá sản phẩm đã hợp lệ hay chưa ?
-	public boolean isValidQuantity(String quantity)
-	{
-		if(!CommonBLL.isValidStringType04(quantity)) {
+	public boolean isValidQuantity(String quantity) {
+		if (!CommonBLL.isValidStringType04(quantity)) {
 			return false;
 		}
 		return true;
 	}
 
-	// - Hàm kiểm tra sản phẩm đã tồn tại trong CTHD chưa?
-	public int isExistProductId(String orderId, String productId)
-	{
-		String[] join = null;
-		String condition = String.format("maHoaDon = '%s' AND maSanPham = '%s' ",orderId,productId);
-		String order = null;
-		ArrayList<OrderDetailDTO> result = orderDetailDAL.selectAllByCondition(join, condition, order);
-		if(result == null || result.isEmpty()) return -1;
-		return result.get(0).getQuantity();
-	}
-	// - Hàm cập nhật một CTHD
-	public String updateOrderDetail(String orderId, String productId, String quantity)
-	{
-		if(!isInputedQuantity(quantity)) return "Chưa nhập số lượng sản phẩm";
-		if(!isValidQuantity(quantity)) return "Nhập sai định dạng của số lượng sản phẩm";
-		// Kiểm tra sản phẩm này đã tồn tại trong CTHD chưa ?
-		int check = isExistProductId(orderId,productId);
-		OrderDetailDTO orderDetail = new OrderDetailDTO(Integer.parseInt(orderId), productId, (check == -1 ) ? Integer.parseInt(quantity) : Integer.parseInt(quantity)+check);
-		if(check == -1)
-		{
-			orderDetailDAL.insert(orderDetail);
+	public String insertOrderDetail(Integer order, String foodId, Long price, Long quantity) {
+		if (order == null || foodId == null || price == null || quantity == null) {
+			return "Thông tin chi tiết phiếu nhập không đầy đủ";
 		}
-		else {
-			orderDetailDAL.update(orderDetail);
-		}
-		return "Có thể cập nhật một CTHD";
+
+		OrderDetailDTO dto = new OrderDetailDTO(order, foodId, price, quantity);
+		int result = orderDetailDAL.insert(dto);
+		return result > 0 ? "Thêm chi tiết phiếu nhập thành công" : "Thêm chi tiết phiếu nhập thất bại";
 	}
+
 	// - Hàm lấy ra danh sách các CTHD hiện có trong CSDL
 	public ArrayList<OrderDetailDTO> getAllOrderDetail() {
 		return orderDetailDAL.selectAll();
@@ -67,6 +51,11 @@ public class OrderDetailBLL {
 	public ArrayList<OrderDetailDTO> getAllOrderDetailByCondition(String[] join, String condition, String OrderDetail) {
 		return orderDetailDAL.selectAllByCondition(join, condition, OrderDetail);
 	}
+
+	// - Hàm lấy ra danh sách các chi tiết hoá đơn theo mã hoá đơn
+	public ArrayList<OrderDetailDTO> getAllOrderDetailByOrderId(String orderId) {
+        return orderDetailDAL.selectAllByOrderId(orderId);
+    }
 
 	// - Hàm lấy ra một CTHD với mã hoá đơn tương ứng
 	public OrderDetailDTO getOneOrderDetailById(String id) {

@@ -459,36 +459,42 @@ public class Admin_RoomManagerPL extends JPanel {
 
         // Sự kiện nút "Thêm" hoặc "Thay đổi"
         addOrUpdateButton.addActionListener(e -> {
-            String id = addOrUpdateIdTextField.getText();
-            String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
-                    ? addOrUpdateNameTextField.getText()
-                    : null;
-            String type = !addOrUpdateTypeComboBox.getSelectedItem().equals(defaultValuesForCrud.get("type"))
-                    ? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
-                    : null;
-            String status = !addOrUpdateStatusComboBox.getSelectedItem().equals(defaultValuesForCrud.get("status"))
-                    ? (String) addOrUpdateStatusComboBox.getSelectedItem()
-                    : null;
-            String timeUpdate = CommonPL.getCurrentDatetime();
+            CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+                    String.format("Có chắc chắn %s phòng hát này?", button.toLowerCase()),
+                    valueSelected);
+            if (valueSelected[0]) {
+                String id = addOrUpdateIdTextField.getText();
+                String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
+                        ? addOrUpdateNameTextField.getText()
+                        : null;
+                String type = !addOrUpdateTypeComboBox.getSelectedItem().equals(defaultValuesForCrud.get("type"))
+                        ? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
+                        : null;
+                String status = !addOrUpdateStatusComboBox.getSelectedItem().equals(defaultValuesForCrud.get("status"))
+                        ? (String) addOrUpdateStatusComboBox.getSelectedItem()
+                        : null;
+                String timeUpdate = CommonPL.getCurrentDatetime();
 
-            System.out.println(type);
+                System.out.println(type);
 
-            // - Biến chứa thông báo trả về
-            String inform = null;
-            // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-            if (title.equals("Thêm phòng hát") && button.equals("Thêm")) {
-                inform = roomBLL.insertRoom(id, name, type, status, timeUpdate);
-            } else if (title.equals("Thay đổi phòng hát") && button.equals("Thay đổi")) {
-                inform = roomBLL.updateRoom(id, name, type, timeUpdate);
+                // - Biến chứa thông báo trả về
+                String inform = null;
+                // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+                if (title.equals("Thêm phòng hát") && button.equals("Thêm")) {
+                    inform = roomBLL.insertRoom(id, name, type, status, timeUpdate);
+                } else if (title.equals("Thay đổi phòng hát") && button.equals("Thay đổi")) {
+                    inform = roomBLL.updateRoom(id, name, type, timeUpdate);
+                }
+                // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+                if (inform.equals("Thêm phòng hát thành công") || inform.equals("Cập nhật phòng hát thành công")) {
+                    CommonPL.createSuccessDialog("Thông báo thành công", inform);
+                    addOrUpdateDialog.dispose();
+                    resetPage();
+                } else {
+                    CommonPL.createErrorDialog("Thông báo lỗi", inform);
+                }
             }
-            // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-            if (inform.equals("Thêm phòng hát thành công") || inform.equals("Cập nhật phòng hát thành công")) {
-                CommonPL.createSuccessDialog("Thông báo thành công", inform);
-                addOrUpdateDialog.dispose();
-                resetPage();
-            } else {
-                CommonPL.createErrorDialog("Thông báo lỗi", inform);
-            }
+            valueSelected[0] = false;
         });
 
         // Cấu hình dialog

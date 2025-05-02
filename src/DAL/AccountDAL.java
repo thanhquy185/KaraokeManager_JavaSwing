@@ -51,19 +51,17 @@ public class AccountDAL implements DAL<AccountDTO> {
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
 			String sql = "UPDATE Karaoke.NguoiDung"
-					+ "\nSET hoVaTen = ?, soDienThoai = ?, email = ?, diaChi = ?, tenTaiKhoan = ?, matKhau = ?, maQuyen = ?, trangThai = ?, thoiGianCapNhat = ?"
+					+ "\nSET hoVaTen = ?, soDienThoai = ?, email = ?, diaChi = ?, matKhau = ?, maQuyen = ?, thoiGianCapNhat = ?"
 					+ "\nWHERE maNguoiDung = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, accountDTO.getFullname());
 			pstmt.setString(2, accountDTO.getPhone());
 			pstmt.setString(3, accountDTO.getEmail());
 			pstmt.setString(4, accountDTO.getAddress());
-			pstmt.setString(5, accountDTO.getUsername());
-			pstmt.setString(6, accountDTO.getPassword());
-			pstmt.setString(7, accountDTO.getPrivilegeId());
-			pstmt.setBoolean(8, accountDTO.getStatus());
-			pstmt.setString(9, accountDTO.getTimeUpdate());
-			pstmt.setInt(10, accountDTO.getId());
+			pstmt.setString(5, accountDTO.getPassword());
+			pstmt.setString(6, accountDTO.getPrivilegeId());
+			pstmt.setString(7, accountDTO.getTimeUpdate());
+			pstmt.setInt(8, accountDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {

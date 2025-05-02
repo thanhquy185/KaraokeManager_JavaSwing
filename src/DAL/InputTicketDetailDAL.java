@@ -95,6 +95,27 @@ public class InputTicketDetailDAL implements DAL<InputTicketDetailDTO> {
         return list;
     }
 
+    public ArrayList<InputTicketDetailDTO> selectAllByInputTicketId(String inputTicketId) {
+        ArrayList<InputTicketDetailDTO> list = new ArrayList<>();
+        String sql = "SELECT maPhieuNhap, maMonAn, giaNhap, soLuong FROM karaoke.ctpn"
+                + (inputTicketId != null ? " WHERE maPhieuNhap = " + inputTicketId + ";" : ";");
+        try (Connection c = JDBCUtil.getInstance().getConnection();
+                PreparedStatement pstmt = c.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                InputTicketDetailDTO dto = new InputTicketDetailDTO(
+                        rs.getInt("maPhieuNhap"),
+                        rs.getString("maMonAn"),
+                        rs.getLong("giaNhap"),
+                        rs.getLong("soLuong"));
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     @Override
     public InputTicketDetailDTO selectOneById(String id) {
         String[] parts = id.split("-");

@@ -1,10 +1,5 @@
 package Program;
 
-import java.io.File;
-
-import javax.swing.JFileChooser;
-
-import PL.CommonPL;
 import PL.FramePL;
 
 public class Program {

@@ -631,50 +631,57 @@ public class Admin_FoodManagerPL extends JPanel {
 
 		// Sự kiện nút "Thêm" hoặc "Thay đổi"
 		addOrUpdateButton.addActionListener(e -> {
-			String id = addOrUpdateIdTextField.getText();
-			String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
-					? addOrUpdateNameTextField.getText()
-					: null;
-			String category = !addOrUpdateCategoryComboBox.getSelectedItem()
-					.equals(defaultValuesForCrud.get("category"))
-							? String.valueOf(addOrUpdateCategoryComboBox.getSelectedItem()).split(" - ")[0]
-							: null;
-			// String inventoryStr =
-			// !addOrUpdateInventoryTextField.getText().equals(defaultValuesForCrud.get("inventory"))
-			// ? addOrUpdateInventoryTextField.getText()
-			// : "0";
-			String priceStr = !addOrUpdatePriceTextField.getText().equals(defaultValuesForCrud.get("price"))
-					? addOrUpdatePriceTextField.getText()
-					: null;
-			// String image =
-			// !addOrUpdateAvatarTextField.getText().equals(defaultValuesForCrud.get("image"))
-			// ? addOrUpdateAvatarTextField.getText()
-			// : "0";
-			String statusStr = !addOrUpdateStatusComboBox.getSelectedItem().equals(defaultValuesForCrud.get("status"))
-					? (String) addOrUpdateStatusComboBox.getSelectedItem()
-					: null;
-			String timeUpdate = CommonPL.getCurrentDatetime();
+			CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+					String.format("Có chắc chắn %s món ăn này?", button.toLowerCase()),
+					valueSelected);
+			if (valueSelected[0]) {
+				String id = addOrUpdateIdTextField.getText();
+				String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
+						? addOrUpdateNameTextField.getText()
+						: null;
+				String category = !addOrUpdateCategoryComboBox.getSelectedItem()
+						.equals(defaultValuesForCrud.get("category"))
+								? String.valueOf(addOrUpdateCategoryComboBox.getSelectedItem()).split(" - ")[0]
+								: null;
+				// String inventoryStr =
+				// !addOrUpdateInventoryTextField.getText().equals(defaultValuesForCrud.get("inventory"))
+				// ? addOrUpdateInventoryTextField.getText()
+				// : "0";
+				String priceStr = !addOrUpdatePriceTextField.getText().equals(defaultValuesForCrud.get("price"))
+						? addOrUpdatePriceTextField.getText()
+						: null;
+				// String image =
+				// !addOrUpdateAvatarTextField.getText().equals(defaultValuesForCrud.get("image"))
+				// ? addOrUpdateAvatarTextField.getText()
+				// : "0";
+				String statusStr = !addOrUpdateStatusComboBox.getSelectedItem()
+						.equals(defaultValuesForCrud.get("status"))
+								? (String) addOrUpdateStatusComboBox.getSelectedItem()
+								: null;
+				String timeUpdate = CommonPL.getCurrentDatetime();
 
-			// - Biến chứa thông báo trả về
-			String inform = null;
-			// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-			if (title.equals("Thêm món ăn") && button.equals("Thêm")) {
-				inform = foodBLL.insertFood(id, name, category, priceStr, fileImage, statusStr,
-						timeUpdate);
-			} else if (title.equals("Thay đổi món ăn") && button.equals("Thay đổi")) {
-				inform = foodBLL.updateFood(id, name, category, priceStr, fileImage, timeUpdate);
+				// - Biến chứa thông báo trả về
+				String inform = null;
+				// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+				if (title.equals("Thêm món ăn") && button.equals("Thêm")) {
+					inform = foodBLL.insertFood(id, name, category, priceStr, fileImage, statusStr,
+							timeUpdate);
+				} else if (title.equals("Thay đổi món ăn") && button.equals("Thay đổi")) {
+					inform = foodBLL.updateFood(id, name, category, priceStr, fileImage, timeUpdate);
+				}
+				// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+				if (inform.equals("Có thể thêm một món ăn")
+						|| inform.equals("Có thể thay đổi một món ăn")) {
+					CommonPL.createSuccessDialog("Thông báo thành công", inform);
+					addOrUpdateDialog.dispose();
+					resetPage();
+				} else {
+					CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				}
+				// - Thành công hay không thì cũng phải cập nhật lại file image
+				fileImage = null;
 			}
-			// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-			if (inform.equals("Có thể thêm một món ăn")
-					|| inform.equals("Có thể thay đổi một món ăn")) {
-				CommonPL.createSuccessDialog("Thông báo thành công", inform);
-				addOrUpdateDialog.dispose();
-				resetPage();
-			} else {
-				CommonPL.createErrorDialog("Thông báo lỗi", inform);
-			}
-			// - Thành công hay không thì cũng phải cập nhật lại file image
-			fileImage = null;
+			valueSelected[0] = false;
 		});
 
 		// Cấu hình Add Or Update Block Panel

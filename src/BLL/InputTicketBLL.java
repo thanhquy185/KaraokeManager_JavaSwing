@@ -1,9 +1,12 @@
 package BLL;
 
 import java.util.ArrayList;
+import java.util.Vector;
 
 import DAL.InputTicketDAL;
 import DTO.InputTicketDTO;
+import DTO.InputTicketDetailDTO;
+import PL.CommonPL;
 
 public class InputTicketBLL {
     private InputTicketDAL inputTicketDAL;
@@ -30,40 +33,41 @@ public class InputTicketBLL {
     }
 
     public String insertInputTicket(Integer id, String timeCreate, Integer employee, String supplier,
-            Long totalPrice, Integer status, long totalDetails) {
+            Long totalPrice, Integer status, Vector<InputTicketDetailDTO> inputTicketDetails) {
         if (id == null && timeCreate == null && employee == null && supplier == null && totalPrice == null
-                && status == null && totalDetails == 0) {
+                && status == null && inputTicketDetails.size() == 0) {
             return "Thông tin phiếu nhập không đầy đủ";
         }
         if (supplier == null)
             return "Chưa chọn nhà cung cấp";
-        if (totalDetails == 0)
+        if (inputTicketDetails.size() == 0)
             return "Chưa nhập món ăn nào";
 
         InputTicketDTO dto = new InputTicketDTO(id, timeCreate, employee, supplier, totalPrice, status);
-        int result = inputTicketDAL.insert(dto);
-        return result > 0 ? "Thêm phiếu nhập thành công" : "Thêm phiếu nhập thất bại";
+        int inform = inputTicketDAL.insert(dto);
+
+        InputTicketDetailBLL inputTicketDetailBLL = new InputTicketDetailBLL();
+        for (InputTicketDetailDTO inputTicketDetail : inputTicketDetails) {
+            String detailInform = inputTicketDetailBLL.insertInputTicketDetail(inputTicketDetail.getInputTicketId(),
+                    inputTicketDetail.getFoodId(), inputTicketDetail.getPrice(), inputTicketDetail.getQuantity());
+            if (!detailInform.equals("Thêm chi tiết phiếu nhập thành công")) {
+                return detailInform;
+            }
+        }
+
+        return inform > 0 ? "Thêm phiếu nhập thành công" : "Thêm phiếu nhập thất bại";
     }
 
-    // public String updateInputTicket(Integer id, String timeCreate, Integer
-    // employeeId, String supplierId,
-    // Long totalPrice, Integer status) {
-    // if (id == null || timeCreate == null || supplierId == null || totalPrice ==
-    // null || status == null
-    // || employeeId == null) {
-    // return "Thông tin phiếu nhập không đầy đủ";
-    // }
+    public String updateStatusInputTicket(Integer inputTicketId, Integer status,
+            Vector<InputTicketDetailDTO> inputTicketDetails) {
+        if (inputTicketDetails.size() > 0 && status == 2) {
+            FoodBLL foodBLL = new FoodBLL();
+            for (InputTicketDetailDTO inputTicketDetail : inputTicketDetails) {
+                foodBLL.updateInventoryFood("create", inputTicketDetail.getFoodId(), inputTicketDetail.getQuantity());
+            }
+        }
 
-    // InputTicketDTO dto = new InputTicketDTO(id, timeCreate, employeeId,
-    // supplierId, totalPrice, status);
-    // int result = inputTicketDAL.update(dto);
-    // return result > 0 ? "Cập nhật phiếu nhập thành công" : "Cập nhật phiếu nhập
-    // thất bại";
-    // }
-
-    public String updateStatusInputTicket(String id, int status) {
-        InputTicketDTO inputTicketUpdate = getOneInputTicketById(id);
-        inputTicketUpdate.setStatus(status);
+        InputTicketDTO inputTicketUpdate = new InputTicketDTO(inputTicketId, null, null, null, null, status);
         int result = inputTicketDAL.updateStatus(inputTicketUpdate);
 
         return result > 0 ? "Thay đổi trạng thái phiếu nhập thành công" : "Thay đổi trạng thái phiếu nhập thất bại";

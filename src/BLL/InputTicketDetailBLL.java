@@ -21,6 +21,10 @@ public class InputTicketDetailBLL {
         return inputTicketDetailDAL.selectAllByCondition(join, condition, order);
     }
 
+    public ArrayList<InputTicketDetailDTO> getAllInputTicketDetailByInputTicketId(String inputTicketId) {
+        return inputTicketDetailDAL.selectAllByInputTicketId(inputTicketId);
+    }
+
     public InputTicketDetailDTO getOneInputTicketDetailById(String id) {
         return inputTicketDetailDAL.selectOneById(id);
     }
@@ -29,18 +33,9 @@ public class InputTicketDetailBLL {
         if (inputTicketId == null || foodId == null || price == null || quantity == null) {
             return "Thông tin chi tiết phiếu nhập không đầy đủ";
         }
-        
+
         InputTicketDetailDTO dto = new InputTicketDetailDTO(inputTicketId, foodId, price, quantity);
         int result = inputTicketDetailDAL.insert(dto);
         return result > 0 ? "Thêm chi tiết phiếu nhập thành công" : "Thêm chi tiết phiếu nhập thất bại";
     }
-
-    // public String updateInputTicketDetail(Integer inputTicketId, String foodId, Long price, Integer quantity) {
-    //     if (inputTicketId == null || foodId == null || price == null || quantity == null) {
-    //         return "Thông tin chi tiết phiếu nhập không đầy đủ";
-    //     }
-    //     InputTicketDetailDTO dto = new InputTicketDetailDTO(inputTicketId, foodId, price, quantity);
-    //     int result = inputTicketDetailDAL.update(dto);
-    //     return result > 0 ? "Cập nhật chi tiết phiếu nhập thành công" : "Cập nhật chi tiết phiếu nhập thất bại";
-    // }
 }

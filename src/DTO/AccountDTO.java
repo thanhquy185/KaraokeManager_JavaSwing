@@ -10,7 +10,7 @@ public class AccountDTO {
 	private String username;
 	private String password;
 	private String privilegeId;
-	private boolean status;
+	private Boolean status;
 	private String timeUpdate;
 
 	// Constructors

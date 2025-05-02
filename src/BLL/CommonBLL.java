@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 import PL.CommonPL;
@@ -153,5 +156,24 @@ public class CommonBLL {
 		}
 
 		return null;
+	}
+
+	// Hàm tính số giờ giữa 2 thời gian
+	public static Long calHoursBetweenTwoTimes(String startStr, String endStr) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+		LocalDateTime start = LocalDateTime.parse(startStr, formatter);
+		LocalDateTime end = LocalDateTime.parse(endStr, formatter);
+
+		if (end.isBefore(start)) {
+			System.out.println("Thời gian kết thúc phải sau thời gian bắt đầu.");
+			return null;
+		}
+
+		Duration duration = Duration.between(start, end);
+		double minutes = duration.toMinutes();
+		double hours = minutes / 60.0;
+
+		return (long) Math.ceil(hours);
 	}
 }

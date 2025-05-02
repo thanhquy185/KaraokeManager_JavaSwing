@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -26,10 +27,12 @@ import java.awt.geom.RoundRectangle2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -81,6 +84,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.xhtmlrenderer.pdf.ITextRenderer;
+
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.BaseFont;
 
 import org.jdesktop.swingx.JXDatePicker;
 import org.jdesktop.swingx.JXMonthView;
@@ -499,6 +510,109 @@ public class CommonPL {
 			}
 
 		});
+	}
+
+	// Hàm in phiếu định dạng pdf
+	public static void printTicket(String title, Map<String, String> infos, String descTable,
+			Map<String, String> headTables, Object[][] bodyTables) {
+		try {
+			// Đường dẫn bắt đầu
+			String pathStart = System.getProperty("user.dir") + File.separator + "src" + File.separator + "PL"
+					+ File.separator;
+			// Đường dẫn tới file HTML nguồn
+			String htmlSource = pathStart + "ticket.html";
+			// Đường dẫn tới file PDF xuất ra
+			String pdfDestination = pathStart + "ticket.pdf";
+
+			// Lấy ra nội dung file html
+			Document doc = Jsoup.parse(new File(htmlSource), "UTF-8");
+			// Chuẩn hoá XHTML (tránh gặp mấy lỗi nhỏ như: <!'doctype' html>, <meta
+			// '/'>,...)
+			doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+
+			// Thay đổi nổi dung của html
+			// - Thay đổi tiêu đề
+			Element titleElement = doc.getElementById("title");
+			if (titleElement != null && title != null) {
+				titleElement.text(title);
+			}
+			// - Thay đổi thông tin cơ bản
+			Element infosElement = doc.getElementById("infos");
+			if (infosElement != null && infos != null) {
+				String infosHtml = "";
+				for (Map.Entry<String, String> entry : infos.entrySet()) {
+					infosHtml += String.format("<p><strong>%s:</strong> %s</p>", entry.getKey(), entry.getValue());
+				}
+				infosElement.html(infosHtml);
+			}
+			// - Thay đổi desc của table
+			Element descTableElement = doc.getElementById("desc-table");
+			if (descTableElement != null && descTable != null) {
+				descTableElement.html(String.format("<strong>%s:</strong>", descTable));
+			}
+			// - Thay đổi head của table
+			Element headTableElement = doc.getElementById("head-table");
+			if (headTableElement != null && headTables != null) {
+				String thsHtml = "";
+				for (Map.Entry<String, String> entry : headTables.entrySet()) {
+					thsHtml += String.format("<th width='%s'>%s</th>", entry.getValue(), entry.getKey());
+				}
+				headTableElement.html(String.format("<tr>%s</tr>", thsHtml));
+			}
+			// - Thay đổi body của table
+			Element bodyTableElement = doc.getElementById("body-table");
+			if (bodyTableElement != null && bodyTables != null) {
+				String trs = "";
+				for (int i = 0; i < bodyTables.length; i++) {
+					String tds = "";
+					for (int j = 0; j < bodyTables[i].length; j++) {
+						tds += String.format("<td>%s</td>", bodyTables[i][j]);
+					}
+
+					trs += String.format("<tr>%s</tr>", tds);
+				}
+
+				bodyTableElement.html(trs);
+			}
+
+			// Ghi lại lên file với các nội dung đã thay đổi
+			Files.write(Paths.get(htmlSource), doc.html().getBytes("UTF-8"));
+
+			// Tạo đối tượng ITextRenderer từ Flying Saucer
+			ITextRenderer renderer = new ITextRenderer();
+			// Đọc file HTML và thiết lập cho renderer
+			File inputFile = new File(htmlSource);
+
+			// Phải sử dụng font hệ thống (khắc phục được tiếng Việt mất dấu)
+			renderer.getFontResolver().addFont("/System/Library/Fonts/Supplemental/Arial.ttf", BaseFont.IDENTITY_H,
+					BaseFont.EMBEDDED);
+
+			renderer.setDocument(inputFile.toURI().toString());
+
+			// Tạo một FileOutputStream để ghi dữ liệu PDF
+			FileOutputStream outputStream = new FileOutputStream(pdfDestination);
+
+			// Layout và tạo PDF
+			renderer.layout();
+			renderer.createPDF(outputStream);
+
+			// Đóng OutputStream
+			outputStream.close();
+
+			// Kiểm tra xem hệ thống có hỗ trợ Desktop hay không
+			if (Desktop.isDesktopSupported()) {
+				Desktop desktop = Desktop.getDesktop();
+				// Mở file PDF bằng ứng dụng mặc định của hệ thống
+				desktop.open(new File(pdfDestination));
+			} else {
+				System.out.println("Hệ thống không hỗ trợ Desktop.");
+			}
+			// System.out.println("File PDF đã được tạo thành công tại: " + pdfDestination);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (DocumentException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// Gán giá trị vào Map
@@ -2275,7 +2389,7 @@ public class CommonPL {
 					}
 
 					// - Cập nhật lại màu chữ theo ý nghĩa của chuỗi
-					if (status.equals("Đã nhập hàng") || status.equals("Hoạt động")) {
+					if (status.equals("Đã nhập hàng") || status.equals("Đã thanh toán") || status.equals("Hoạt động")) {
 						statusLabel.setForeground(Color.decode("#33CC00"));
 					} else if (status.equals("Chưa thanh toán")) {
 						statusLabel.setForeground(Color.decode("#FFCC33"));

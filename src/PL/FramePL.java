@@ -18,9 +18,9 @@ public class FramePL extends JFrame {
 		CommonPL.renderAddressInfo();
 
 		// Mặc định sẽ luôn hiện Trang Đăng nhập - Đăng ký
-		AdminCardPL adminCardPL = new AdminCardPL();
-//		LoginRegisterPL loginRegisterPL = new LoginRegisterPL();
-		this.add(adminCardPL);
+		// AdminCardPL adminCardPL = new AdminCardPL();
+		LoginRegisterPL loginRegisterPL = new LoginRegisterPL();
+		this.add(loginRegisterPL);
 
 		// Đĩnh nghĩa tính chất của Frame
 		this.setTitle("Karaoke Manager");

@@ -3,8 +3,6 @@ package PL;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -90,8 +88,6 @@ public class Admin_AccountManagerPL extends JPanel {
 	private JPanel addOrUpdatePrivilegeDetailPanel;
 	private JLabel addOrUpdateStatusLabel;
 	private JComboBox<String> addOrUpdateStatusComboBox;
-	private JLabel addOrUpdateTimeLabel;
-	private JLabel addOrUpdateTimeDetailLabel;
 	private JButton addOrUpdateButton;
 	private JPanel addOrUpdateBlockPanel;
 	private JDialog addOrUpdateDialog;
@@ -111,6 +107,7 @@ public class Admin_AccountManagerPL extends JPanel {
 	private String addressDetailWardNameSelected = null;
 	private String addressDetailDistrictNameSelected = null;
 	private String addressDetailCityNameSelected = null;
+
 	// - Các thông tin cần có của Table Data và Table Scroll Pane
 	// + Tiêu đề các cột
 	private final String[] columns = { "Mã người dùng", "Họ và tên", "Số điện thoại", "Email", "Địa chỉ",
@@ -123,14 +120,36 @@ public class Admin_AccountManagerPL extends JPanel {
 	private int rowSelected = -1;
 	// + Giá trị (true / false) khi "Xoá" dòng dữ liệu
 	private Boolean[] valueSelected = { null };
+
+	// Các giá trị mặc định cho text field, text area hoặc combobox để tìm kiếm,
+	// thêm, sửa và xoá
+	private final Map<String, String> defaultValuesForCrud = new LinkedHashMap<String, String>() {
+		{
+			put("id", "Nhập Mã người dùng");
+			put("fullname", "Nhập Họ và tên");
+			put("phone", "Nhập Số điện thoại");
+			put("email", "Nhập Email");
+			put("address", "Nhập Địa chỉ");
+			put("username", "Nhập Tên tài khoản");
+			put("password", "Nhập Mật khẩu");
+			put("privilege", "Chọn Quyền");
+			put("status", "Chọn Trạng thái");
+		}
+	};
+
 	// - Các thông tin cần thiết cho người dùng
 	// + Sắp xếp
-	private final String[] sortsString;
-	private final String[] sortsSQL;
+	private final String[] sortsString = new String[] { "Mã người dùng tăng dần", "Mã người dùng giảm dần",
+			"Họ và tên tăng dần",
+			"Họ và tên giảm dần", "Tên tài khoản tăng dần", "Tên tài khoản giảm dần" };
+	private final String[] sortsSQL = new String[] { "maNguoiDung ASC", "maNguoiDung DESC", "hoVaTen ASC",
+			"hoVaTen DESC",
+			"tenTaiKhoan ASC", "tenTaiKhoan DESC" };
 	// + Trạng thái
-	private final String[] statusStringForFilter;
-	private final String[] statusStringForAddOrUpdate;
-	private final String[] statusSQL;
+	private final String[] statusStringForFilter = new String[] { "Tất cả", "Hoạt động", "Tạm dừng" };
+	private final String[] statusStringForAddOrUpdate = new String[] { defaultValuesForCrud.get("status"), "Hoạt động",
+			"Tạm dừng" };
+	private final String[] statusSQL = new String[] { "", "trangThai = 1", "trangThai = 0" };
 	// + Quyền
 	private final String[] privilegesStringForFilter;
 	private final String[] privilegesStringForAddOrUpdate;
@@ -145,16 +164,9 @@ public class Admin_AccountManagerPL extends JPanel {
 		// <==================== ====================>
 
 		// <===== Cập nhật các dữ liệu cần thiết =====>
-		sortsString = new String[] { "Mã người dùng tăng dần", "Mã người dùng giảm dần", "Họ và tên tăng dần",
-				"Họ và tên giảm dần", "Tên tài khoản tăng dần", "Tên tài khoản giảm dần" };
-		sortsSQL = new String[] { "maNguoiDung ASC", "maNguoiDung DESC", "hoVaTen ASC", "hoVaTen DESC",
-				"tenTaiKhoan ASC", "tenTaiKhoan DESC" };
 		privilegesStringForFilter = renderPrivilegesString("Tìm kiếm");
 		privilegesStringForAddOrUpdate = renderPrivilegesString("Thêm hoặc sửa");
 		privilegesSQL = renderPrivilegesString("Truy vấn SQL");
-		statusStringForFilter = new String[] { "Tất cả", "Hoạt động", "Tạm dừng" };
-		statusStringForAddOrUpdate = new String[] { "Chọn Trạng thái", "Hoạt động", "Tạm dừng" };
-		statusSQL = new String[] { "", "trangThai = 1", "trangThai = 0" };
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Title Label =====>
@@ -245,21 +257,6 @@ public class Admin_AccountManagerPL extends JPanel {
 		// <==================== ====================>
 
 		// <===== Cấu trúc của Data Pane =====>
-//		// - Tuỳ chỉnh Add Button
-//		addButton = CommonPL.getRoundedBorderButton(20, "Thêm", Color.decode("#699f4c"), Color.WHITE,
-//				CommonPL.getFontParagraphBold());
-//		addButton.setBounds(15, 15, 210, 40);
-//
-//		// - Tuỳ chỉnh Update Button
-//		updateButton = CommonPL.getRoundedBorderButton(20, "Thay đổi", Color.decode("#bf873e"), Color.WHITE,
-//				CommonPL.getFontParagraphBold());
-//		updateButton.setBounds(240, 15, 210, 40);
-//
-//		// - Tuỳ chỉnh Lock Button
-//		lockButton = CommonPL.getRoundedBorderButton(20, "Khoá", Color.decode("#9f4d4d"), Color.WHITE,
-//				CommonPL.getFontParagraphBold());
-//		lockButton.setBounds(465, 15, 210, 40);
-
 		// - Tuỳ chỉnh Add Button
 		addButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
 				CommonPL.getMiddlePathToShowIcon() + "add-icon.png", "Thêm", Color.BLACK, Color.decode("#699f4c"),
@@ -341,15 +338,14 @@ public class Admin_AccountManagerPL extends JPanel {
 
 				if (valueSelected[0]) {
 					String inform = accountBLL.lockAccount(String.valueOf(currentObject.get(0)),
-							CommonPL.getCurrentDate());
+							CommonPL.getCurrentDatetime());
 					if (inform.equals("Có thể khoá một người dùng")) {
 						CommonPL.createSuccessDialog("Thông báo thành công", String.format("%s thành công",
 								currentObject.get(currentObject.size() - 1).equals("Hoạt động") ? "Khoá" : "Mở khoá"));
-						renderTableData(null, null, null);
+						resetPage();
 					} else {
 						CommonPL.createErrorDialog("Thông báo lỗi", inform);
 					}
-					renderTableData(null, null, null);
 				}
 			} else {
 				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần khoá");
@@ -370,24 +366,43 @@ public class Admin_AccountManagerPL extends JPanel {
 	private String[] renderPrivilegesString(String action) {
 		ArrayList<PrivilegeDTO> privilegeList = privilegeBLL.getAllPrivilege();
 		String[] result = new String[privilegeList.size() + 1];
-		 if(action.equals("Tìm kiếm")) {
+		if (action.equals("Tìm kiếm")) {
 			result[0] = "Tất cả";
 		} else if (action.equals("Thêm hoặc sửa")) {
-			result[0] = "Chọn Quyền";
-		}  else if(action.equals("Truy vấn SQL")) {
+			result[0] = defaultValuesForCrud.get("privilege");
+		} else if (action.equals("Truy vấn SQL")) {
 			result[0] = "";
 		}
 		for (int i = 0; i < privilegeList.size(); i++) {
 			if (action.equals("Tìm kiếm")) {
 				result[i + 1] = String.format("%s", privilegeList.get(i).getName());
-			} else if(action.equals("Thêm hoặc sửa")) {
+			} else if (action.equals("Thêm hoặc sửa")) {
 				result[i + 1] = String.format("%s - %s", privilegeList.get(i).getId(), privilegeList.get(i).getName());
-			} else if(action.equals("Truy vấn SQL")) {
+			} else if (action.equals("Truy vấn SQL")) {
 				result[i + 1] = String.format("maQuyen = '%s'", privilegeList.get(i).getId());
 			}
 		}
 
 		return result;
+	}
+
+	// Hàm reset trang
+	private void resetPage() {
+		// Cập nhật lại ô tìm kiếm
+		findInputTextField.setText("Nhập thông tin");
+		findInputTextField.setForeground(Color.LIGHT_GRAY);
+
+		// Cập nhật lại ô sắp xếp
+		CommonPL.resetMapForFilter(sortsCheckboxs, sortsString, sortsButton);
+
+		// Cập nhật lại ô quyền
+		CommonPL.resetMapForFilter(privilegesRadios, privilegesStringForFilter, privilegesButton);
+
+		// Cập nhật lại ô trạng thái
+		CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
+
+		// Cập nhật lại bảng
+		renderTableData(null, null, null);
 	}
 
 	// Hàm sự kiện lọc dữ liệu
@@ -423,21 +438,8 @@ public class Admin_AccountManagerPL extends JPanel {
 
 		// Nếu nhấn vào nút "Đặt lại"
 		filterResetButton.addActionListener(e -> {
-			// Cập nhật lại ô tìm kiếm
-			findInputTextField.setText("Nhập thông tin");
-			findInputTextField.setForeground(Color.LIGHT_GRAY);
-
-			// Cập nhật lại ô sắp xếp
-			CommonPL.resetMapForFilter(sortsCheckboxs, sortsString, sortsButton);
-
-			// Cập nhật lại ô quyền
-			CommonPL.resetMapForFilter(privilegesRadios, privilegesStringForFilter, privilegesButton);
-
-			// Cập nhật lại ô trạng thái
-			CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
-
-			// Cập nhật lại bảng
-			renderTableData(null, null, null);
+			// Gọi hàm reset trang
+			resetPage();
 		});
 	}
 
@@ -448,28 +450,14 @@ public class Admin_AccountManagerPL extends JPanel {
 		for (int i = 0; i < accountList.size(); i++) {
 			String privilegeName = (privilegeBLL.getOnePrivilegeById(accountList.get(i).getPrivilegeId())).getName();
 
-			String[] joinPrivilegeDetail = null;
-			String conditionPrivilegeDetail = String.format("ChiTietQuyen.maNguoiDung = '%s'",
-					accountList.get(i).getId());
-			String orderPrivilegeDetail = null;
-			ArrayList<PrivilegeDetailDTO> privilegeDetailList = privilegeDetailBLL.getAllPrivilegeDetailByCondition(
-					joinPrivilegeDetail, conditionPrivilegeDetail, orderPrivilegeDetail);
-
+			ArrayList<PrivilegeDetailDTO> privilegeDetailList = privilegeDetailBLL
+					.getAllPrivilegeDetailByAccountId(String.valueOf(accountList.get(i).getId()));
 			String functionsStr = "";
 			for (PrivilegeDetailDTO privilegeDetailDTO : privilegeDetailList) {
-				if (privilegeDetailDTO.getStatus()) {
-					String[] joinFunction = null;
-					String conditionFunction = String.format("maChucNang = '%s'", privilegeDetailDTO.getFunctionId());
-					String orderFunction = null;
-					ArrayList<FunctionDTO> functionList = functionBLL.getAllFunctionByCondition(joinFunction,
-							conditionFunction, orderFunction);
-					for (FunctionDTO functionDTO : functionList) {
-						functionsStr += "," + functionDTO.getName();
-					}
-				}
+				functionsStr += ", " + functionBLL.getOneFunctionById(privilegeDetailDTO.getFunctionId()).getName();
 			}
 			if (functionsStr.length() != 0)
-				functionsStr = functionsStr.substring(1);
+				functionsStr = functionsStr.substring(2);
 
 			datasQuery[i][0] = (Object) accountList.get(i).getId();
 			datasQuery[i][1] = (Object) accountList.get(i).getFullname();
@@ -549,14 +537,16 @@ public class Admin_AccountManagerPL extends JPanel {
 				addressDetailWardNameSelected, addressDetailWardNameComboBox);
 
 		// - Tuỳ chỉnh Add Address Detail Apply Button
-		addressDetailApplyButton = CommonPL.getButtonDefaultForm("Chọn địa chỉ", CommonPL.getFontParagraphBold());
+		addressDetailApplyButton = CommonPL.getRoundedBorderButton(20, "Tạo địa chỉ",
+				Color.decode("#42A5F5"), Color.WHITE,
+				CommonPL.getFontParagraphBold());
 		addressDetailApplyButton.setBounds(20, 390, 460, 40);
 		addressDetailApplyButton.addActionListener(e -> {
 			// - Lấy ra các thông tin để kiểm tra
 			String houseNumberAndStreetName = addressDetailHouseNumberAndStreetNameTextField.getText();
-			String cityName = (String) addressDetailCityNameComboBox.getSelectedItem();
-			String districtName = (String) addressDetailDistrictNameComboBox.getSelectedItem();
-			String wardName = (String) addressDetailWardNameComboBox.getSelectedItem();
+			String cityName = String.valueOf(addressDetailCityNameComboBox.getSelectedItem());
+			String districtName = String.valueOf(addressDetailDistrictNameComboBox.getSelectedItem());
+			String wardName = String.valueOf(addressDetailWardNameComboBox.getSelectedItem());
 
 			if (houseNumberAndStreetName.equals("Nhập Số nhà - tên đường") || wardName.equals("Chọn Phường / Xã")
 					|| districtName.equals("Chọn Quận / Huyện") || cityName.equals("Chọn Tỉnh / Thành phố")) {
@@ -606,13 +596,14 @@ public class Admin_AccountManagerPL extends JPanel {
 		addressDetailDialog.setAutoRequestFocus(false);
 		addressDetailDialog.setLocationRelativeTo(null);
 		addressDetailDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//				addressDetailDialog.addWindowListener(new WindowAdapter() {
-//					@Override
-//					public void windowDeactivated(WindowEvent e) {
-//						SwingUtilities.invokeLater(() -> addOrUpdateAddressTextField.requestFocusInWindow());
-//						addressDetailDialog.dispose(); // Đóng Dialog khi mất focus (nhấn ngoài)
-//					}
-//				});
+		// addressDetailDialog.addWindowListener(new WindowAdapter() {
+		// @Override
+		// public void windowDeactivated(WindowEvent e) {
+		// SwingUtilities.invokeLater(() ->
+		// addOrUpdateAddressTextField.requestFocusInWindow());
+		// addressDetailDialog.dispose(); // Đóng Dialog khi mất focus (nhấn ngoài)
+		// }
+		// });
 		addressDetailDialog.add(addressDetailBlockPanel);
 		addressDetailDialog.setModal(true);
 		addressDetailDialog.setVisible(true);
@@ -620,18 +611,11 @@ public class Admin_AccountManagerPL extends JPanel {
 
 	// Hàm đặt lại "Chi tiết Quyền" với "Quyền" được chọn tương ứng
 	private void renderAddPrivilegeDetailPanel() {
-		// - Lấy ra tất cả các JButton ở Main Menu
-		ArrayList<JButton> buttonsInMainMenu = CommonPL.getAllButtons((new AdminMenuPL()).getMainMenuPanel());
-		ArrayList<JButton> buttons = new ArrayList<>();
-		buttons.addAll(buttonsInMainMenu);
-
-		// - Mặc dinh là mục "Chọn Quyền" hiển thị đầu tiên
-		for (JButton button : buttons) {
-			String itemValue = ((JLabel) button.getComponent(1)).getText();
-			if (!itemValue.equals("Đăng xuất")) {
-				addOrUpdatePrivilegeDetailCheckboxs.put(itemValue, false);
-			}
+		ArrayList<FunctionDTO> functionList = functionBLL.getAllFunction();
+		for (FunctionDTO function : functionList) {
+			addOrUpdatePrivilegeDetailCheckboxs.put(function.getName(), false);
 		}
+
 		int x = 10, y = 10;
 		for (String key : addOrUpdatePrivilegeDetailCheckboxs.keySet()) {
 			JCheckBox itemCheckBox = new JCheckBox();
@@ -653,37 +637,28 @@ public class Admin_AccountManagerPL extends JPanel {
 
 		// - Mỗi lần thay đổi "Quyền" thì phải có "Chi tiết Quyền" tương ứng
 		addOrUpdatePrivilegeComboBox.addActionListener(e1 -> {
-			String privilegeValueSelected = (String) addOrUpdatePrivilegeComboBox.getSelectedItem();
+			String privilegeValueSelected = String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem());
 			if (privilegeValueSelected.equals("QUANLY - Quản lý")) {
 				addOrUpdatePrivilegeDetailPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 				addOrUpdatePrivilegeDetailLabel.setText("Chi tiết Quyền");
-				for (JButton button : buttons) {
-					String itemValue = ((JLabel) button.getComponent(1)).getText();
-					if (!itemValue.equals("Đăng xuất")) {
-						addOrUpdatePrivilegeDetailCheckboxs.put(itemValue, true);
-					}
+				for (FunctionDTO function : functionList) {
+					addOrUpdatePrivilegeDetailCheckboxs.put(function.getName(), true);
 				}
 			} else if (privilegeValueSelected.equals("NHANVIEN - Nhân viên")) {
 				addOrUpdatePrivilegeDetailPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 				addOrUpdatePrivilegeDetailLabel.setText("Chi tiết Quyền");
-				for (JButton button : buttons) {
-					String itemValue = ((JLabel) button.getComponent(1)).getText();
-					if (!itemValue.equals("Đăng xuất")) {
-						if (itemValue.equals("Thống kê")) {
-							addOrUpdatePrivilegeDetailCheckboxs.put(itemValue, true);
-						} else {
-							addOrUpdatePrivilegeDetailCheckboxs.put(itemValue, false);
-						}
+				for (FunctionDTO function : functionList) {
+					if (function.getName().equals("Thống kê")) {
+						addOrUpdatePrivilegeDetailCheckboxs.put(function.getName(), true);
+					} else {
+						addOrUpdatePrivilegeDetailCheckboxs.put(function.getName(), false);
 					}
 				}
 			} else if (privilegeValueSelected.equals("Chọn Quyền")) {
 				addOrUpdatePrivilegeDetailPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 				addOrUpdatePrivilegeDetailLabel.setText("<html><strike>Chi tiết Quyền</strike></html>");
-				for (JButton button : buttons) {
-					String itemValue = ((JLabel) button.getComponent(1)).getText();
-					if (!itemValue.equals("Đăng xuất")) {
-						addOrUpdatePrivilegeDetailCheckboxs.put(itemValue, false);
-					}
+				for (FunctionDTO function : functionList) {
+					addOrUpdatePrivilegeDetailCheckboxs.put(function.getName(), false);
 				}
 			}
 
@@ -707,8 +682,8 @@ public class Admin_AccountManagerPL extends JPanel {
 					subY += 34;
 				}
 
-				// Nếu "Quyền" đang được chọn là: "Chọn Quyền"
-				if (privilegeValueSelected.equals("Chọn Quyền")) {
+				// Nếu là "Chọn Quyền" hay "QUANLY - Quản lý" thì không cho nhấn và ngược lại
+				if (privilegeValueSelected.equals("Chọn Quyền") || privilegeValueSelected.equals("QUANLY - Quản lý")) {
 					itemCheckBox.setEnabled(false);
 					itemCheckBox.setForeground(Color.LIGHT_GRAY);
 				} else {
@@ -738,8 +713,9 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateIdLabel.setBounds(20, 10, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Id Text Field
-		addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mã người dùng", Color.LIGHT_GRAY,
+		addOrUpdateIdTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("id"), Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
+		addOrUpdateIdTextField.setHorizontalAlignment(JTextField.CENTER);
 		addOrUpdateIdTextField.setEnabled(false);
 		((CustomTextField) addOrUpdateIdTextField).setBorderColor(Color.decode("#dedede"));
 		addOrUpdateIdTextField.setBackground(Color.decode("#dedede"));
@@ -751,7 +727,8 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateFullnameLabel.setBounds(500, 10, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Fullname Text Field
-		addOrUpdateFullnameTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Họ và tên", Color.LIGHT_GRAY,
+		addOrUpdateFullnameTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("fullname"),
+				Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateFullnameTextField.setBounds(500, 50, 460, 40);
 
@@ -761,7 +738,8 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdatePhoneLabel.setBounds(20, 100, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Phone Text Field
-		addOrUpdatePhoneTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Số điện thoại", Color.LIGHT_GRAY,
+		addOrUpdatePhoneTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("phone"),
+				Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdatePhoneTextField.setBounds(20, 140, 220, 40);
 
@@ -770,7 +748,8 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateEmailLabel.setBounds(260, 100, 220, 40);
 
 		// - Tuỳ chỉnh Add Or Update Email Text Field
-		addOrUpdateEmailTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Email", Color.LIGHT_GRAY, Color.BLACK,
+		addOrUpdateEmailTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("email"),
+				Color.LIGHT_GRAY, Color.BLACK,
 				CommonPL.getFontParagraphPlain());
 		addOrUpdateEmailTextField.setBounds(260, 140, 220, 40);
 
@@ -779,24 +758,26 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateAddressLabel.setBounds(500, 100, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Address Button
-		addOrUpdateAddressButton = CommonPL.getButtonDefaultForm("Nhấn để chọn địa chỉ",
+		addOrUpdateAddressButton = CommonPL.getRoundedBorderButton(20, "Tạo địa chỉ",
+				Color.decode("#42A5F5"), Color.WHITE,
 				new Font("Arial", Font.BOLD, 14));
 		addOrUpdateAddressButton.setBounds(780, 106, 180, 28);
 		addOrUpdateAddressButton.addActionListener(e -> {
-//									addOrUpdateDialog.setVisible(true);
+			// addOrUpdateDialog.setVisible(true);
 			addOrUpdateAddressButton.setBackground(Color.BLACK);
 			showAddressDetailDialog();
 
-//									addOrUpdateDialog.setVisible(false);
-//									SwingUtilities.invokeLater(() -> {
-//										addOrUpdateAddressButton.setBackground(Color.BLACK);
-//										showAddressDetailDialog();
-//										addOrUpdateDialog.setVisible(true);
-//									});
+			// addOrUpdateDialog.setVisible(false);
+			// SwingUtilities.invokeLater(() -> {
+			// addOrUpdateAddressButton.setBackground(Color.BLACK);
+			// showAddressDetailDialog();
+			// addOrUpdateDialog.setVisible(true);
+			// });
 		});
 
 		// - Tuỳ chỉnh Add Or Update Address Text Field
-		addOrUpdateAddressTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Địa chỉ", Color.LIGHT_GRAY,
+		addOrUpdateAddressTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("address"),
+				Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateAddressTextField.setBounds(500, 140, 460, 40);
 
@@ -807,7 +788,8 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateUsernameLabel.setBounds(20, 190, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Username Text Field
-		addOrUpdateUsernameTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Tên tài khoản", Color.LIGHT_GRAY,
+		addOrUpdateUsernameTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("username"),
+				Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdateUsernameTextField.setBounds(20, 230, 460, 40);
 
@@ -818,7 +800,8 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdatePasswordLabel.setBounds(20, 280, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Password Text Field
-		addOrUpdatePasswordTextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mật khẩu", Color.LIGHT_GRAY,
+		addOrUpdatePasswordTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("password"),
+				Color.LIGHT_GRAY,
 				Color.BLACK, CommonPL.getFontParagraphPlain());
 		addOrUpdatePasswordTextField.setBounds(20, 320, 460, 40);
 
@@ -933,20 +916,15 @@ public class Admin_AccountManagerPL extends JPanel {
 			addOrUpdatePrivilegeComboBox.setForeground(Color.BLACK);
 
 			// - Gán dữ liệu là "Chi tiết quyền"
-			String[] privilegesDetail = (String.valueOf(object.get(8))).split("\\,");
-			// + Lấy ra tất cả các JButton ở Main Menu
-			ArrayList<JButton> buttonsInMainMenu = CommonPL.getAllButtons((new AdminMenuPL()).getMainMenuPanel());
-			ArrayList<JButton> buttons = new ArrayList<>();
-			buttons.addAll(buttonsInMainMenu);
+			String[] privilegeDetails = (String.valueOf(object.get(8))).split("\\, ");
 			// + Mặc dinh là mục "Chọn Quyền" hiển thị đầu tiên
-			for (JButton buttonn : buttons) {
-				String itemValue = ((JLabel) buttonn.getComponent(1)).getText();
-				if (!itemValue.equals("Đăng xuất")) {
-					addOrUpdatePrivilegeDetailCheckboxs.put(itemValue, false);
-				}
+			ArrayList<FunctionDTO> functionList = functionBLL.getAllFunction();
+			for (FunctionDTO function : functionList) {
+				addOrUpdatePrivilegeDetailCheckboxs.put(function.getName(), false);
 			}
+			// + Tuỳ theo chi tiết quyền của người dùng đã chọn mà cập nhật
 			for (String key : addOrUpdatePrivilegeDetailCheckboxs.keySet()) {
-				for (String privilege : privilegesDetail) {
+				for (String privilege : privilegeDetails) {
 					if (key.equals(privilege)) {
 						addOrUpdatePrivilegeDetailCheckboxs.put(key, true);
 					}
@@ -964,6 +942,10 @@ public class Admin_AccountManagerPL extends JPanel {
 				itemCheckBox.setFont(new Font("Arial", Font.PLAIN, 18));
 				itemCheckBox.setForeground(Color.BLACK);
 				itemCheckBox.setBounds(x, y, 215, 24);
+				if (addOrUpdatePrivilegeComboBox.getSelectedItem().equals("QUANLY - Quản lý")) {
+					itemCheckBox.setEnabled(false);
+					itemCheckBox.setForeground(Color.LIGHT_GRAY);
+				}
 				itemCheckBox.addActionListener(e2 -> {
 					if (addOrUpdatePrivilegeDetailCheckboxs.get(key) == true) {
 						addOrUpdatePrivilegeDetailCheckboxs.replace(key, false);
@@ -986,33 +968,12 @@ public class Admin_AccountManagerPL extends JPanel {
 			addOrUpdatePrivilegeDetailPanel.repaint();
 
 			// - Gán dữ liệu là "Trạng thái"
-			addOrUpdateStatusComboBox.setSelectedItem((String) object.get(9));
+			addOrUpdateStatusComboBox.setSelectedItem(String.valueOf(object.get(9)));
 			addOrUpdateStatusComboBox.setEnabled(false);
 			((JTextField) addOrUpdateStatusComboBox.getEditor().getEditorComponent()).setCaretPosition(0);
 			UIManager.put("ComboBox.disabledBackground", Color.decode("#dedede"));
 			addOrUpdateStatusComboBox.setBorder(BorderFactory.createLineBorder(Color.decode("#dedede"), 1));
-
-			// - Gán dữ liệu là "Thời gian cập nhật gần đây"
-//							addOrUpdateTimeDetailLabel.setText((String) object.get(11));
 		}
-
-		// - Tuỳ chỉnh Add Or Update Time Label
-		addOrUpdateTimeLabel = CommonPL.getParagraphLabel("Cập nhật gần đây:", Color.GRAY,
-				new Font("Arial", Font.ITALIC, 18));
-		addOrUpdateTimeLabel.setBounds(260, 550, 148, 40);
-
-		// - Tuỳ chỉnh Add Or Update Time Detail Label
-		addOrUpdateTimeDetailLabel = CommonPL.getTitleLabel("yyyy-MM-dd HH:mm:ss", Color.GRAY,
-				new Font("Arial", Font.ITALIC, 18), SwingConstants.RIGHT, SwingConstants.CENTER);
-		addOrUpdateTimeDetailLabel.setBounds(413, 550, 307, 40);
-		// -- Tạo Timer cập nhật thời gian
-		Timer timer = new Timer(1000, e -> {
-			LocalDateTime currentDateTime = LocalDateTime.now();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			String formattedDateTime = currentDateTime.format(formatter);
-			addOrUpdateTimeDetailLabel.setText(formattedDateTime);
-		});
-		timer.start();
 
 		// - Tuỳ chỉnh Add Or Update Button
 		addOrUpdateButton = CommonPL.getRoundedBorderButton(20, button,
@@ -1023,87 +984,65 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateButton.addActionListener(e -> {
 			// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
 			// + Mã người dùng
-			String id = !addOrUpdateIdTextField.getText().equals("Nhập Mã người dùng")
+			String id = !addOrUpdateIdTextField.getText().equals(defaultValuesForCrud.get("id"))
 					? addOrUpdateIdTextField.getText()
 					: null;
 			// + Tên người dùng
-			String fullname = !addOrUpdateFullnameTextField.getText().equals("Nhập Họ và tên")
+			String fullname = !addOrUpdateFullnameTextField.getText().equals(defaultValuesForCrud.get("fullname"))
 					? addOrUpdateFullnameTextField.getText()
 					: null;
 			// + Số điện thoại
-			String phone = !addOrUpdatePhoneTextField.getText().equals("Nhập Số điện thoại")
+			String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
 					? addOrUpdatePhoneTextField.getText()
 					: null;
 			// + Email
-			String email = !addOrUpdateEmailTextField.getText().equals("Nhập Email")
+			String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
 					? addOrUpdateEmailTextField.getText()
 					: null;
 			// + Địa chỉ
-			String address = !addOrUpdateAddressTextField.getText().equals("Nhập Địa chỉ")
+			String address = !addOrUpdateAddressTextField.getText().equals(defaultValuesForCrud.get("address"))
 					? addOrUpdateAddressTextField.getText()
 					: null;
 			// + Tên tài khoản
-			String username = !addOrUpdateUsernameTextField.getText().equals("Nhập Tên tài khoản")
+			String username = !addOrUpdateUsernameTextField.getText().equals(defaultValuesForCrud.get("username"))
 					? addOrUpdateUsernameTextField.getText()
 					: null;
 			// + Mật khẩu
-			String password = !addOrUpdatePasswordTextField.getText().equals("Nhập Mật khẩu")
+			String password = !addOrUpdatePasswordTextField.getText().equals(defaultValuesForCrud.get("password"))
 					? addOrUpdatePasswordTextField.getText()
 					: null;
 			// + Quyền
-			String privilegeId = !String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem()).equals("Chọn Quyền")
-					? String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem()).split(" - ")[0]
-					: null;
+			String privilegeId = !String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem())
+					.equals(defaultValuesForCrud.get("privilege"))
+							? String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem()).split(" - ")[0]
+							: null;
 			// + Trạng thái
-			String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem()).equals("Chọn Trạng thái")
-					? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
-					: null;
+			String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+					.equals(defaultValuesForCrud.get("status"))
+							? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+							: null;
 			// + Ngày cập nhật
-			String dateUpdate = CommonPL.getCurrentDate();
+			String timeUpdate = CommonPL.getCurrentDatetime();
 
-//			System.out.println(id);
-//			System.out.println(fullname);
-//			System.out.println(phone);
-//			System.out.println(email);
-//			System.out.println(address);
-//			System.out.println(username);
-//			System.out.println(password);
-//			System.out.println(privilegeId);
-//			System.out.println(status);
-//			System.out.println(dateUpdate);
-
-			// - Nếu là "Thêm"
+			// - Biến chứa thông báo trả về
+			String inform = null;
+			// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
 			if (title.equals("Thêm Người dùng") && button.equals("Thêm")) {
-				String inform = accountBLL.insertAccount(id, fullname, phone, email, address, username, password,
-						privilegeId, status, dateUpdate);
-				if (inform.equals("Có thể thêm một người dùng")) {
-					// - Phải thêm vào bảng Người dùng thì mới thêm dữ liệu vào bảng Chi tiết quyền
-					privilegeDetailBLL.insertPrivilegeDetail(id, privilegeId, addOrUpdatePrivilegeDetailCheckboxs);
-
-					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện
-					CommonPL.createSuccessDialog("Thông báo thành công", "Thêm thành công");
-					addOrUpdateDialog.dispose();
-					renderTableData(null, null, null);
-				} else {
-					CommonPL.createErrorDialog("Thông báo lỗi", inform);
-				}
+				inform = accountBLL.insertAccount(id, fullname, phone, email, address,
+						username, password,
+						privilegeId, status, timeUpdate);
+			} else if (title.equals("Thay đổi Người dùng") && button.equals("Thay đổi")) {
+				inform = accountBLL.updateAccount(id, fullname, phone, email, address, password,
+						privilegeId, timeUpdate);
 			}
-			// - Nếu là "Sửa"
-			else if (title.equals("Thay đổi Người dùng") && button.equals("Thay đổi")) {
-				String inform = accountBLL.updateAccount(id, fullname, phone, email, address, username, password,
-						privilegeId, status, dateUpdate);
-				if (inform.equals("Có thể thay đổi một người dùng")) {
-					// - Phải thay đổi vào bảng Người dùng thì mới thay đổi dữ liệu vào bảng Chi
-					// tiết quyền
-					privilegeDetailBLL.updatePrivilegeDetail(id, privilegeId, addOrUpdatePrivilegeDetailCheckboxs);
-
-					// - Hoàn thành việc thêm thì thông báo và cập nhật lại trên giao diện
-					CommonPL.createSuccessDialog("Thông báo thành công", "Thay đổi thành công");
-					addOrUpdateDialog.dispose();
-					renderTableData(null, null, null);
-				} else {
-					CommonPL.createErrorDialog("Thông báo lỗi", inform);
-				}
+			// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+			if (inform.equals("Có thể thêm một người dùng") || inform.equals("Có thể thay đổi một người dùng")) {
+				privilegeDetailBLL.insertPrivilegeDetail(id, privilegeId, addOrUpdatePrivilegeDetailCheckboxs);
+				CommonPL.createSuccessDialog("Thông báo thành công", inform);
+				addOrUpdateDialog.dispose();
+				resetPage();
+			} else {
+				CommonPL.createErrorDialog("Thông báo lỗi", inform);
 			}
 		});
 
@@ -1133,8 +1072,6 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateBlockPanel.add(addOrUpdatePrivilegeDetailPanel);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateStatusComboBox);
-//		addOrUpdateBlockPanel.add(addOrUpdateTimeLabel);
-//		addOrUpdateBlockPanel.add(addOrUpdateTimeDetailLabel);
 		addOrUpdateBlockPanel.add(addOrUpdateButton);
 		// <==================== ====================>
 
@@ -1147,11 +1084,11 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateDialog.setLocationRelativeTo(null);
 		addOrUpdateDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		addOrUpdateDialog.addWindowListener(new WindowAdapter() {
-//			@Override
-//			public void windowDeactivated(WindowEvent e) {
-//				// Đóng Dialog khi mất focus (nhấn ngoài)
-//				addOrUpdateDialog.dispose();
-//			}
+			// @Override
+			// public void windowDeactivated(WindowEvent e) {
+			// // Đóng Dialog khi mất focus (nhấn ngoài)
+			// addOrUpdateDialog.dispose();
+			// }
 		});
 		addOrUpdateDialog.add(addOrUpdateBlockPanel);
 		addOrUpdateDialog.setModal(true);

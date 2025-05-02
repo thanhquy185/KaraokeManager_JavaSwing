@@ -558,7 +558,7 @@ public class Admin_SupplierManagerPL extends JPanel {
                                 Color.LIGHT_GRAY, Color.BLACK,
                                 CommonPL.getFontParagraphPlain());
                 addOrUpdateAddressTextField.setBounds(20, 320, 460, 40);
-                addOrUpdateAddressTextField.setEnabled(true); // Chỉ cho phép chỉnh sửa qua dialog
+                addOrUpdateAddressTextField.setEnabled(true);
                 ((CustomTextField) addOrUpdateAddressTextField).setBorderColor(Color.decode("#dedede"));
                 addOrUpdateAddressTextField.setBackground(Color.WHITE);
 
@@ -631,44 +631,54 @@ public class Admin_SupplierManagerPL extends JPanel {
 
                 // Sự kiện nút "Thêm" hoặc "Thay đổi"
                 addOrUpdateButton.addActionListener(e -> {
-                        String id = addOrUpdateIdTextField.getText();
-                        String name = !addOrUpdateNameTextField.getText().equals(defaultValuesForCrud.get("name"))
-                                        ? addOrUpdateNameTextField.getText()
-                                        : null;
-                        String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
-                                        ? addOrUpdatePhoneTextField.getText()
-                                        : null;
-                        String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
-                                        ? addOrUpdateEmailTextField.getText()
-                                        : null;
-                        String address = !addOrUpdateAddressTextField.getText()
-                                        .equals(defaultValuesForCrud.get("address"))
-                                                        ? addOrUpdateAddressTextField.getText()
-                                                        : null;
-                        String status = !addOrUpdateStatusComboBox.getSelectedItem()
-                                        .equals(defaultValuesForCrud.get("status"))
-                                                        ? (String) addOrUpdateStatusComboBox.getSelectedItem()
-                                                        : null;
-                        String timeUpdate = CommonPL.getCurrentDatetime();
+                        CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+                                        String.format("Có chắc chắn %s nhà cung cấp này?", button.toLowerCase()),
+                                        valueSelected);
+                        if (valueSelected[0]) {
+                                String id = addOrUpdateIdTextField.getText();
+                                String name = !addOrUpdateNameTextField.getText()
+                                                .equals(defaultValuesForCrud.get("name"))
+                                                                ? addOrUpdateNameTextField.getText()
+                                                                : null;
+                                String phone = !addOrUpdatePhoneTextField.getText()
+                                                .equals(defaultValuesForCrud.get("phone"))
+                                                                ? addOrUpdatePhoneTextField.getText()
+                                                                : null;
+                                String email = !addOrUpdateEmailTextField.getText()
+                                                .equals(defaultValuesForCrud.get("email"))
+                                                                ? addOrUpdateEmailTextField.getText()
+                                                                : null;
+                                String address = !addOrUpdateAddressTextField.getText()
+                                                .equals(defaultValuesForCrud.get("address"))
+                                                                ? addOrUpdateAddressTextField.getText()
+                                                                : null;
+                                String status = !addOrUpdateStatusComboBox.getSelectedItem()
+                                                .equals(defaultValuesForCrud.get("status"))
+                                                                ? (String) addOrUpdateStatusComboBox.getSelectedItem()
+                                                                : null;
+                                String timeUpdate = CommonPL.getCurrentDatetime();
 
-                        // - Biến chứa thông báo trả về
-                        String inform = null;
-                        // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-                        if (title.equals("Thêm Nhà cung cấp") && button.equals("Thêm")) {
-                                inform = supplierBLL.insertSupplier(id, name, phone, email, address, status,
-                                                timeUpdate);
-                        } else if (title.equals("Thay đổi Nhà cung cấp") && button.equals("Thay đổi")) {
-                                inform = supplierBLL.updateSupplier(id, name, phone, email, address, timeUpdate);
+                                // - Biến chứa thông báo trả về
+                                String inform = null;
+                                // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+                                if (title.equals("Thêm Nhà cung cấp") && button.equals("Thêm")) {
+                                        inform = supplierBLL.insertSupplier(id, name, phone, email, address, status,
+                                                        timeUpdate);
+                                } else if (title.equals("Thay đổi Nhà cung cấp") && button.equals("Thay đổi")) {
+                                        inform = supplierBLL.updateSupplier(id, name, phone, email, address,
+                                                        timeUpdate);
+                                }
+                                // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+                                if (inform.equals("Thêm nhà cung cấp thành công")
+                                                || inform.equals("Cập nhật nhà cung cấp thành công")) {
+                                        CommonPL.createSuccessDialog("Thông báo thành công", inform);
+                                        addOrUpdateDialog.dispose();
+                                        resetPage();
+                                } else {
+                                        CommonPL.createErrorDialog("Thông báo lỗi", inform);
+                                }
                         }
-                        // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-                        if (inform.equals("Thêm nhà cung cấp thành công")
-                                        || inform.equals("Cập nhật nhà cung cấp thành công")) {
-                                CommonPL.createSuccessDialog("Thông báo thành công", inform);
-                                addOrUpdateDialog.dispose();
-                                resetPage();
-                        } else {
-                                CommonPL.createErrorDialog("Thông báo lỗi", inform);
-                        }
+                        valueSelected[0] = false;
                 });
 
                 // Cấu hình dialog

@@ -5,10 +5,7 @@ import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.math.BigInteger;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -78,7 +75,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
 
     private final String[] columns = { "Mã phiếu", "Thời gian tạo phiếu", "Nhân viên tạo phiếu", "Nhà cung cấp",
             "Tổng tiền nhập (VNĐ)", "Trạng thái" };
-    private final int[] widthColumns = { 150, 200, 400, 400, 500, 200 };
+    private final int[] widthColumns = { 150, 200, 300, 300, 400, 200 };
     private Object[][] datas = {};
     private int rowSelected = -1;
     private Boolean[] valueSelected = { null };
@@ -115,7 +112,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
 
     private Vector<String> suppliersVector;
     private Vector<String> foodsVector;
-    private Vector<String> employeesVector;
 
     // - Các giá trị mặc định cho text field, text area hoặc combobox để tìm kiếm,
     // thêm, sửa và xoá
@@ -146,16 +142,6 @@ public class Admin_InputTicketManagerPL extends JPanel {
         accountBLL = new AccountBLL();
         privilegeDetailBLL = new PrivilegeDetailBLL();
 
-        // Khởi tạo danh sách nguyên liệu
-        foodsVector = new Vector<>();
-        foodsVector.add(defaultValuesForCrud.get("food"));
-        ArrayList<FoodDTO> foods = foodBLL.getAllFood();
-        for (FoodDTO food : foods) {
-            if (food.getStatus()) {
-                foodsVector.add(food.getId() + " - " + food.getName());
-            }
-        }
-
         // Khởi tạo danh sách nhà cung cấp
         suppliersVector = new Vector<>();
         suppliersVector.add(defaultValuesForCrud.get("supplier"));
@@ -166,26 +152,13 @@ public class Admin_InputTicketManagerPL extends JPanel {
             }
         }
 
-        // Khởi tạo danh sách nhân viên
-        employeesVector = new Vector<>();
-        employeesVector.add(defaultValuesForCrud.get("employee"));
-        ArrayList<AccountDTO> accounts = accountBLL.getAllAccount();
-        for (AccountDTO account : accounts) {
-            if (account.getStatus()) {
-                String privilegeId = account.getPrivilegeId();
-                if (privilegeId.equals("QUANLY")) {
-                    employeesVector.add(account.getId() + " - " + account.getFullname());
-                } else {
-                    String[] join = null;
-                    String condition = String.format("maNguoiDung = '%s' AND maChucNang = 'PHIEUNHAP'",
-                            account.getId());
-                    String order = null;
-                    ArrayList<PrivilegeDetailDTO> privilegeDetails = privilegeDetailBLL
-                            .getAllPrivilegeDetailByCondition(join, condition, order);
-                    if (!privilegeDetails.isEmpty() && privilegeDetails.get(0).getStatus()) {
-                        employeesVector.add(account.getId() + " - " + account.getFullname());
-                    }
-                }
+        // Khởi tạo danh sách nguyên liệu
+        foodsVector = new Vector<>();
+        foodsVector.add(defaultValuesForCrud.get("food"));
+        ArrayList<FoodDTO> foods = foodBLL.getAllFood();
+        for (FoodDTO food : foods) {
+            if (food.getStatus()) {
+                foodsVector.add(food.getId() + " - " + food.getName());
             }
         }
 
@@ -338,6 +311,60 @@ public class Admin_InputTicketManagerPL extends JPanel {
             tableData.clearSelection();
         });
 
+        printButton.addActionListener(e -> {
+            if (rowSelected != -1) {
+                String inputTicketIdSelected = String.valueOf(tableData.getValueAt(rowSelected, 0));
+                InputTicketDTO inputTicketSelected = inputTicketBLL.getOneInputTicketById(inputTicketIdSelected);
+
+                String title = "In phiếu nhập";
+                Map<String, String> infos = new LinkedHashMap<>() {
+                    {
+                        put("Mã phiếu", String.format("#%s", inputTicketSelected.getId()));
+                        put("Thời gian tạo phiếu", inputTicketSelected.getTimeCreate());
+                        put("Nhân viên tạo phiếu", accountBLL
+                                .getOneAccountById(String.valueOf(inputTicketSelected.getEmployeeId())).getFullname());
+                        put("Nhà cung cấp",
+                                supplierBLL.getOneSupplierById(inputTicketSelected.getSupplierId()).getName());
+                        put("Tổng tiền nhập (VNĐ)", CommonPL.moneyLongToMoneyFormat(
+                                new BigInteger(String.valueOf(inputTicketSelected.getTotalPrice()))) + "đ");
+                        put("Trạng thái", inputTicketSelected.getStatus() == 2 ? "Đã nhập hàng"
+                                : inputTicketSelected.getStatus() == 1 ? "Đã huỷ phiếu" : "Đang chờ xác nhận");
+                    }
+                };
+                String descTable = "Chi tiết phiếu nhập";
+                Map<String, String> headTables = new LinkedHashMap<>() {
+                    {
+                        put("Mã món ăn", "10%");
+                        put("Tên món ăn", "38%");
+                        put("Giá nhập (VNĐ)", "14%");
+                        put("Số lượng", "14%");
+                        put("Thành tiền (VNĐ)", "24%");
+                    }
+                };
+                ArrayList<InputTicketDetailDTO> inputTicketDetails = inputTicketDetailBLL
+                        .getAllInputTicketDetailByInputTicketId(String.valueOf(inputTicketSelected.getId()));
+                String[][] bodyTables = new String[inputTicketDetails.size()][headTables.size()];
+                for (int i = 0; i < inputTicketDetails.size(); i++) {
+                    bodyTables[i][0] = inputTicketDetails.get(i).getFoodId();
+                    bodyTables[i][1] = foodBLL.getOneFoodById(inputTicketDetails.get(i).getFoodId()).getName();
+                    bodyTables[i][2] = CommonPL.moneyLongToMoneyFormat(
+                            new BigInteger(String.valueOf(inputTicketDetails.get(i).getPrice())));
+                    bodyTables[i][3] = String.valueOf(inputTicketDetails.get(i).getQuantity());
+                    bodyTables[i][4] = CommonPL.moneyLongToMoneyFormat(
+                            new BigInteger(String.valueOf(
+                                    inputTicketDetails.get(i).getPrice() * inputTicketDetails.get(i).getQuantity())));
+                }
+
+                CommonPL.printTicket(title, infos, descTable, headTables, bodyTables);
+            } else {
+                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần in phiếu");
+            }
+
+            rowSelected = -1;
+            valueSelected[0] = false;
+            tableData.clearSelection();
+        });
+
         filterDatasInTable();
         renderTableData(null, null, null);
     }
@@ -347,13 +374,13 @@ public class Admin_InputTicketManagerPL extends JPanel {
         Object[][] datasQuery = new Object[ticketList.size()][columns.length];
         for (int i = 0; i < ticketList.size(); i++) {
             InputTicketDTO ticket = ticketList.get(i);
-            AccountDTO accountDTO = accountBLL.getOneAccountById(String.valueOf(ticket.getEmployeeId()));
-            SupplierDTO supplierDTO = supplierBLL.getOneSupplierById(ticket.getSupplierId());
+            AccountDTO employee = accountBLL.getOneAccountById(String.valueOf(ticket.getEmployeeId()));
+            SupplierDTO supplier = supplierBLL.getOneSupplierById(ticket.getSupplierId());
 
             datasQuery[i][0] = String.valueOf(ticket.getId());
             datasQuery[i][1] = ticket.getTimeCreate();
-            datasQuery[i][2] = accountDTO.getFullname();
-            datasQuery[i][3] = supplierDTO.getName();
+            datasQuery[i][2] = employee.getFullname();
+            datasQuery[i][3] = supplier.getName();
             datasQuery[i][4] = CommonPL.moneyLongToMoneyFormat(BigInteger.valueOf(ticket.getTotalPrice()));
             datasQuery[i][5] = ticket.getStatus() == 2 ? "Đã nhập hàng"
                     : (ticket.getStatus() == 1 ? "Đã huỷ phiếu" : "Đang chờ xác nhận");
@@ -660,6 +687,9 @@ public class Admin_InputTicketManagerPL extends JPanel {
             addOrUpdateEmployeeTextField.setText(currentUser.getId() + " - " + currentUser.getFullname());
             ((CustomTextField) addOrUpdateEmployeeTextField).setBorderColor(Color.decode("#dedede"));
 
+            addOrUpdateTotalPriceTextField.setText("0");
+            ((CustomTextField) addOrUpdateTotalPriceTextField).setBorderColor(Color.decode("#dedede"));
+
             addOrUpdateStatusTextField.setText("Đang chờ xác nhận");
             ((CustomTextField) addOrUpdateStatusTextField).setBorderColor(Color.decode("#dedede"));
         }
@@ -678,13 +708,9 @@ public class Admin_InputTicketManagerPL extends JPanel {
             }
 
             if (object.get(2) != null) {
-                for (String employee : employeesVector) {
-                    if (employee.startsWith(String.valueOf(object.get(2)))) {
-                        addOrUpdateEmployeeTextField.setText(employee);
-                        ((CustomTextField) addOrUpdateEmployeeTextField).setBorderColor(Color.decode("#dedede"));
-                        break;
-                    }
-                }
+                AccountDTO employee = accountBLL.getOneAccountById(String.valueOf(object.get(2)));
+                addOrUpdateEmployeeTextField.setText(employee.getId() + " - " + employee.getFullname());
+                ((CustomTextField) addOrUpdateEmployeeTextField).setBorderColor(Color.decode("#dedede"));
             }
 
             if (object.get(3) != null) {
@@ -738,70 +764,76 @@ public class Admin_InputTicketManagerPL extends JPanel {
         }
 
         addOrUpdateButton.addActionListener(e -> {
-            Integer id = !addOrUpdateIdTextField.getText().equals(defaultValuesForCrud.get("id"))
-                    ? Integer.parseInt(addOrUpdateIdTextField.getText())
-                    : null;
-            String timeCreate = !addOrUpdateTimeCreateTextField.getText().equals(defaultValuesForCrud.get("timeCreate"))
-                    ? addOrUpdateTimeCreateTextField.getText()
-                    : null;
-            Integer employee = !addOrUpdateEmployeeTextField.getText().equals(defaultValuesForCrud.get("employee"))
-                    ? Integer.parseInt(addOrUpdateEmployeeTextField.getText().split(" - ")[0])
-                    : null;
-            String supplier = !addOrUpdateSupplierComboBox.getSelectedItem()
-                    .equals(defaultValuesForCrud.get("supplier"))
-                            ? String.valueOf(addOrUpdateSupplierComboBox.getSelectedItem()).split(" - ")[0]
-                            : null;
-            Long totalPrice = !addOrUpdateTotalPriceTextField.getText()
-                    .equals(defaultValuesForCrud.get("totalPrice"))
-                            ? Long.parseLong(addOrUpdateTotalPriceTextField.getText())
-                            : null;
-            Integer status = !addOrUpdateStatusTextField.getText().equals(defaultValuesForCrud.get("status"))
-                    ? (addOrUpdateStatusTextField.getText().equals("Đang chờ xác nhận") ? 0 : null)
-                    : null;
-
-            // - Biến chứa thông báo trả về
-            String inform = null;
-            // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-            if (title.equals("Thêm Phiếu nhập") && button.equals("Thêm")) {
-                inform = inputTicketBLL.insertInputTicket(id, timeCreate, employee, supplier, totalPrice, status,
-                        addOrUpdateTableData.getRowCount());
-            }
-            // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-            if (inform.equals("Thêm phiếu nhập thành công")) {
+            CommonPL.createSelectionsDialog("Thông báo lựa chọn", "Có chắc chắn thêm phiếu nhập này?",
+                    valueSelected);
+            if (valueSelected[0]) {
+                Integer inputTicketId = !addOrUpdateIdTextField.getText().equals(defaultValuesForCrud.get("id"))
+                        ? Integer.parseInt(addOrUpdateIdTextField.getText())
+                        : null;
+                String timeCreate = !addOrUpdateTimeCreateTextField.getText()
+                        .equals(defaultValuesForCrud.get("timeCreate"))
+                                ? addOrUpdateTimeCreateTextField.getText()
+                                : null;
+                Integer employee = !addOrUpdateEmployeeTextField.getText().equals(defaultValuesForCrud.get("employee"))
+                        ? Integer.parseInt(addOrUpdateEmployeeTextField.getText().split(" - ")[0])
+                        : null;
+                String supplier = !addOrUpdateSupplierComboBox.getSelectedItem()
+                        .equals(defaultValuesForCrud.get("supplier"))
+                                ? String.valueOf(addOrUpdateSupplierComboBox.getSelectedItem()).split(" - ")[0]
+                                : null;
+                Long totalPrice = !addOrUpdateTotalPriceTextField.getText()
+                        .equals(defaultValuesForCrud.get("totalPrice"))
+                                ? Long.parseLong(addOrUpdateTotalPriceTextField.getText())
+                                : null;
+                Integer status = !addOrUpdateStatusTextField.getText().equals(defaultValuesForCrud.get("status"))
+                        ? (addOrUpdateStatusTextField.getText().equals("Đang chờ xác nhận") ? 0 : null)
+                        : null;
+                Vector<InputTicketDetailDTO> inputTicketDetails = new Vector<>();
                 for (int i = 0; i < addOrUpdateTableData.getRowCount(); i++) {
                     String foodId = String.valueOf(addOrUpdateTableData.getValueAt(i, 0));
                     Long price = CommonPL.moneyFormatToMoneyLong(String.valueOf(addOrUpdateTableData.getValueAt(i, 2)));
                     Long quantity = Long.parseLong(String.valueOf(addOrUpdateTableData.getValueAt(i, 3)));
-                    String detailInform = inputTicketDetailBLL.insertInputTicketDetail(id,
-                            foodId, price, quantity);
-                    if (!detailInform.equals("Thêm chi tiết phiếu nhập thành công")) {
-                        CommonPL.createErrorDialog("Thông báo lỗi", "Lỗi khi thêm chi tiết: " +
-                                detailInform);
-                        return;
-                    }
+                    inputTicketDetails.add(new InputTicketDetailDTO(inputTicketId, foodId, price, quantity));
                 }
 
-                CommonPL.createSuccessDialog("Thông báo thành công", inform);
-                addOrUpdateDialog.dispose();
-                resetPage();
-            } else {
-                CommonPL.createErrorDialog("Thông báo lỗi", inform);
+                // - Biến chứa thông báo trả về
+                String inform = null;
+                // - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+                if (title.equals("Thêm Phiếu nhập") && button.equals("Thêm")) {
+                    inform = inputTicketBLL.insertInputTicket(inputTicketId, timeCreate,
+                            employee, supplier, totalPrice,
+                            status,
+                            inputTicketDetails);
+                }
+                // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+                if (inform.equals("Thêm phiếu nhập thành công")) {
+                    CommonPL.createSuccessDialog("Thông báo thành công", inform);
+                    addOrUpdateDialog.dispose();
+                    resetPage();
+                } else {
+                    CommonPL.createErrorDialog("Thông báo lỗi", inform);
+                }
             }
+            valueSelected[0] = false;
         });
 
         addOrUpdateCompleteButton.addActionListener(e -> {
             CommonPL.createSelectionsDialog("Thông báo lựa chọn", "Có chắc chắn đã nhập hàng từ phiếu này?",
                     valueSelected);
             if (valueSelected[0]) {
-                String id = addOrUpdateIdTextField.getText();
-                String result = inputTicketBLL.updateStatusInputTicket(id, 2);
-                if (result.equals("Thay đổi trạng thái phiếu nhập thành công")) {
-                    for (int i = 0; i < addOrUpdateTableData.getRowCount(); i++) {
-                        String foodId = String.valueOf(addOrUpdateTableData.getValueAt(i, 0));
-                        Long quantity = Long.parseLong(String.valueOf(addOrUpdateTableData.getValueAt(i, 3)));
-                        foodBLL.updateInventoryFood("create", foodId, quantity);
-                    }
+                Integer inputTicketId = Integer.parseInt(addOrUpdateIdTextField.getText());
 
+                Vector<InputTicketDetailDTO> inputTicketDetails = new Vector<>();
+                for (int i = 0; i < addOrUpdateTableData.getRowCount(); i++) {
+                    String foodId = String.valueOf(addOrUpdateTableData.getValueAt(i, 0));
+                    Long price = CommonPL.moneyFormatToMoneyLong(String.valueOf(addOrUpdateTableData.getValueAt(i, 2)));
+                    Long quantity = Long.parseLong(String.valueOf(addOrUpdateTableData.getValueAt(i, 3)));
+                    inputTicketDetails
+                            .add(new InputTicketDetailDTO(inputTicketId, foodId, price, quantity));
+                }
+
+                String result = inputTicketBLL.updateStatusInputTicket(inputTicketId, 2, inputTicketDetails);
+                if (result.equals("Thay đổi trạng thái phiếu nhập thành công")) {
                     CommonPL.createSuccessDialog("Thông báo thành công", "Phiếu nhập đã nhập hàng");
                     addOrUpdateDialog.dispose();
                     resetPage();
@@ -815,8 +847,9 @@ public class Admin_InputTicketManagerPL extends JPanel {
         addOrUpdateDeleteButton.addActionListener(e -> {
             CommonPL.createSelectionsDialog("Thông báo lựa chọn", "Có chắc chắn muốn hủy phiếu này?", valueSelected);
             if (valueSelected[0]) {
-                String id = addOrUpdateIdTextField.getText();
-                String result = inputTicketBLL.updateStatusInputTicket(id, 1);
+                Integer inputTicketId = Integer.parseInt(addOrUpdateIdTextField.getText());
+
+                String result = inputTicketBLL.updateStatusInputTicket(inputTicketId, 1, new Vector<>());
                 if (result.equals("Thay đổi trạng thái phiếu nhập thành công")) {
                     CommonPL.createSuccessDialog("Thông báo thành công", "Phiếu nhập đã huỷ");
                     addOrUpdateDialog.dispose();

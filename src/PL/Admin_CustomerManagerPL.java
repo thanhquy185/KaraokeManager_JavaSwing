@@ -815,69 +815,75 @@ public class Admin_CustomerManagerPL extends JPanel {
 		addOrUpdateButton.setBounds(20, 590, 460, 40);
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 		addOrUpdateButton.addActionListener(e -> {
-			// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
-			// + CCCD (Căn cước công dân)
-			String id = !addOrUpdateIdCardTextField.getText().equals(defaultValuesForCrud.get("idCard"))
-					? addOrUpdateIdCardTextField.getText()
-					: null;
-			// + Loại khách hàng
-			String type = !String.valueOf(addOrUpdateTypeComboBox.getSelectedItem())
-					.equals(defaultValuesForCrud.get("type"))
-							? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
-							: null;
-			// + Tên khách hàng
-			String fullname = !addOrUpdateFullnameTextField.getText().equals(defaultValuesForCrud.get("fullname"))
-					? addOrUpdateFullnameTextField.getText()
-					: null;
-			// + Ngày sinh
-			String birthday = !String.valueOf(addOrUpdateBirthdayDatePicker.getEditor().getText())
-					.equals(defaultValuesForCrud.get("birthday"))
-							? String.valueOf(addOrUpdateBirthdayDatePicker.getEditor().getText())
-							: null;
-			// + Giới tính
-			String gender = !String.valueOf(addOrUpdateGenderComboBox.getSelectedItem())
-					.equals(defaultValuesForCrud.get("gender"))
-							? String.valueOf(addOrUpdateGenderComboBox.getSelectedItem())
-							: null;
-			// + Số điện thoại
-			String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
-					? addOrUpdatePhoneTextField.getText()
-					: null;
-			// + Email
-			String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
-					? addOrUpdateEmailTextField.getText()
-					: null;
-			// + Địa chỉ
-			String address = !addOrUpdateAddressTextField.getText().equals(defaultValuesForCrud.get("address"))
-					? addOrUpdateAddressTextField.getText()
-					: null;
-			// + Trạng thái
-			String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
-					.equals(defaultValuesForCrud.get("status"))
-							? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
-							: null;
-			// + Ngày cập nhật
-			String timeUpdate = CommonPL.getCurrentDatetime();
+			CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+					String.format("Có chắc chắn %s khách hàng này?", button.toLowerCase()),
+					valueSelected);
+			if (valueSelected[0]) {
+				// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
+				// + CCCD (Căn cước công dân)
+				String id = !addOrUpdateIdCardTextField.getText().equals(defaultValuesForCrud.get("idCard"))
+						? addOrUpdateIdCardTextField.getText()
+						: null;
+				// + Loại khách hàng
+				String type = !String.valueOf(addOrUpdateTypeComboBox.getSelectedItem())
+						.equals(defaultValuesForCrud.get("type"))
+								? String.valueOf(addOrUpdateTypeComboBox.getSelectedItem()).split(" - ")[0]
+								: null;
+				// + Tên khách hàng
+				String fullname = !addOrUpdateFullnameTextField.getText().equals(defaultValuesForCrud.get("fullname"))
+						? addOrUpdateFullnameTextField.getText()
+						: null;
+				// + Ngày sinh
+				String birthday = !String.valueOf(addOrUpdateBirthdayDatePicker.getEditor().getText())
+						.equals(defaultValuesForCrud.get("birthday"))
+								? String.valueOf(addOrUpdateBirthdayDatePicker.getEditor().getText())
+								: null;
+				// + Giới tính
+				String gender = !String.valueOf(addOrUpdateGenderComboBox.getSelectedItem())
+						.equals(defaultValuesForCrud.get("gender"))
+								? String.valueOf(addOrUpdateGenderComboBox.getSelectedItem())
+								: null;
+				// + Số điện thoại
+				String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
+						? addOrUpdatePhoneTextField.getText()
+						: null;
+				// + Email
+				String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
+						? addOrUpdateEmailTextField.getText()
+						: null;
+				// + Địa chỉ
+				String address = !addOrUpdateAddressTextField.getText().equals(defaultValuesForCrud.get("address"))
+						? addOrUpdateAddressTextField.getText()
+						: null;
+				// + Trạng thái
+				String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+						.equals(defaultValuesForCrud.get("status"))
+								? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+								: null;
+				// + Ngày cập nhật
+				String timeUpdate = CommonPL.getCurrentDatetime();
 
-			// - Biến chứa thông báo trả về
-			String inform = null;
-			// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-			if (title.equals("Thêm Khách hàng") && button.equals("Thêm")) {
-				inform = customerBLL.insertCustomer(id, type, fullname, birthday, gender, phone, email, address, status,
-						timeUpdate);
-			} else if (title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi")) {
-				inform = customerBLL.updateCustomer(id, type, fullname, birthday, gender, phone, email, address,
-						timeUpdate);
+				// - Biến chứa thông báo trả về
+				String inform = null;
+				// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+				if (title.equals("Thêm Khách hàng") && button.equals("Thêm")) {
+					inform = customerBLL.insertCustomer(id, type, fullname, birthday, gender, phone, email, address,
+							status,
+							timeUpdate);
+				} else if (title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi")) {
+					inform = customerBLL.updateCustomer(id, type, fullname, birthday, gender, phone, email, address,
+							timeUpdate);
+				}
+				// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+				if (inform.equals("Có thể thêm một khách hàng") || inform.equals("Có thể thay đổi một khách hàng")) {
+					CommonPL.createSuccessDialog("Thông báo thành công", String.format("%s thành công", button));
+					addOrUpdateDialog.dispose();
+					resetPage();
+				} else {
+					CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				}
 			}
-			// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-			if (inform.equals("Có thể thêm một khách hàng") || inform.equals("Có thể thay đổi một khách hàng")) {
-				CommonPL.createSuccessDialog("Thông báo thành công", String.format("%s thành công", button));
-				addOrUpdateDialog.dispose();
-				resetPage();
-			} else {
-				CommonPL.createErrorDialog("Thông báo lỗi", inform);
-			}
-
+			valueSelected[0] = false;
 		});
 
 		// - Tuỳ chỉnh Add Or Update Block Panel

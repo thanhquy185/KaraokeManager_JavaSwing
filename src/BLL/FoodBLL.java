@@ -173,17 +173,22 @@ public class FoodBLL {
     // - Hàm cập nhật tồn kho một món ăn
     public String updateInventoryFood(String action, String id, Long inventory) {
         // Đối tượng chứa món ăn cần cập nhật
-        FoodDTO updatedfood = getOneFoodById(id);
+        FoodDTO updatedFood = getOneFoodById(id);
 
         // Kiểm tra hành động và tồn kho hiện tại mà cập nhật trạng thái tương ứng
-        Long inventoryCurrent = updatedfood.getInventory();
+        Long currentInventory = updatedFood.getInventory();
         if (action.equals("create")) {
-            updatedfood.setInventory(inventoryCurrent + inventory);
-            updatedfood.setStatus(true);
+            updatedFood.setInventory(currentInventory + inventory);
+            if (currentInventory == 0) {
+                updatedFood.setStatus(true);
+            }
         } else if (action.equals("delete")) {
-
+            updatedFood.setInventory(currentInventory - inventory);
+            if (currentInventory - inventory == 0) {
+                updatedFood.setStatus(false);
+            }
         }
-        foodDAL.updateInventory(updatedfood);
+        foodDAL.updateInventory(updatedFood);
 
         return "Có thể thay đổi tồn kho  một món ăn";
     }
