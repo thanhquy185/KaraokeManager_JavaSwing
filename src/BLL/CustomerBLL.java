@@ -152,7 +152,8 @@ public class CustomerBLL {
 	public String insertCustomer(String idCard, String type, String fullname, String birthday, String gender,
 			String phone, String email, String address, String status, String timeUpdate) {
 		// - Kiểm tra các trường hợp
-		if (!isInputedIdCard(idCard) && !isSelectedType(type) && !isInputedFullname(fullname) && !isInputedPhone(phone) && !isSelectedStatus(status)) {
+		if (!isInputedIdCard(idCard) && !isSelectedType(type) && !isInputedFullname(fullname) && !isInputedPhone(phone)
+				&& !isSelectedStatus(status)) {
 			return "Chưa nhập đầy đủ các thông tin khách hàng cần thiết";
 		}
 		if (!isInputedIdCard(idCard)) {
@@ -171,7 +172,7 @@ public class CustomerBLL {
 			return "Chưa chọn trạng thái";
 		}
 		if (!isValidIdCard(idCard) && !isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email)
-				&& !isValidAddress(address)  && !isValidStatus(status)) {
+				&& !isValidAddress(address) && !isValidStatus(status)) {
 			return "Nhập sai định dạng nhiều thông tin khách hàng";
 		}
 		if (!isValidIdCard(idCard)) {
@@ -224,10 +225,14 @@ public class CustomerBLL {
 
 	// - Hàm cập nhật một khách hàng
 	public String updateCustomer(String idCard, String type, String fullname, String birthday, String gender,
-			String phone, String email, String address, String timeUpdate) {
+			String phone, String email, String address, String timeUpdate, String oldPhone, String oldEmail) {
 		// - Kiểm tra các trường hợp
-		if (!isInputedPhone(phone) && !isInputedFullname(fullname) && !isSelectedType(type)) {
+		if (!isInputedIdCard(idCard) && !isSelectedType(type) && !isInputedFullname(fullname)
+				&& !isInputedPhone(phone)) {
 			return "Chưa nhập đầy đủ thông tin khách hàng cần thiết";
+		}
+		if (!isInputedIdCard(idCard)) {
+			return "Chưa nhập CCCD";
 		}
 		if (!isSelectedType(type)) {
 			return "Chưa chọn loại khách hàng";
@@ -238,8 +243,12 @@ public class CustomerBLL {
 		if (!isInputedPhone(phone)) {
 			return "Chưa nhập số điện thoại";
 		}
-		if (!isValidIdCard(idCard) && !isValidType(type) && !isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email) && !isValidAddress(address)) {
+		if (!isValidIdCard(idCard) && !isValidType(type) && !isValidFullname(fullname) && !isValidPhone(phone)
+				&& !isValidEmail(email) && !isValidAddress(address)) {
 			return "Nhập sai định dạng thông tin khách hàng";
+		}
+		if (!isValidIdCard(idCard)) {
+			return "Nhập sai định dạng CCCD";
 		}
 		if (!isValidType(type)) {
 			return "Chọn sai định dạng mã loại khách hàng";
@@ -250,11 +259,21 @@ public class CustomerBLL {
 		if (!isValidPhone(phone)) {
 			return "Nhập sai định dạng số điện thoại";
 		}
-		if (!isValidEmail(email)) {
+		if (email != null && !isValidEmail(email)) {
 			return "Nhập sai định dạng email";
 		}
-		if (!isValidAddress(address)) {
+		if (address != null && !isValidAddress(address)) {
 			return "Nhập sai định dạng địa chỉ";
+		}
+		if (!phone.equals(oldPhone) && isExistsPhone(phone)
+				&& email != null && oldEmail != null && !email.equals(oldEmail) && isExistsEmail(email)) {
+			return "Nhiều thông tin khách hàng đã tồn tại";
+		}
+		if (!phone.equals(oldPhone) && isExistsPhone(phone)) {
+			return "Số điện thoại đã tồn tại";
+		}
+		if (email != null && oldEmail != null && !email.equals(oldEmail) && isExistsEmail(email)) {
+			return "Email đã tồn tại";
 		}
 
 		// - Nếu thoả mãn hết thì thêm vào CSDL
@@ -266,12 +285,13 @@ public class CustomerBLL {
 		String customerPhone = phone;
 		String customerEmail = email;
 		String customerAddress = address;
-//		boolean customerStatus = status.equals("Hoạt động") ? true : false;
+		// boolean customerStatus = status.equals("Hoạt động") ? true : false;
 		String customertimeUpdate = timeUpdate;
-		CustomerDTO updateCustomerDTO = new CustomerDTO(customerIdCard, customerType, customerFullname, customerBirthday,
+		CustomerDTO updateCustomerDTO = new CustomerDTO(customerIdCard, customerType, customerFullname,
+				customerBirthday,
 				customerGender, customerPhone, customerEmail, customerAddress, null, customertimeUpdate);
 		customerDAL.update(updateCustomerDTO);
-		
+
 		return "Có thể thay đổi một khách hàng";
 	}
 

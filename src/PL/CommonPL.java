@@ -2389,12 +2389,13 @@ public class CommonPL {
 					}
 
 					// - Cập nhật lại màu chữ theo ý nghĩa của chuỗi
-					if (status.equals("Đã nhập hàng") || status.equals("Đã thanh toán") || status.equals("Hoạt động")) {
+					if (status.equals("Đã nhập hàng") || status.equals("Đã thanh toán") || status.equals("Hoạt động")
+							|| status.equals("Đang bán")) {
 						statusLabel.setForeground(Color.decode("#33CC00"));
 					} else if (status.equals("Chưa thanh toán")) {
 						statusLabel.setForeground(Color.decode("#FFCC33"));
 					} else if (status.equals("Đã huỷ đơn") || status.equals("Đã huỷ phiếu")
-							|| status.equals("Tạm dừng")) {
+							|| status.equals("Tạm dừng") || status.equals("Dừng bán")) {
 						statusLabel.setForeground(Color.decode("#EE0000"));
 					} else if (status.equals("Đang chờ xác nhận")) {
 						statusLabel.setForeground(Color.decode("#AAAAAA"));

@@ -85,7 +85,7 @@ public class FoodBLL {
             return "Chưa nhập tên món ăn";
         }
         if (!isInputCategory(category)) {
-            return "Chưa nhập loại món ăn";
+            return "Chưa chọn loại món ăn";
         }
         if (!isInputPrice(priceStr)) {
             return "Chưa nhập giá bán";

@@ -1033,7 +1033,7 @@ public class Admin_AccountManagerPL extends JPanel {
 						privilegeId, status, timeUpdate);
 			} else if (title.equals("Thay đổi Người dùng") && button.equals("Thay đổi")) {
 				inform = accountBLL.updateAccount(id, fullname, phone, email, address, password,
-						privilegeId, timeUpdate);
+						privilegeId, timeUpdate, String.valueOf(object.get(2)), String.valueOf(object.get(3)));
 			}
 			// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
 			if (inform.equals("Có thể thêm một người dùng") || inform.equals("Có thể thay đổi một người dùng")) {

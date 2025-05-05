@@ -195,7 +195,7 @@ public class Admin_RoomManagerPL extends JPanel {
         lockButton.setBounds(465, 15, 210, 40);
 
         tableData = CommonPL.createTableData(columns, widthColumns, datas, "room manager");
-        tableScrollPane = CommonPL.createScrollPane(true, true, tableData);
+        tableScrollPane = CommonPL.createScrollPane(true, false, tableData);
         tableScrollPane.setBounds(15, 70, 1110, 400);
 
         dataPanel = new CommonPL.RoundedPanel(12);
@@ -333,7 +333,7 @@ public class Admin_RoomManagerPL extends JPanel {
 
         CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
 
-        CommonPL.resetMapForFilter(statusRadios, typesStringForFilter, typeButton);
+        CommonPL.resetMapForFilter(typeRadios, typesStringForFilter, typeButton);
 
         CommonPL.resetMapForFilter(statusRadios, statusString, statusButton);
 

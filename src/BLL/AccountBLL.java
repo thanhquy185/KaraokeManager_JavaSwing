@@ -344,7 +344,7 @@ public class AccountBLL {
 
 	// - Hàm cập nhật một người dùng
 	public String updateAccount(String id, String fullname, String phone, String email, String address, String password,
-			String privilegeId, String timeUpdate) {
+			String privilegeId, String timeUpdate, String oldPhone, String oldEmail) {
 		// - Kiểm tra các trường hợp
 		if (!isInputedPassword(password) && !isSelectedPrivilege(privilegeId)) {
 			return "Chưa nhập đầy đủ thông tin người dùng cần thiết";
@@ -377,13 +377,15 @@ public class AccountBLL {
 		if (!isValidPrivilege(privilegeId)) {
 			return "Chọn sai định dạng quyền";
 		}
-		if (isExistsPhone(phone) && isExistsEmail(email)) {
+		if (phone != null && oldPhone != null && !phone.equals(oldPhone) && isExistsPhone(phone) && email != null
+				&& oldEmail != null && email.equals(oldEmail) && isExistsEmail(email)) {
 			return "Nhiều thông tin người dùng đã tồn tại";
 		}
-		if (isExistsPhone(phone)) {
+		if (phone != null && oldPhone != null && !phone.equals(oldPhone) && isExistsPhone(phone)) {
 			return "Số điện thoại đã tồn tại";
 		}
-		if (isExistsEmail(email)) {
+		if (email != null
+				&& oldEmail != null && email.equals(oldEmail) && isExistsEmail(email)) {
 			return "Email đã tồn tại";
 		}
 

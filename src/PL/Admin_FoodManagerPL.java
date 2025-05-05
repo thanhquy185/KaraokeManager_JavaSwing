@@ -376,7 +376,7 @@ public class Admin_FoodManagerPL extends JPanel {
 			datasQuery[i][2] = categoryBLL.getOneCategoryById(foodList.get(i).getCategory()).getName();
 			datasQuery[i][3] = foodList.get(i).getInventory();
 			datasQuery[i][4] = CommonPL.moneyLongToMoneyFormat(BigInteger.valueOf(foodList.get(i).getPrice()));
-			datasQuery[i][5] = foodList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng";
+			datasQuery[i][5] = foodList.get(i).getStatus() ? "Đang bán" : "Dừng bán";
 		}
 		datas = datasQuery;
 		CommonPL.updateRowsInTableData(tableData, datas);

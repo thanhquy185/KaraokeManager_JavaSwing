@@ -393,7 +393,7 @@ public class Admin_CategoryManagerPL extends JPanel {
                     inform = categoryBLL.updateCategory(id, name, timeUpdate);
                 }
                 // - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-                if (inform.equals("Thêm Loại món ăn thành công") || inform.equals("Cập nhật loại món ăn thành công")) {
+                if (inform.equals("Thêm loại món ăn thành công") || inform.equals("Cập nhật loại món ăn thành công")) {
                     CommonPL.createSuccessDialog("Thông báo thành công", inform);
                     addOrUpdateDialog.dispose();
                     resetPage();

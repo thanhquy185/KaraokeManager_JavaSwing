@@ -29,6 +29,7 @@ import BLL.CustomerBLL;
 import BLL.CustomerTypeBLL;
 import DTO.CustomerDTO;
 import PL.CommonPL.CustomCornerDatePicker.CustomRoundedBorder;
+import PL.CommonPL.CustomTextField;
 
 public class Admin_CustomerManagerPL extends JPanel {
 	// Các đối tượng từ tầng Bussiness Logical Layer
@@ -732,7 +733,9 @@ public class Admin_CustomerManagerPL extends JPanel {
 			if (object.get(0) != null) {
 				addOrUpdateIdCardTextField.setText(String.valueOf(object.get(0)));
 				addOrUpdateIdCardTextField.setCaretPosition(0);
-				addOrUpdateIdCardTextField.setForeground(Color.BLACK);
+				addOrUpdateIdCardTextField.setEnabled(false);
+				addOrUpdateIdCardTextField.setBackground(Color.decode("#dedede"));
+				((CustomTextField) addOrUpdateIdCardTextField).setBorderColor(Color.decode("#dedede"));
 			}
 
 			// - Gán dữ liệu là "Loại khách hàng"
@@ -872,7 +875,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 							timeUpdate);
 				} else if (title.equals("Thay đổi Khách hàng") && button.equals("Thay đổi")) {
 					inform = customerBLL.updateCustomer(id, type, fullname, birthday, gender, phone, email, address,
-							timeUpdate);
+							timeUpdate, String.valueOf(object.get(5)), String.valueOf(object.get(6)));
 				}
 				// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
 				if (inform.equals("Có thể thêm một khách hàng") || inform.equals("Có thể thay đổi một khách hàng")) {
