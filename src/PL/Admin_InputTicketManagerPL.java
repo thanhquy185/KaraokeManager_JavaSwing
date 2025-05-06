@@ -53,7 +53,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
     private JTextField findInputTextField;
     private JButton findInformButton;
     private JLabel sortLabel;
-    private Map<String, Boolean> sortCheckboxs;
+    private Map<String, Boolean> sortRadios;
     private JButton sortButton;
     private JLabel dateCreateLabel;
     private JButton dateCreateInformButton;
@@ -181,8 +181,8 @@ public class Admin_InputTicketManagerPL extends JPanel {
         sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
         sortLabel.setBounds(390, 15, 360, 24);
 
-        sortCheckboxs = CommonPL.getMapHasValues(sortsString);
-        sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sortsString[0],
+        sortRadios = CommonPL.getMapHasValues(sortsString);
+        sortButton = CommonPL.ButtonHasRadios.createButtonHasRadios(sortRadios, sortsString[0],
                 Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         sortButton.setBounds(390, 45, 360, 40);
 
@@ -392,7 +392,7 @@ public class Admin_InputTicketManagerPL extends JPanel {
     private void resetPage() {
         findInputTextField.setText("Nhập thông tin");
         findInputTextField.setForeground(Color.LIGHT_GRAY);
-        CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
+        CommonPL.resetMapForFilter(sortRadios, sortsString, sortButton);
         CommonPL.resetMapForFilter(statusRadios, statusString, statusButton);
         dateCreateBeforeDatePicker.setDate(null);
         dateCreateAfterDatePicker.setDate(null);
@@ -403,12 +403,24 @@ public class Admin_InputTicketManagerPL extends JPanel {
         filterApplyButton.addActionListener(e -> {
             String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText()
                     : null;
-            String sortValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
+            String sortValue = CommonPL.getSQLFromRadios(sortRadios, sortsSQL);
             String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);
 
             String dateCreateCondition = "";
-            if (dateCreateBeforeDatePicker.getDate() != null && dateCreateAfterDatePicker.getDate() != null) {
-                dateCreateCondition = String.format("thoiGianTaoPhieu BETWEEN '%s' AND '%s'",
+            if (dateCreateBeforeDatePicker.getDate() != null
+                    && dateCreateAfterDatePicker.getDate() == null) {
+                dateCreateCondition = String.format(
+                        "thoiGianTaoPhieu >= '%s 00:00:00'",
+                        CommonPL.getDateFormat().format(dateCreateBeforeDatePicker.getDate()));
+            } else if (dateCreateBeforeDatePicker.getDate() == null
+                    && dateCreateAfterDatePicker.getDate() != null) {
+                dateCreateCondition = String.format(
+                        "thoiGianTaoPhieu <= '%s 00:00:00'",
+                        CommonPL.getDateFormat().format(dateCreateAfterDatePicker.getDate()));
+            } else if (dateCreateBeforeDatePicker.getDate() != null
+                    && dateCreateAfterDatePicker.getDate() != null) {
+                dateCreateCondition = String.format(
+                        "thoiGianTaoPhieu BETWEEN '%s 00:00:00' AND '%s 23:59:59'",
                         CommonPL.getDateFormat().format(dateCreateBeforeDatePicker.getDate()),
                         CommonPL.getDateFormat().format(dateCreateAfterDatePicker.getDate()));
             }

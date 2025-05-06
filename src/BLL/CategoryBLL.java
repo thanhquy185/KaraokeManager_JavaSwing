@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import DAL.CategoryDAL;
 import DTO.CategoryDTO;
+import DTO.FoodDTO;
 import DTO.SupplierDTO;
 
 public class CategoryBLL {
@@ -80,6 +81,13 @@ public class CategoryBLL {
 		CategoryDTO category = categoryDAL.selectOneById(id);
 		if (category == null)
 			return "Loại món ăn không tồn tại";
+
+		// Kiểm tra xem có món ăn nào đã liên kết với loại món ăn này chưa ?
+		FoodBLL foodBLL = new FoodBLL();
+		ArrayList<FoodDTO> listFood = foodBLL.getAllFoodByCondition(null, String.format("maLoaiMonAn = '%s'", id),
+				null);
+		if (listFood.size() > 0 && category.getStatus())
+			return "Loại món ăn này không thể khoá vì có ít nhất 1 một món ăn có liên kết đến";
 
 		// Đảo ngược trạng thái trước khi cập nhật
 		category.setStatus(!category.getStatus());

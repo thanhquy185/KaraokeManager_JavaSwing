@@ -48,7 +48,7 @@ public class Admin_FoodManagerPL extends JPanel {
 	private JTextField findInputTextField;
 	private JButton findInformButton;
 	private JLabel sortsLabel;
-	private Map<String, Boolean> sortsCheckboxs;
+	private Map<String, Boolean> sortsRadios;
 	private JButton sortsButton;
 	private JLabel categoriesLabel;
 	private Map<String, Boolean> categoriesRadios;
@@ -163,8 +163,8 @@ public class Admin_FoodManagerPL extends JPanel {
 		sortsLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortsLabel.setBounds(390, 15, 360, 24);
 
-		sortsCheckboxs = CommonPL.getMapHasValues(sortsString);
-		sortsButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortsCheckboxs, sortsString[0],
+		sortsRadios = CommonPL.getMapHasValues(sortsString);
+		sortsButton = CommonPL.ButtonHasRadios.createButtonHasRadios(sortsRadios, sortsString[0],
 				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortsButton.setBounds(390, 45, 360, 40);
 
@@ -333,16 +333,16 @@ public class Admin_FoodManagerPL extends JPanel {
 
 	// Hàm cập nhật dữ liệu loại món ăn cho việc tìm kiếm, thêm và sửa
 	private String[] renderCategoriesString(String action) {
-		ArrayList<CategoryDTO> categoryList = categoryBLL.getAllCategory();
+		ArrayList<CategoryDTO> categoryList = categoryBLL.getAllCategoryByCondition(null, "trangThai = 1", null);
 
-		int validLength = 0;
-		for (int i = 0; i < categoryList.size(); i++) {
-			if (categoryList.get(i).getStatus()) {
-				validLength++;
-			}
-		}
+		// int validLength = 0;
+		// for (int i = 0; i < categoryList.size(); i++) {
+		// if (categoryList.get(i).getStatus()) {
+		// validLength++;
+		// }
+		// }
 
-		String[] result = new String[validLength + 1];
+		String[] result = new String[categoryList.size() + 1];
 		if (action.equals("Tìm kiếm")) {
 			result[0] = "Tất cả";
 		} else if (action.equals("Thêm hoặc sửa")) {
@@ -351,15 +351,13 @@ public class Admin_FoodManagerPL extends JPanel {
 			result[0] = "";
 		}
 		for (int i = 0; i < categoryList.size(); i++) {
-			if (categoryList.get(i).getStatus()) {
-				if (action.equals("Tìm kiếm")) {
-					result[i + 1] = String.format("%s", categoryList.get(i).getName());
-				} else if (action.equals("Thêm hoặc sửa")) {
-					result[i + 1] = String.format("%s - %s", categoryList.get(i).getId(),
-							categoryList.get(i).getName());
-				} else if (action.equals("Truy vấn SQL")) {
-					result[i + 1] = String.format("maLoaiMonAn = '%s'", categoryList.get(i).getId());
-				}
+			if (action.equals("Tìm kiếm")) {
+				result[i + 1] = String.format("%s", categoryList.get(i).getName());
+			} else if (action.equals("Thêm hoặc sửa")) {
+				result[i + 1] = String.format("%s - %s", categoryList.get(i).getId(),
+						categoryList.get(i).getName());
+			} else if (action.equals("Truy vấn SQL")) {
+				result[i + 1] = String.format("maLoaiMonAn = '%s'", categoryList.get(i).getId());
 			}
 		}
 
@@ -386,7 +384,7 @@ public class Admin_FoodManagerPL extends JPanel {
 	private void resetPage() {
 		findInputTextField.setText("Nhập thông tin");
 		findInputTextField.setForeground(Color.LIGHT_GRAY);
-		CommonPL.resetMapForFilter(sortsCheckboxs, sortsString, sortsButton);
+		CommonPL.resetMapForFilter(sortsRadios, sortsString, sortsButton);
 		CommonPL.resetMapForFilter(categoriesRadios, categoriesStringForFilter, categoriesButton);
 		CommonPL.resetMapForFilter(inventoryRadios, inventoryString, inventoryButton);
 		CommonPL.resetMapForFilter(statusRadios, statusStringForFilter, statusButton);
@@ -398,7 +396,7 @@ public class Admin_FoodManagerPL extends JPanel {
 		filterApplyButton.addActionListener(e -> {
 			String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText()
 					: null;
-			String sortsValue = CommonPL.getSQLFromCheckboxs(sortsCheckboxs, sortsSQL);
+			String sortsValue = CommonPL.getSQLFromRadios(sortsRadios, sortsSQL);
 			String categoriesValue = CommonPL.getSQLFromRadios(categoriesRadios, categoriesSQL);
 			String inventoryValue = CommonPL.getSQLFromRadios(inventoryRadios, inventorySQL);
 			String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);

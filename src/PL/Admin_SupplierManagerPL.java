@@ -37,10 +37,10 @@ public class Admin_SupplierManagerPL extends JPanel {
         private JTextField findInputTextField;
         private JButton findInformButton;
         private JLabel sortLabel;
-        private Map<String, Boolean> sortCheckboxs;
+        private Map<String, Boolean> sortRadios;
         private JButton sortButton;
         private JLabel statusLabel;
-        private Map<String, Boolean> statusCheckboxs;
+        private Map<String, Boolean> statusRadios;
         private JButton statusButton;
         private JButton filterApplyButton;
         private JButton filterResetButton;
@@ -139,16 +139,16 @@ public class Admin_SupplierManagerPL extends JPanel {
                 sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
                 sortLabel.setBounds(390, 15, 360, 24);
 
-                sortCheckboxs = CommonPL.getMapHasValues(sortsString);
-                sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sortsString[0],
+                sortRadios = CommonPL.getMapHasValues(sortsString);
+                sortButton = CommonPL.ButtonHasRadios.createButtonHasRadios(sortRadios, sortsString[0],
                                 Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
                 sortButton.setBounds(390, 45, 360, 40);
 
                 statusLabel = CommonPL.getParagraphLabel("Trạng thái", Color.BLACK, CommonPL.getFontParagraphPlain());
                 statusLabel.setBounds(765, 15, 360, 24);
 
-                statusCheckboxs = CommonPL.getMapHasValues(statusString);
-                statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusCheckboxs, statusString[0],
+                statusRadios = CommonPL.getMapHasValues(statusString);
+                statusButton = CommonPL.ButtonHasRadios.createButtonHasRadios(statusRadios, statusString[0],
                                 Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
                 statusButton.setBounds(765, 45, 360, 40);
 
@@ -322,9 +322,9 @@ public class Admin_SupplierManagerPL extends JPanel {
                 findInputTextField.setText("Nhập thông tin");
                 findInputTextField.setForeground(Color.LIGHT_GRAY);
 
-                CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
+                CommonPL.resetMapForFilter(sortRadios, sortsString, sortButton);
 
-                CommonPL.resetMapForFilter(statusCheckboxs, statusString, statusButton);
+                CommonPL.resetMapForFilter(statusRadios, statusString, statusButton);
 
                 renderTableData(null, null, null);
         }
@@ -335,8 +335,8 @@ public class Admin_SupplierManagerPL extends JPanel {
                         String findValue = !findInputTextField.getText().equals("Nhập thông tin")
                                         ? findInputTextField.getText()
                                         : null;
-                        String sortValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
-                        String statusValue = CommonPL.getSQLFromRadios(statusCheckboxs, statusSQL);
+                        String sortValue = CommonPL.getSQLFromRadios(sortRadios, sortsSQL);
+                        String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);
 
                         String condition = (findValue != null
                                         ? String.format("(maNCC = '%s' OR tenNCC LIKE '%%%s%%' OR soDienThoai LIKE '%%%s%%' OR email LIKE '%%%s%%')",

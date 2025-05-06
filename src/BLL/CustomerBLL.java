@@ -182,7 +182,7 @@ public class CustomerBLL {
 			return "Nhập sai định dạng họ và tên";
 		}
 		if (!isValidPhone(phone)) {
-			return "Nhập sai định dạng số điện thoại";
+			return "Số điện thoại phải là số có 10 chữ số";
 		}
 		if (email != null && !isValidEmail(email)) {
 			return "Nhập sai định dạng email";
@@ -257,7 +257,7 @@ public class CustomerBLL {
 			return "Nhập sai định dạng họ và tên";
 		}
 		if (!isValidPhone(phone)) {
-			return "Nhập sai định dạng số điện thoại";
+			return "Số điện phải là số có 10 chữ số";
 		}
 		if (email != null && !isValidEmail(email)) {
 			return "Nhập sai định dạng email";

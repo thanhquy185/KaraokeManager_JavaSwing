@@ -47,7 +47,7 @@ public class Admin_AccountManagerPL extends JPanel {
 	private JTextField findInputTextField;
 	private JButton findInformButton;
 	private JLabel sortsLabel;
-	private Map<String, Boolean> sortsCheckboxs;
+	private Map<String, Boolean> sortsRadios;
 	private JButton sortsButton;
 	private JLabel privilegesLabel;
 	private Map<String, Boolean> privilegesRadios;
@@ -196,11 +196,11 @@ public class Admin_AccountManagerPL extends JPanel {
 		sortsLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortsLabel.setBounds(390, 15, 360, 24);
 
-		// - Tuỳ chỉnh Sorts Checkboxs
-		sortsCheckboxs = CommonPL.getMapHasValues(sortsString);
+		// - Tuỳ chỉnh Sorts Radios
+		sortsRadios = CommonPL.getMapHasValues(sortsString);
 
 		// - Tuỳ chỉnh Sorts Button
-		sortsButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortsCheckboxs, sortsString[0],
+		sortsButton = CommonPL.ButtonHasRadios.createButtonHasRadios(sortsRadios, sortsString[0],
 				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortsButton.setBounds(390, 45, 360, 40);
 
@@ -393,7 +393,7 @@ public class Admin_AccountManagerPL extends JPanel {
 		findInputTextField.setForeground(Color.LIGHT_GRAY);
 
 		// Cập nhật lại ô sắp xếp
-		CommonPL.resetMapForFilter(sortsCheckboxs, sortsString, sortsButton);
+		CommonPL.resetMapForFilter(sortsRadios, sortsString, sortsButton);
 
 		// Cập nhật lại ô quyền
 		CommonPL.resetMapForFilter(privilegesRadios, privilegesStringForFilter, privilegesButton);
@@ -413,7 +413,7 @@ public class Admin_AccountManagerPL extends JPanel {
 			String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText()
 					: null;
 			// Giá trị ô sắp xếp
-			String sortsValue = CommonPL.getSQLFromCheckboxs(sortsCheckboxs, sortsSQL);
+			String sortsValue = CommonPL.getSQLFromCheckboxs(sortsRadios, sortsSQL);
 			// Giá trị ô quyền
 			String privilegesValue = CommonPL.getSQLFromRadios(privilegesRadios, privilegesSQL);
 			// Giá trị ô trạng thái

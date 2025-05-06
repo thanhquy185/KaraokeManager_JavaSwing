@@ -42,7 +42,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 	private JButton findInformButton;
 	private JTextField findInputTextField;
 	private JLabel sortLabel;
-	private Map<String, Boolean> sortCheckboxs;
+	private Map<String, Boolean> sortRadios;
 	private JButton sortButton;
 	private JLabel genderLabel;
 	private Map<String, Boolean> genderRadios;
@@ -187,11 +187,11 @@ public class Admin_CustomerManagerPL extends JPanel {
 		sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortLabel.setBounds(390, 15, 360, 24);
 
-		// - Tuỳ chỉnh Sort Checkboxs
-		sortCheckboxs = CommonPL.getMapHasValues(sortsString);
+		// - Tuỳ chỉnh Sort Radios
+		sortRadios = CommonPL.getMapHasValues(sortsString);
 
 		// - Tuỳ chỉnh Sort Button
-		sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sortsString[0],
+		sortButton = CommonPL.ButtonHasRadios.createButtonHasRadios(sortRadios, sortsString[0],
 				Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
 		sortButton.setBounds(390, 45, 360, 40);
 
@@ -415,7 +415,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 		findInputTextField.setForeground(Color.LIGHT_GRAY);
 
 		// Cập nhật lại ô sắp xếp
-		CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
+		CommonPL.resetMapForFilter(sortRadios, sortsString, sortButton);
 
 		// Cập nhật lại ô loại khách hàng
 		CommonPL.resetMapForFilter(typeRadios, typeStringForFilter, typeButton);
@@ -438,7 +438,7 @@ public class Admin_CustomerManagerPL extends JPanel {
 			String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText()
 					: null;
 			// Giá trị ô sắp xếp
-			String sortsValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
+			String sortsValue = CommonPL.getSQLFromRadios(sortRadios, sortsSQL);
 			// Giá trị ô loại khách hàng
 			String typeValue = CommonPL.getSQLFromRadios(typeRadios, typeSQL);
 			// Giá trị ô giới tính

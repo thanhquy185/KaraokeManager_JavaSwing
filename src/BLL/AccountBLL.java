@@ -288,7 +288,7 @@ public class AccountBLL {
 			return "Nhập sai định dạng họ và tên";
 		}
 		if (!isValidPhone(phone)) {
-			return "Nhập sai định dạng số điện thoại";
+			return "Số điện thoại phải là số có 10 chữ số";
 		}
 		if (!isValidEmail(email)) {
 			return "Nhập sai định dạng email";
@@ -363,7 +363,7 @@ public class AccountBLL {
 			return "Nhập sai định dạng họ và tên";
 		}
 		if (!isValidPhone(phone)) {
-			return "Nhập sai định dạng số điện thoại";
+			return "Số điện thoại phải là số có 10 chữ số";
 		}
 		if (!isValidEmail(email)) {
 			return "Nhập sai định dạng email";
@@ -378,14 +378,14 @@ public class AccountBLL {
 			return "Chọn sai định dạng quyền";
 		}
 		if (phone != null && oldPhone != null && !phone.equals(oldPhone) && isExistsPhone(phone) && email != null
-				&& oldEmail != null && email.equals(oldEmail) && isExistsEmail(email)) {
+				&& oldEmail != null && !email.equals(oldEmail) && isExistsEmail(email)) {
 			return "Nhiều thông tin người dùng đã tồn tại";
 		}
 		if (phone != null && oldPhone != null && !phone.equals(oldPhone) && isExistsPhone(phone)) {
 			return "Số điện thoại đã tồn tại";
 		}
 		if (email != null
-				&& oldEmail != null && email.equals(oldEmail) && isExistsEmail(email)) {
+				&& oldEmail != null && !email.equals(oldEmail) && isExistsEmail(email)) {
 			return "Email đã tồn tại";
 		}
 

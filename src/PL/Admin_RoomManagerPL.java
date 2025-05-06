@@ -41,7 +41,7 @@ public class Admin_RoomManagerPL extends JPanel {
     private JTextField findInputTextField;
     private JButton findInformButton;
     private JLabel sortLabel;
-    private Map<String, Boolean> sortCheckboxs;
+    private Map<String, Boolean> sortRadios;
     private JButton sortButton;
     private JLabel typeLabel;
     private Map<String, Boolean> typeRadios;
@@ -133,8 +133,8 @@ public class Admin_RoomManagerPL extends JPanel {
         sortLabel = CommonPL.getParagraphLabel("Sắp xếp", Color.BLACK, CommonPL.getFontParagraphPlain());
         sortLabel.setBounds(390, 15, 360, 24);
 
-        sortCheckboxs = CommonPL.getMapHasValues(sortsString);
-        sortButton = CommonPL.ButtonHasCheckboxs.createButtonHasCheckboxs(sortCheckboxs, sortsString[0],
+        sortRadios = CommonPL.getMapHasValues(sortsString);
+        sortButton = CommonPL.ButtonHasRadios.createButtonHasRadios(sortRadios, sortsString[0],
                 Color.LIGHT_GRAY, Color.BLACK, CommonPL.getFontParagraphPlain());
         sortButton.setBounds(390, 45, 360, 40);
 
@@ -272,7 +272,7 @@ public class Admin_RoomManagerPL extends JPanel {
                     }
                 }
             } else {
-                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cầnkhóa");
+                CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần khóa");
             }
             rowSelected = -1;
             valueSelected[0] = false;
@@ -331,7 +331,7 @@ public class Admin_RoomManagerPL extends JPanel {
         findInputTextField.setText("Nhập thông tin");
         findInputTextField.setForeground(Color.LIGHT_GRAY);
 
-        CommonPL.resetMapForFilter(sortCheckboxs, sortsString, sortButton);
+        CommonPL.resetMapForFilter(sortRadios, sortsString, sortButton);
 
         CommonPL.resetMapForFilter(typeRadios, typesStringForFilter, typeButton);
 
@@ -345,7 +345,7 @@ public class Admin_RoomManagerPL extends JPanel {
         filterApplyButton.addActionListener(e -> {
             String findValue = !findInputTextField.getText().equals("Nhập thông tin") ? findInputTextField.getText()
                     : null;
-            String sortValue = CommonPL.getSQLFromCheckboxs(sortCheckboxs, sortsSQL);
+            String sortValue = CommonPL.getSQLFromRadios(sortRadios, sortsSQL);
             String typeValue = CommonPL.getSQLFromRadios(typeRadios, typesSQL);
             String statusValue = CommonPL.getSQLFromRadios(statusRadios, statusSQL);
 
@@ -474,8 +474,6 @@ public class Admin_RoomManagerPL extends JPanel {
                         ? (String) addOrUpdateStatusComboBox.getSelectedItem()
                         : null;
                 String timeUpdate = CommonPL.getCurrentDatetime();
-
-                System.out.println(type);
 
                 // - Biến chứa thông báo trả về
                 String inform = null;
