@@ -32,6 +32,7 @@ import DTO.AccountDTO;
 import DTO.FunctionDTO;
 import DTO.PrivilegeDTO;
 import DTO.PrivilegeDetailDTO;
+import PL.CommonPL.CustomPasswordField;
 import PL.CommonPL.CustomTextField;
 
 public class Admin_AccountManagerPL extends JPanel {
@@ -62,9 +63,18 @@ public class Admin_AccountManagerPL extends JPanel {
 	private JButton addButton;
 	private JButton updateButton;
 	private JButton lockButton;
+	private JButton changePasswordButton;
 	private JTable tableData;
 	private JScrollPane tableScrollPane;
 	private JPanel dataPanel;
+	// - Các Component của Change Password
+	private JLabel changePasswordInput01Label;
+	private JTextField changePasswordInput01TextField;
+	private JLabel changePasswordInput02Label;
+	private JTextField changePasswordInput02TextField;
+	private JButton changePasswordConfirm;
+	private JPanel changePasswordBlockPanel;
+	private JDialog changePasswordDialog;
 	// - Các Component của Add Or Update Accont Dialog (dialog thêm một người dùng)
 	private JLabel addOrUpdateIdLabel;
 	private JTextField addOrUpdateIdTextField;
@@ -275,6 +285,13 @@ public class Admin_AccountManagerPL extends JPanel {
 				Color.BLACK, Color.decode("#9f4d4d"), CommonPL.getFontParagraphBold());
 		lockButton.setBounds(465, 15, 210, 40);
 
+		// - Tuỳ chỉnh Change Password Button
+		changePasswordButton = CommonPL.getButtonHasIcon(210, 40, 30, 30, 20, 5,
+				CommonPL.getMiddlePathToShowIcon() + "change-password-icon.png", "Đổi mật khẩu", Color.BLACK,
+				Color.decode("#4a9e7d"),
+				Color.BLACK, Color.decode("#4a9e7d"), CommonPL.getFontParagraphBold());
+		changePasswordButton.setBounds(690, 15, 210, 40);
+
 		// - Tuỳ chỉnh Table Data và Table Scroll Pane
 		tableData = CommonPL.createTableData(columns, widthColumns, datas, "account manager");
 		tableScrollPane = CommonPL.createScrollPane(true, true, tableData);
@@ -288,6 +305,7 @@ public class Admin_AccountManagerPL extends JPanel {
 		dataPanel.add(addButton);
 		dataPanel.add(updateButton);
 		dataPanel.add(lockButton);
+		dataPanel.add(changePasswordButton);
 		dataPanel.add(tableScrollPane);
 		// <==================== ====================>
 
@@ -349,6 +367,16 @@ public class Admin_AccountManagerPL extends JPanel {
 				}
 			} else {
 				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần khoá");
+			}
+			rowSelected = -1;
+			valueSelected[0] = false;
+			tableData.clearSelection();
+		});
+		changePasswordButton.addActionListener(e -> {
+			if (rowSelected != -1) {
+				showChangePasswordDialog(String.valueOf(tableData.getValueAt(rowSelected, 0)));
+			} else {
+				CommonPL.createErrorDialog("Thông báo lỗi", "Vui lòng chọn 1 dòng dữ liệu cần thay đổi mật khẩu");
 			}
 			rowSelected = -1;
 			valueSelected[0] = false;
@@ -465,7 +493,7 @@ public class Admin_AccountManagerPL extends JPanel {
 			datasQuery[i][3] = (Object) accountList.get(i).getEmail();
 			datasQuery[i][4] = (Object) accountList.get(i).getAddress();
 			datasQuery[i][5] = (Object) accountList.get(i).getUsername();
-			datasQuery[i][6] = (Object) accountList.get(i).getPassword();
+			datasQuery[i][6] = "Mật khẩu đã được mã hoá";
 			datasQuery[i][7] = (Object) privilegeName;
 			datasQuery[i][8] = (Object) functionsStr;
 			datasQuery[i][9] = (Object) (accountList.get(i).getStatus() ? "Hoạt động" : "Tạm dừng");
@@ -473,6 +501,102 @@ public class Admin_AccountManagerPL extends JPanel {
 		datas = datasQuery;
 
 		CommonPL.updateRowsInTableData(tableData, datas);
+	}
+
+	// Hàm tạo một Dialog để thay đổi mật khẩu người dùng
+	private void showChangePasswordDialog(String accountId) {
+		// - Tuỳ chỉnh Change Password Input 01 Label
+		changePasswordInput01Label = CommonPL.getParagraphLabel("Mật khẩu mới lần 1", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		changePasswordInput01Label.setBounds(20, 10, 460, 40);
+
+		// - Tuỳ chỉnh Change Password Input 01 Text Field
+		changePasswordInput01TextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mật khẩu mới lần 1",
+				Color.LIGHT_GRAY,
+				Color.BLACK, CommonPL.getFontParagraphPlain());
+		changePasswordInput01TextField.setBounds(20, 50, 460, 40);
+
+		// - Tuỳ chỉnh Change Password Input 02 Label
+		changePasswordInput02Label = CommonPL.getParagraphLabel("Mật khẩu mới lần 2", Color.BLACK,
+				CommonPL.getFontParagraphPlain());
+		changePasswordInput02Label.setBounds(20, 100, 460, 40);
+
+		// - Tuỳ chỉnh Change Password Input 02 Text Field
+		changePasswordInput02TextField = new CommonPL.CustomTextField(0, 0, 0, "Nhập Mật khẩu mới lần 2",
+				Color.LIGHT_GRAY,
+				Color.BLACK, CommonPL.getFontParagraphPlain());
+		changePasswordInput02TextField.setBounds(20, 140, 460, 40);
+
+		// - Tuỳ chỉnh Change Password Button
+		changePasswordConfirm = CommonPL.getRoundedBorderButton(20, "Thay đổi", Color.decode("#4a9e7d"), Color.WHITE,
+				CommonPL.getFontParagraphBold());
+		changePasswordConfirm.setBounds(20, 230, 460, 40);
+		SwingUtilities.invokeLater(() -> changePasswordConfirm.requestFocusInWindow());
+		changePasswordConfirm.addActionListener(e -> {
+			CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+					"Có chắc chắn thay đổi mật khẩu người dùng này?",
+					valueSelected);
+			if (valueSelected[0]) {
+				// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
+				// + Mã người dùng
+				String id = accountId != null ? accountId : null;
+				// + Mật khẩu mới lần 1
+				String input01 = !changePasswordInput01TextField.getText()
+						.equals("Nhập Mật khẩu mới lần 1")
+								? changePasswordInput01TextField.getText()
+								: null;
+				// + Mật khẩu mới lần 2
+				// String phone =
+				String input02 = !changePasswordInput02TextField.getText()
+						.equals("Nhập Mật khẩu mới lần 2")
+								? changePasswordInput02TextField.getText()
+								: null;
+				// + Ngày cập nhật
+				String timeUpdate = CommonPL.getCurrentDatetime();
+
+				// - Biến chứa thông báo trả về
+				String inform = accountBLL.changePasswordAccount(accountId, input01, input02, timeUpdate);
+				if (inform.equals("Có thể thay đổi mật khẩu một người dùng")) {
+					CommonPL.createSuccessDialog("Thông báo thành công", inform);
+					changePasswordDialog.dispose();
+					resetPage();
+				} else {
+					CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				}
+			}
+			valueSelected[0] = false;
+		});
+
+		// - Tuỳ chỉnh Change Password Block Panel
+		changePasswordBlockPanel = new JPanel();
+		changePasswordBlockPanel.setLayout(null);
+		changePasswordBlockPanel.setBounds(0, 0, 500, 320);
+		changePasswordBlockPanel.setBackground(Color.WHITE);
+		changePasswordBlockPanel.add(changePasswordInput01Label);
+		changePasswordBlockPanel.add(changePasswordInput01TextField);
+		changePasswordBlockPanel.add(changePasswordInput02Label);
+		changePasswordBlockPanel.add(changePasswordInput02TextField);
+		changePasswordBlockPanel.add(changePasswordConfirm);
+		// <==================== ====================>
+
+		// Định nghĩa tính chất cho Change Password Dialog
+		changePasswordDialog = new JDialog();
+		changePasswordDialog.setTitle("Thay đổi Mật khẩu người dùng");
+		changePasswordDialog.setLayout(null);
+		changePasswordDialog.setSize(500, 320);
+		changePasswordDialog.setResizable(false);
+		changePasswordDialog.setLocationRelativeTo(null);
+		changePasswordDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		changePasswordDialog.addWindowListener(new WindowAdapter() {
+			// @Override
+			// public void windowDeactivated(WindowEvent e) {
+			// // Đóng Dialog khi mất focus (nhấn ngoài)
+			// changePasswordDialog.dispose();
+			// }
+		});
+		changePasswordDialog.add(changePasswordBlockPanel);
+		changePasswordDialog.setModal(true);
+		changePasswordDialog.setVisible(true);
 	}
 
 	// Hàm tạo một Dialog nhỏ khi nhấn để chọn địa chỉ
@@ -800,9 +924,20 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdatePasswordLabel.setBounds(20, 280, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Password Text Field
-		addOrUpdatePasswordTextField = new CommonPL.CustomTextField(0, 0, 0, defaultValuesForCrud.get("password"),
-				Color.LIGHT_GRAY,
-				Color.BLACK, CommonPL.getFontParagraphPlain());
+		if (title.equals("Thêm Người dùng") && button.equals("Thêm") && object.isEmpty()) {
+			addOrUpdatePasswordTextField = new CommonPL.CustomTextField(0, 0, 0,
+					defaultValuesForCrud.get("password"),
+					Color.LIGHT_GRAY,
+					Color.BLACK, CommonPL.getFontParagraphPlain());
+		} else {
+			addOrUpdatePasswordTextField = new CommonPL.CustomPasswordField(0, 0, 0,
+					defaultValuesForCrud.get("password"),
+					Color.LIGHT_GRAY,
+					Color.BLACK, CommonPL.getFontParagraphPlain());
+			addOrUpdatePasswordTextField.setEnabled(false);
+			((CustomPasswordField) addOrUpdatePasswordTextField).setBorderColor(Color.decode("#dedede"));
+			addOrUpdatePasswordTextField.setBackground(Color.decode("#dedede"));
+		}
 		addOrUpdatePasswordTextField.setBounds(20, 320, 460, 40);
 
 		// - Tuỳ chỉnh Add Or Update Status Label
@@ -901,7 +1036,8 @@ public class Admin_AccountManagerPL extends JPanel {
 			if (object.get(6) != null) {
 				addOrUpdatePasswordTextField.setText(String.valueOf(object.get(6)));
 				addOrUpdatePasswordTextField.setCaretPosition(0);
-				addOrUpdatePasswordTextField.setForeground(Color.BLACK);
+				((CustomPasswordField) addOrUpdatePasswordTextField).setBorderColor(Color.decode("#dedede"));
+				addOrUpdatePasswordTextField.setBackground(Color.decode("#dedede"));
 			}
 
 			// - Gán dữ liệu là "Quyền"
@@ -982,68 +1118,74 @@ public class Admin_AccountManagerPL extends JPanel {
 		addOrUpdateButton.setBounds(260, 590, 460, 40);
 		SwingUtilities.invokeLater(() -> addOrUpdateButton.requestFocusInWindow());
 		addOrUpdateButton.addActionListener(e -> {
-			// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
-			// + Mã người dùng
-			String id = !addOrUpdateIdTextField.getText().equals(defaultValuesForCrud.get("id"))
-					? addOrUpdateIdTextField.getText()
-					: null;
-			// + Tên người dùng
-			String fullname = !addOrUpdateFullnameTextField.getText().equals(defaultValuesForCrud.get("fullname"))
-					? addOrUpdateFullnameTextField.getText()
-					: null;
-			// + Số điện thoại
-			String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
-					? addOrUpdatePhoneTextField.getText()
-					: null;
-			// + Email
-			String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
-					? addOrUpdateEmailTextField.getText()
-					: null;
-			// + Địa chỉ
-			String address = !addOrUpdateAddressTextField.getText().equals(defaultValuesForCrud.get("address"))
-					? addOrUpdateAddressTextField.getText()
-					: null;
-			// + Tên tài khoản
-			String username = !addOrUpdateUsernameTextField.getText().equals(defaultValuesForCrud.get("username"))
-					? addOrUpdateUsernameTextField.getText()
-					: null;
-			// + Mật khẩu
-			String password = !addOrUpdatePasswordTextField.getText().equals(defaultValuesForCrud.get("password"))
-					? addOrUpdatePasswordTextField.getText()
-					: null;
-			// + Quyền
-			String privilegeId = !String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem())
-					.equals(defaultValuesForCrud.get("privilege"))
-							? String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem()).split(" - ")[0]
-							: null;
-			// + Trạng thái
-			String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
-					.equals(defaultValuesForCrud.get("status"))
-							? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
-							: null;
-			// + Ngày cập nhật
-			String timeUpdate = CommonPL.getCurrentDatetime();
+			CommonPL.createSelectionsDialog("Thông báo lựa chọn",
+					String.format("Có chắc chắn %s người dùng này?", button.toLowerCase()),
+					valueSelected);
+			if (valueSelected[0]) {
+				// - Lấy ra các giá trị hiện tại từ các thẻ JTextField
+				// + Mã người dùng
+				String id = !addOrUpdateIdTextField.getText().equals(defaultValuesForCrud.get("id"))
+						? addOrUpdateIdTextField.getText()
+						: null;
+				// + Tên người dùng
+				String fullname = !addOrUpdateFullnameTextField.getText().equals(defaultValuesForCrud.get("fullname"))
+						? addOrUpdateFullnameTextField.getText()
+						: null;
+				// + Số điện thoại
+				String phone = !addOrUpdatePhoneTextField.getText().equals(defaultValuesForCrud.get("phone"))
+						? addOrUpdatePhoneTextField.getText()
+						: null;
+				// + Email
+				String email = !addOrUpdateEmailTextField.getText().equals(defaultValuesForCrud.get("email"))
+						? addOrUpdateEmailTextField.getText()
+						: null;
+				// + Địa chỉ
+				String address = !addOrUpdateAddressTextField.getText().equals(defaultValuesForCrud.get("address"))
+						? addOrUpdateAddressTextField.getText()
+						: null;
+				// + Tên tài khoản
+				String username = !addOrUpdateUsernameTextField.getText().equals(defaultValuesForCrud.get("username"))
+						? addOrUpdateUsernameTextField.getText()
+						: null;
+				// + Mật khẩu
+				String password = !addOrUpdatePasswordTextField.getText().equals(defaultValuesForCrud.get("password"))
+						? addOrUpdatePasswordTextField.getText()
+						: null;
+				// + Quyền
+				String privilegeId = !String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem())
+						.equals(defaultValuesForCrud.get("privilege"))
+								? String.valueOf(addOrUpdatePrivilegeComboBox.getSelectedItem()).split(" - ")[0]
+								: null;
+				// + Trạng thái
+				String status = !String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+						.equals(defaultValuesForCrud.get("status"))
+								? String.valueOf(addOrUpdateStatusComboBox.getSelectedItem())
+								: null;
+				// + Ngày cập nhật
+				String timeUpdate = CommonPL.getCurrentDatetime();
 
-			// - Biến chứa thông báo trả về
-			String inform = null;
-			// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
-			if (title.equals("Thêm Người dùng") && button.equals("Thêm")) {
-				inform = accountBLL.insertAccount(id, fullname, phone, email, address,
-						username, password,
-						privilegeId, status, timeUpdate);
-			} else if (title.equals("Thay đổi Người dùng") && button.equals("Thay đổi")) {
-				inform = accountBLL.updateAccount(id, fullname, phone, email, address, password,
-						privilegeId, timeUpdate, String.valueOf(object.get(2)), String.valueOf(object.get(3)));
+				// - Biến chứa thông báo trả về
+				String inform = null;
+				// - Tuỳ vào tác vụ thêm hoặc thay đổi mà gọi đến hàm ở tầng BLL tương ứng
+				if (title.equals("Thêm Người dùng") && button.equals("Thêm")) {
+					inform = accountBLL.insertAccount(id, fullname, phone, email, address,
+							username, password,
+							privilegeId, status, timeUpdate);
+				} else if (title.equals("Thay đổi Người dùng") && button.equals("Thay đổi")) {
+					inform = accountBLL.updateAccount(id, fullname, phone, email, address,
+							privilegeId, timeUpdate, String.valueOf(object.get(2)), String.valueOf(object.get(3)));
+				}
+				// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
+				if (inform.equals("Có thể thêm một người dùng") || inform.equals("Có thể thay đổi một người dùng")) {
+					privilegeDetailBLL.insertPrivilegeDetail(id, privilegeId, addOrUpdatePrivilegeDetailCheckboxs);
+					CommonPL.createSuccessDialog("Thông báo thành công", inform);
+					addOrUpdateDialog.dispose();
+					resetPage();
+				} else {
+					CommonPL.createErrorDialog("Thông báo lỗi", inform);
+				}
 			}
-			// - Tuỳ vào kết quả của thông báo trả về mà thông báo và cập nhật bảng dữ liệu
-			if (inform.equals("Có thể thêm một người dùng") || inform.equals("Có thể thay đổi một người dùng")) {
-				privilegeDetailBLL.insertPrivilegeDetail(id, privilegeId, addOrUpdatePrivilegeDetailCheckboxs);
-				CommonPL.createSuccessDialog("Thông báo thành công", inform);
-				addOrUpdateDialog.dispose();
-				resetPage();
-			} else {
-				CommonPL.createErrorDialog("Thông báo lỗi", inform);
-			}
+			valueSelected[0] = false;
 		});
 
 		// - Tuỳ chỉnh Add Or Update Block Panel

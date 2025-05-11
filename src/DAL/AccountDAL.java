@@ -51,17 +51,16 @@ public class AccountDAL implements DAL<AccountDTO> {
 		Connection c = JDBCUtil.getInstance().getConnection();
 		try {
 			String sql = "UPDATE Karaoke.NguoiDung"
-					+ "\nSET hoVaTen = ?, soDienThoai = ?, email = ?, diaChi = ?, matKhau = ?, maQuyen = ?, thoiGianCapNhat = ?"
+					+ "\nSET hoVaTen = ?, soDienThoai = ?, email = ?, diaChi = ?, maQuyen = ?, thoiGianCapNhat = ?"
 					+ "\nWHERE maNguoiDung = ?";
 			PreparedStatement pstmt = c.prepareStatement(sql);
 			pstmt.setString(1, accountDTO.getFullname());
 			pstmt.setString(2, accountDTO.getPhone());
 			pstmt.setString(3, accountDTO.getEmail());
 			pstmt.setString(4, accountDTO.getAddress());
-			pstmt.setString(5, accountDTO.getPassword());
-			pstmt.setString(6, accountDTO.getPrivilegeId());
-			pstmt.setString(7, accountDTO.getTimeUpdate());
-			pstmt.setInt(8, accountDTO.getId());
+			pstmt.setString(5, accountDTO.getPrivilegeId());
+			pstmt.setString(6, accountDTO.getTimeUpdate());
+			pstmt.setInt(7, accountDTO.getId());
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {
@@ -86,6 +85,29 @@ public class AccountDAL implements DAL<AccountDTO> {
 			pstmt.setBoolean(1, accountDTO.getStatus());
 			pstmt.setString(2, accountDTO.getTimeUpdate());
 			pstmt.setInt(3, accountDTO.getId());
+			rowChange = pstmt.executeUpdate();
+			JDBCUtil.getInstance().closeConnection(c);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return rowChange;
+	}
+
+	// - Hàm thay đổi mật khẩu một người dùng
+	public int changePassword(Integer id, String newPassword, String timeUpdate) {
+		// - Biến chứa số dòng đã được thêm
+		int rowChange = 0;
+
+		// - Kết nối đến CSDL để truy vấn
+		Connection c = JDBCUtil.getInstance().getConnection();
+		try {
+			String sql = "UPDATE Karaoke.NguoiDung" + "\nSET matKhau = ?, thoiGianCapNhat = ?"
+					+ "\nWHERE maNguoiDung = ?";
+			PreparedStatement pstmt = c.prepareStatement(sql);
+			pstmt.setString(1, newPassword);
+			pstmt.setString(2, timeUpdate);
+			pstmt.setInt(3, id);
 			rowChange = pstmt.executeUpdate();
 			JDBCUtil.getInstance().closeConnection(c);
 		} catch (SQLException e) {

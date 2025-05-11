@@ -2,12 +2,17 @@ package BLL;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
 
 import PL.CommonPL;
 
@@ -175,5 +180,31 @@ public class CommonBLL {
 		double hours = minutes / 60.0;
 
 		return (long) Math.ceil(hours);
+	}
+
+	// Hàm mã hoá mật khẩu theo kiểu md5
+	public static String hashPassword(String password) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+
+			// Chuyển chuỗi thành byte để băm luôn luôn có length bằng 16
+			byte[] bytes = md.digest(password.getBytes());
+
+			// 1 biểu thị cho số dương, không cần bù 2
+			BigInteger big = new BigInteger(1, bytes);
+
+			// Chuyển sang hệ 16
+			String hashPassword = big.toString(16);
+			// Đảm bảo đủ 32 kí tự
+			while (hashPassword.length() < 32) {
+				hashPassword = "0" + hashPassword;
+			}
+
+			return hashPassword.toString();
+		} catch (NoSuchAlgorithmException exception) {
+			JOptionPane.showMessageDialog(null, exception.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+		}
+
+		return "";
 	}
 }

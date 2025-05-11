@@ -195,7 +195,8 @@ public class AccountBLL {
 	// - Hàm kiểm tra tài khoản có tồn tại hay không ?
 	public boolean isExistsAccount(String username, String password) {
 		String[] join = null;
-		String condition = String.format("tenTaiKhoan = '%s' AND matKhau = '%s'", username, password);
+		String condition = String.format("tenTaiKhoan = '%s' AND matKhau = '%s'", username,
+				CommonBLL.hashPassword(password));
 		String order = null;
 		if ((accountDAL.selectAllByCondition(join, condition, order)).size() == 0) {
 			return false;
@@ -207,7 +208,8 @@ public class AccountBLL {
 	// - Hàm kiểm tra tài khoản có đang bị khoá hay không ?
 	public boolean isAccountLocked(String username, String password) {
 		String[] join = null;
-		String condition = String.format("tenTaiKhoan = '%s' AND matKhau = '%s'", username, password);
+		String condition = String.format("tenTaiKhoan = '%s' AND matKhau = '%s'", username,
+				CommonBLL.hashPassword(password));
 		String order = null;
 		if (!(accountDAL.selectAllByCondition(join, condition, order)).get(0).getStatus()) {
 			return false;
@@ -246,7 +248,8 @@ public class AccountBLL {
 
 		// - Thoả hết thì tài khoản có thể đăng nhập
 		String[] join = null;
-		String condition = String.format("tenTaiKhoan = '%s' AND matKhau = '%s'", username, password);
+		String condition = String.format("tenTaiKhoan = '%s' AND matKhau = '%s'", username,
+				CommonBLL.hashPassword(password));
 		String order = null;
 		CommonPL.setAccountUsingApp(accountDAL.selectAllByCondition(join, condition, order).get(0));
 
@@ -331,7 +334,7 @@ public class AccountBLL {
 		String accountEmail = email;
 		String accountAddress = address;
 		String accountUsername = username;
-		String accountPassword = password;
+		String accountPassword = CommonBLL.hashPassword(password);
 		String accountPrivilegeId = privilegeId;
 		boolean accountStatus = status.equals("Hoạt động") ? true : false;
 		String accountTimeUpdate = timeUpdate;
@@ -343,20 +346,17 @@ public class AccountBLL {
 	}
 
 	// - Hàm cập nhật một người dùng
-	public String updateAccount(String id, String fullname, String phone, String email, String address, String password,
+	public String updateAccount(String id, String fullname, String phone, String email, String address,
 			String privilegeId, String timeUpdate, String oldPhone, String oldEmail) {
 		// - Kiểm tra các trường hợp
-		if (!isInputedPassword(password) && !isSelectedPrivilege(privilegeId)) {
+		if (!isSelectedPrivilege(privilegeId)) {
 			return "Chưa nhập đầy đủ thông tin người dùng cần thiết";
-		}
-		if (!isInputedPassword(password)) {
-			return "Chưa nhập mật khẩu";
 		}
 		if (!isSelectedPrivilege(privilegeId)) {
 			return "Chưa chọn quyền";
 		}
 		if (!isValidFullname(fullname) && !isValidPhone(phone) && !isValidEmail(email) && !isValidAddress(address)
-				&& !isValidPassword(password) && !isValidPrivilege(privilegeId)) {
+				&& !isValidPrivilege(privilegeId)) {
 			return "Nhập sai định dạng thông tin người dùng";
 		}
 		if (!isValidFullname(fullname)) {
@@ -370,9 +370,6 @@ public class AccountBLL {
 		}
 		if (!isValidAddress(address)) {
 			return "Nhập sai định dạng địa chỉ";
-		}
-		if (!isValidPassword(password)) {
-			return "Nhập sai định dạng mật khẩu";
 		}
 		if (!isValidPrivilege(privilegeId)) {
 			return "Chọn sai định dạng quyền";
@@ -396,7 +393,7 @@ public class AccountBLL {
 		String accountEmail = email;
 		String accountAddress = address;
 		String accountUsername = null;
-		String accountPassword = password;
+		String accountPassword = null;
 		String accountPrivilegeId = privilegeId;
 		Boolean accountStatus = null;
 		String accountTimeUpdate = timeUpdate;
@@ -416,6 +413,39 @@ public class AccountBLL {
 		accountDAL.lock(lockAccountDTO);
 
 		return "Có thể khoá một người dùng";
+	}
+
+	// - Hàm thay đổi mật khẩu một người dùng
+	public String changePasswordAccount(String id, String input01, String input02, String timeUpdate) {
+		// Kiểm tra tính hợp lệ
+		if (!isInputedPassword(input01) && !isInputedPassword(input02)) {
+			return "Chưa nhập đầy đủ thông tin cần thiết";
+		}
+		if (!isInputedPassword(input01)) {
+			return "Chưa nhập mật khẩu mới lần 1";
+		}
+		if (!isInputedPassword(input02)) {
+			return "Chưa nhập mật khẩu mới lần 2";
+		}
+		if (!isValidPassword(input01) && !isValidPassword(input02)) {
+			return "Nhập sai định dạng nhiều thông tin cần thiết";
+		}
+		if (!isValidPassword(input01)) {
+			return "Nhập sai định dạng mật khẩu mới 1";
+		}
+		if (!isValidPassword(input02)) {
+			return "Nhập sai định dạng mật khẩu mới 2";
+		}
+		if (!input01.equals(input02)) {
+			return "Mật khẩu mới 1 và 2 không giống nhau";
+		}
+
+		// Nếu thoả hết thì gọi lệnh SQL
+		Integer accountId = Integer.valueOf(id);
+		String accountPassword = CommonBLL.hashPassword(input01);
+		accountDAL.changePassword(accountId, accountPassword, timeUpdate);
+
+		return "Có thể thay đổi mật khẩu một người dùng";
 	}
 
 	// - Hàm lấy ra danh sách các người dùng hiện có trong CSDL
